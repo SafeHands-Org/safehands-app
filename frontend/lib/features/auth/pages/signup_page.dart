@@ -20,6 +20,7 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
   
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
