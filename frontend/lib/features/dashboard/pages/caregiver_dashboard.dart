@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/styles/app_theme.dart';
+import 'package:frontend/features/auth/pages/character_card.dart';
+
 
 class CaregiverDashboard extends StatelessWidget {
   const CaregiverDashboard({super.key});
@@ -35,7 +37,7 @@ class CaregiverUserCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, '/user-detail');
+        Navigator.push(context, MaterialPageRoute(builder: (context) => CharacterCard(user: user)));
       },
       child: Card(
         shape: RoundedRectangleBorder(

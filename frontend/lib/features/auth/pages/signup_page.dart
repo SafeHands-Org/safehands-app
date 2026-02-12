@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/features/auth/pages/login_page.dart';
 import 'package:frontend/styles/app_theme.dart';
+import 'package:frontend/features/dashboard/pages/caregiver_dashboard.dart';
+
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -10,6 +13,19 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   String? selectedRole;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => CaregiverDashboard()));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +85,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     TextField(
                       decoration: AppTheme.inputDecoration(
                         hintText: "Email",
+                        icon: Icons.email,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -76,6 +93,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       obscureText: true,
                       decoration: AppTheme.inputDecoration(
                         hintText: "Password",
+                        icon: Icons.lock,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -83,13 +101,14 @@ class _SignUpPageState extends State<SignUpPage> {
                       obscureText: true,
                       decoration: AppTheme.inputDecoration(
                         hintText: "Confirm Password",
+                        icon: Icons.lock,
                       ),
                     ),
                   ],
                 ),
 
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _submit,
                   style: AppTheme.buttonStyle,
                   child: const Text(
                     "Sign up",
@@ -102,7 +121,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: <Widget>[
                     const Text("Already have an account?"),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen())),
                       child: const Text(
                         "Login",
                         style: AppTheme.link,
