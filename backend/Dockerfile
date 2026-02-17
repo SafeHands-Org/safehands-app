@@ -1,10 +1,12 @@
 FROM node:25
 
-WORKDIR /app
+WORKDIR /safehands-app
 
-COPY . .
+COPY package*.json ./
 
 RUN npm install
+
+COPY . .
 
 EXPOSE 8000
 

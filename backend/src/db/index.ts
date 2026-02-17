@@ -1,17 +1,25 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
-import config from '../config/config';
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import config from "../config/config";
+import * as schema from "./schema";
 
-const pool = new Pool({
-  connectionString: config.database_url
+export const pool = new Pool({
+  connectionString: config.database_url,
 });
 
-pool.on('error', () => {
-  console.log("Error connecting to the database pool");
+pool.on("error", (err) => {
+  console.error("Unexpected PG pool error", err);
+  process.exit(1);
 });
 
-(async () => {
-  await pool.query("SELECT 1");
-})();
+export const db = drizzle(pool, { schema });
 
-export const db = drizzle(pool)
+export async function connectDB() {
+  try {
+    await pool.query("SELECT 1");
+    console.log("Database connected");
+  } catch (err) {
+    console.error("Database connection failed");
+    process.exit(1);
+  }
+}

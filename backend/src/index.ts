@@ -1,24 +1,34 @@
-import express from "express";
-import { drizzle } from 'drizzle-orm/node-postgres';
+import express, { Request, Response, NextFunction } from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 import config from './config/config';
-import usersRoutes from "./routes/user-routes";
-import familiesRoutes from "./routes/families-routes";
-import medicationsRoutes from "./routes/medication-routes";
+import authRouter from "./routes/auth.routes";
+import usersRouter from "./routes/users.routes";
+import familiesRouter from "./routes/families.routes";
+import medicationsRouter from "./routes/medications.routes";
 
+const PORT = config.app_port || 8000;
 const app = express();
-const db = drizzle(config.database_url!)
 
+app.use(cors());
 app.use(express.json());
-app.use("/users", usersRoutes);
-app.use("/families", familiesRoutes);
-app.use("/medications", medicationsRoutes);
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-app.get("/", (_req, res) => {
-  res.send("SafeHands backend is running");
+app.use((req: Request, _res: Response, next: NextFunction) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
 });
 
-app.listen(config.app_port, () => {
-  console.log(`Server running on port ${config.app_port}`);
+app.use("/api/auth", authRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/families", familiesRouter);
+app.use("/api/medications", medicationsRouter);
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK" });
 });
 
-export default app
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

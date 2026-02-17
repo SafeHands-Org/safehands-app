@@ -9,6 +9,7 @@ interface Config {
   postgres_user: string;
   postgres_password: string;
   postgres_db: string;
+  jwt_secret: string,
   node_env: string;
 }
 
@@ -19,6 +20,7 @@ const config: Config = {
   postgres_user: process.env.POSTGRES_USER || (() => { throw new Error("POSTGRES_USER not set"); })(),
   postgres_password: process.env.POSTGRES_PASSWORD || (() => { throw new Error("POSTGRES_PASSWORD not set"); })(),
   postgres_db: process.env.POSTGRES_DB || (() => { throw new Error("POSTGRES_DB not set"); })(),
+  jwt_secret: process.env.JWT_SECRET || (() => { throw new Error("JWT_SECRET not set"); })(),
   node_env: process.env.NODE_ENV || 'development'
 }
 
