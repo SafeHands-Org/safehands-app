@@ -35,16 +35,13 @@ export const familyMemberships = pgTable(
     familyId: uuid("family_id")
       .notNull()
       .references(() => families.id, { onDelete: "cascade" }),
-    role: text("role").notNull(), // admin | caregiver | viewer | patient
+    is_admin: boolean("is_admin").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
     index("family_memberships_user_idx").on(table.userId),
     index("family_memberships_family_idx").on(table.familyId),
-    uniqueIndex("family_memberships_unique_member").on(
-      table.userId,
-      table.familyId
-    ),
+    uniqueIndex("family_memberships_unique_member").on(table.userId, table.familyId),
   ]
 );
 

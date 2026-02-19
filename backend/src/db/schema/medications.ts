@@ -7,17 +7,33 @@ import {
   time,
   boolean,
   index,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { users } from "./users";
 import { familyMemberships } from "./families";
 
+export const doseFormEnum = pgEnum("dose_form", [
+  "tablet",
+  "capsule",
+  "liquid",
+  "inhaler",
+  "injection",
+  "topical",
+  "drops",
+  "patch",
+  "suppository",
+  "other",
+]);
+
 export const medications = pgTable(
   "medications",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    name: text("name").notNull(),
+    nameEntered: text("name_entered").notNull(),
+    rxcui: text("rxcui"),
     dosage: text("dosage"),
+    doseForm: doseFormEnum("dose_form").notNull(),
     instructions: text("instructions"),
     createdBy: uuid("created_by")
       .notNull()
@@ -74,7 +90,7 @@ export const medicationAdherenceLogs = pgTable(
       .references(() => familyMemberMedications.id, { onDelete: "cascade" }),
     scheduledTime: timestamp("scheduled_time").notNull(),
     takenAt: timestamp("taken_at"),
-    status: text("status").notNull(), // taken | missed | skipped
+    status: text("status").notNull(),
     recordedBy: uuid("recorded_by")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
