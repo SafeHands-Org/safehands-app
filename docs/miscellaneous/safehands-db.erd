@@ -1,0 +1,87 @@
+erdiagram safehands_db
+notation=chen
+
+entity Users {
+  id key
+  full_name
+  email
+  password
+  role 
+  createdAt
+  updatedAt
+}
+
+entity Families {
+  id key
+  name  
+  createdAt
+  updatedAt
+}
+
+entity FamilyMemberships {
+  id key
+  user_id derived
+  family_id derived
+  role
+  created_at
+}
+
+entity Invitations {
+  id key
+  email
+  family_id derived
+  role
+  token
+  expires_at
+  accepted_at
+  created_by derived
+  created_at
+}
+
+entity Medications {
+  id key
+  name
+  dosage
+  instructions
+  created_by derived
+  created_at
+}
+
+entity FamilyMemberMedications {
+  id key
+  medication_id derived
+  family_member_id derived
+  start_date
+  end_date
+  active
+}
+
+relationship CanBelongTo {
+  Users[N] -> FamilyMemberships[N]
+}
+
+// Someone has to create the family group. 
+// That person becomes the originator/admin. 
+// A single user can create multiple families (e.g., a caregiver managing two households).
+relationship CanCreate {
+  Users[1] -> Families[N]
+}
+
+// Only caregivers/admins can invite people. 
+// One user may send many invites over time.
+relationship Invite {
+  Users[1] -> Invitations[N]
+}
+
+// Invitations are scoped to a family group. 
+// A family may invite multiple members, clinicians, or caregivers.
+relationship InvitedFrom {
+  Families[1] -> Invitations[N]
+}
+
+// A medication can be taken by multiple people (e.g., insulin), 
+// and a person takes multiple medications. 
+// We need a way to assign meds per person and track start/end dates, dosage variations, etc.
+relationship TakesMedication {
+  Users[N] -> Medications[N]
+}

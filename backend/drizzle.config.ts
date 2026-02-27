@@ -6,7 +6,8 @@ export default defineConfig({
   schema: [
     "./dist/db/schema/users.js",
     "./dist/db/schema/families.js",
-    "./dist/db/schema/medications.js"
+    "./dist/db/schema/medications.js",
+    "./dist/db/schema/sessions.js"
   ],
   out: "./drizzle",
   dbCredentials: {
