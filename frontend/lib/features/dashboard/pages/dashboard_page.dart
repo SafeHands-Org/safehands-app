@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/styles/app_theme.dart';
-import 'package:frontend/features/auth/pages/character_card.dart';
+import 'package:frontend/common/character_card.dart';
+import 'package:frontend/features/auth/services/auth_service.dart';
+import 'package:frontend/features/auth/pages/auth_page.dart';
 
-
-class CaregiverDashboard extends StatelessWidget {
-  const CaregiverDashboard({super.key});
+class DashboardPage extends StatelessWidget {
+  const DashboardPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +16,15 @@ class CaregiverDashboard extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontSize: 25),
         ),
         backgroundColor: AppTheme.primary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await AuthService().clearToken();
+              Navigator.pushReplacementNamed(context, AuthPage.routeName);
+            },
+          ),
+        ],
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(15),

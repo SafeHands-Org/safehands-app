@@ -25,7 +25,6 @@ export const users = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
-    index("users_email_idx").on(table.email),
     index("users_role_idx").on(table.role),
   ]
 );

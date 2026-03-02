@@ -1,26 +1,39 @@
 import { Router } from "express";
-import {
-  createFamily, 
-  getFamilies,
+import { 
+  getUserFamilies,
+  createFamily,
+  getFamilyById,
   updateFamily,
-  deleteFamily, 
-  getFamiliesByUser,
-  getFamilyMembers} from "../controllers/families.controller";
+  deleteFamily,
+  addFamilyMember,
+  updateFamilyMember,
+  removeFamilyMember,
+  createInvitation,
+  checkInvitation,
+  acceptInvitation
+} from "../controllers/families.controller";
 
 const router = Router();
 
-router.post("/", createFamily);
+router.route("/")
+  .get(getUserFamilies)
+  .post(createFamily);
 
-router.get("/", getFamilies);
+router.route("/:id")
+  .get(getFamilyById)
+  .put(updateFamily)
+  .delete(deleteFamily);
 
-router.put("/:id", updateFamily);
+router.route("/:id/members")
+  .post(addFamilyMember)
+  .put(updateFamilyMember)
+  .delete(removeFamilyMember);
 
-router.delete("/:id", deleteFamily);
+router.route("/:id/invitations")
+  .post(createInvitation);
 
-// GET /families/user/:userId
-router.get("/user/:userId", getFamiliesByUser);
-
-// GET /families/:familyId/members
-router.get("/:familyId/members", getFamilyMembers);
+router.route("/invitations/:token")
+  .get(checkInvitation)
+  .put(acceptInvitation);
 
 export default router;
