@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/features/auth/pages/auth_page.dart';
-import 'package:frontend/features/auth/services/auth_service.dart';
+import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/features/dashboard/pages/dashboard_page.dart';
 import 'package:frontend/routes/app_router.dart';
 import 'package:frontend/features/dashboard/pages/hamburger_menu.dart';
