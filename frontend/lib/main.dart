@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/auth/pages/signup_page.dart';
+import 'package:frontend/features/dashboard/pages/hamburger_menu.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,9 +14,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'SafeHands',
       theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
       ),
-      home: const SignUpPage(),
+      home: const HomePage(),
     );
   }
 }
