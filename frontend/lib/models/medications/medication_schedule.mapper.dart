@@ -1,0 +1,230 @@
+// coverage:ignore-file
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
+// ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
+// ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
+// ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
+
+part of 'medication_schedule.dart';
+
+class MedicationScheduleMapper extends ClassMapperBase<MedicationSchedule> {
+  MedicationScheduleMapper._();
+
+  static MedicationScheduleMapper? _instance;
+  static MedicationScheduleMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = MedicationScheduleMapper._());
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'MedicationSchedule';
+
+  static String _$id(MedicationSchedule v) => v.id;
+  static const Field<MedicationSchedule, String> _f$id = Field('id', _$id);
+  static String _$medicationId(MedicationSchedule v) => v.medicationId;
+  static const Field<MedicationSchedule, String> _f$medicationId = Field(
+    'medicationId',
+    _$medicationId,
+  );
+  static ScheduleType _$type(MedicationSchedule v) => v.type;
+  static const Field<MedicationSchedule, ScheduleType> _f$type = Field(
+    'type',
+    _$type,
+  );
+  static List<String> _$times(MedicationSchedule v) => v.times;
+  static const Field<MedicationSchedule, List<String>> _f$times = Field(
+    'times',
+    _$times,
+  );
+  static List<int>? _$daysOfWeek(MedicationSchedule v) => v.daysOfWeek;
+  static const Field<MedicationSchedule, List<int>> _f$daysOfWeek = Field(
+    'daysOfWeek',
+    _$daysOfWeek,
+    opt: true,
+  );
+  static DateTime _$startDate(MedicationSchedule v) => v.startDate;
+  static const Field<MedicationSchedule, DateTime> _f$startDate = Field(
+    'startDate',
+    _$startDate,
+  );
+  static DateTime? _$endDate(MedicationSchedule v) => v.endDate;
+  static const Field<MedicationSchedule, DateTime> _f$endDate = Field(
+    'endDate',
+    _$endDate,
+    opt: true,
+  );
+
+  @override
+  final MappableFields<MedicationSchedule> fields = const {
+    #id: _f$id,
+    #medicationId: _f$medicationId,
+    #type: _f$type,
+    #times: _f$times,
+    #daysOfWeek: _f$daysOfWeek,
+    #startDate: _f$startDate,
+    #endDate: _f$endDate,
+  };
+
+  static MedicationSchedule _instantiate(DecodingData data) {
+    return MedicationSchedule(
+      id: data.dec(_f$id),
+      medicationId: data.dec(_f$medicationId),
+      type: data.dec(_f$type),
+      times: data.dec(_f$times),
+      daysOfWeek: data.dec(_f$daysOfWeek),
+      startDate: data.dec(_f$startDate),
+      endDate: data.dec(_f$endDate),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static MedicationSchedule fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<MedicationSchedule>(map);
+  }
+
+  static MedicationSchedule fromJson(String json) {
+    return ensureInitialized().decodeJson<MedicationSchedule>(json);
+  }
+}
+
+mixin MedicationScheduleMappable {
+  String toJson() {
+    return MedicationScheduleMapper.ensureInitialized()
+        .encodeJson<MedicationSchedule>(this as MedicationSchedule);
+  }
+
+  Map<String, dynamic> toMap() {
+    return MedicationScheduleMapper.ensureInitialized()
+        .encodeMap<MedicationSchedule>(this as MedicationSchedule);
+  }
+
+  MedicationScheduleCopyWith<
+    MedicationSchedule,
+    MedicationSchedule,
+    MedicationSchedule
+  >
+  get copyWith =>
+      _MedicationScheduleCopyWithImpl<MedicationSchedule, MedicationSchedule>(
+        this as MedicationSchedule,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return MedicationScheduleMapper.ensureInitialized().stringifyValue(
+      this as MedicationSchedule,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return MedicationScheduleMapper.ensureInitialized().equalsValue(
+      this as MedicationSchedule,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return MedicationScheduleMapper.ensureInitialized().hashValue(
+      this as MedicationSchedule,
+    );
+  }
+}
+
+extension MedicationScheduleValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, MedicationSchedule, $Out> {
+  MedicationScheduleCopyWith<$R, MedicationSchedule, $Out>
+  get $asMedicationSchedule => $base.as(
+    (v, t, t2) => _MedicationScheduleCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class MedicationScheduleCopyWith<
+  $R,
+  $In extends MedicationSchedule,
+  $Out
+>
+    implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get times;
+  ListCopyWith<$R, int, ObjectCopyWith<$R, int, int>>? get daysOfWeek;
+  $R call({
+    String? id,
+    String? medicationId,
+    ScheduleType? type,
+    List<String>? times,
+    List<int>? daysOfWeek,
+    DateTime? startDate,
+    DateTime? endDate,
+  });
+  MedicationScheduleCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _MedicationScheduleCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, MedicationSchedule, $Out>
+    implements MedicationScheduleCopyWith<$R, MedicationSchedule, $Out> {
+  _MedicationScheduleCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<MedicationSchedule> $mapper =
+      MedicationScheduleMapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get times =>
+      ListCopyWith(
+        $value.times,
+        (v, t) => ObjectCopyWith(v, $identity, t),
+        (v) => call(times: v),
+      );
+  @override
+  ListCopyWith<$R, int, ObjectCopyWith<$R, int, int>>? get daysOfWeek =>
+      $value.daysOfWeek != null
+      ? ListCopyWith(
+          $value.daysOfWeek!,
+          (v, t) => ObjectCopyWith(v, $identity, t),
+          (v) => call(daysOfWeek: v),
+        )
+      : null;
+  @override
+  $R call({
+    String? id,
+    String? medicationId,
+    ScheduleType? type,
+    List<String>? times,
+    Object? daysOfWeek = $none,
+    DateTime? startDate,
+    Object? endDate = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (id != null) #id: id,
+      if (medicationId != null) #medicationId: medicationId,
+      if (type != null) #type: type,
+      if (times != null) #times: times,
+      if (daysOfWeek != $none) #daysOfWeek: daysOfWeek,
+      if (startDate != null) #startDate: startDate,
+      if (endDate != $none) #endDate: endDate,
+    }),
+  );
+  @override
+  MedicationSchedule $make(CopyWithData data) => MedicationSchedule(
+    id: data.get(#id, or: $value.id),
+    medicationId: data.get(#medicationId, or: $value.medicationId),
+    type: data.get(#type, or: $value.type),
+    times: data.get(#times, or: $value.times),
+    daysOfWeek: data.get(#daysOfWeek, or: $value.daysOfWeek),
+    startDate: data.get(#startDate, or: $value.startDate),
+    endDate: data.get(#endDate, or: $value.endDate),
+  );
+
+  @override
+  MedicationScheduleCopyWith<$R2, MedicationSchedule, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _MedicationScheduleCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
