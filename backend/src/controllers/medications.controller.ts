@@ -1,22 +1,73 @@
 import { Request, Response } from "express";
-import * as throwErr from "../utils/error.handling"
+import * as service from "../services/medication.service";
+import * as throwErr from "../utils/error.handling";
 
-export const getMedications = async (req: Request, res: Response) => {};
-export const createMedication = async (req: Request, res: Response) => {};
-export const getMedicationById = async (req: Request, res: Response) => {};
-export const updateMedication = async (req: Request, res: Response) => {};
-export const deleteMedication = async (req: Request, res: Response) => {};
+export const getMedications = async (req: Request, res: Response) => {
+  const meds = await service.getAllMedications(req.user.userId);
+  res.json(meds);
+};
 
-export const getFamilyMemberMedications = async (req: Request, res: Response) => {};
-export const assignMedicationToMember = async (req: Request, res: Response) => {};
-export const updateFamilyMemberMedication = async (req: Request, res: Response) => {};
-export const removeFamilyMemberMedication = async (req: Request, res: Response) => {};
+export const createMedication = async (req: Request, res: Response) => {
+  const medication = await service.createMedication({
+    ...req.body,
+    createdBy: req.user.userId,
+  });
 
-export const getMedicationSchedules = async (req: Request, res: Response) => {};
-export const createMedicationSchedule = async (req: Request, res: Response) => {};
-export const updateMedicationSchedule = async (req: Request, res: Response) => {};
-export const deleteMedicationSchedule = async (req: Request, res: Response) => {};
+  res.status(201).json(medication);
+};
 
-export const getAdherenceLogs = (req: Request, res: Response) => {};
-export const createAdherenceLog = (req: Request, res: Response) => {};
-export const updateAdherenceLog = (req: Request, res: Response) => {};
+export const getMedicationById = async (
+  req: Request<{ id: string }>,
+  res: Response
+) => {
+  const med = await service.getMedicationById(req.params.id);
+
+  if (!med) return throwErr.notFound("Medication not found");
+
+  if (med.createdBy !== req.user.userId) {
+    return throwErr.forbidden("Not authorized");
+  }
+
+  res.json(med);
+};
+
+export const updateMedication = async (
+  req: Request<{ id: string }>,
+  res: Response
+) => {
+  const med = await service.getMedicationById(req.params.id);
+
+  if (!med) return throwErr.notFound("Medication not found");
+
+  const canEdit =
+    med.createdBy === req.user.userId ||
+    req.permissions?.canEditMedications === true;
+
+  if (!canEdit) {
+    return throwErr.forbidden("No edit permissions");
+  }
+
+  const updated = await service.updateMedication(req.params.id, req.body);
+
+  res.json(updated);
+};
+
+export const deleteMedication = async (
+  req: Request<{ id: string }>,
+  res: Response
+) => {
+  const med = await service.getMedicationById(req.params.id);
+
+  if (!med) return throwErr.notFound("Medication not found");
+
+  const canEdit =
+    med.createdBy === req.user.userId ||
+    req.permissions?.canEditMedications === true;
+
+  if (!canEdit) {
+    return throwErr.forbidden("No delete permissions");
+  }
+
+  await service.deleteMedication(req.params.id);
+  res.status(204).send();
+};
