@@ -1,18 +1,22 @@
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'family.mapper.dart';
+part 'user.mapper.dart';
 
 @MappableClass()
-class Family with FamilyMappable {
+class User with UserMappable{
   final String id;
   final String name;
-  final String createdBy;
+  final String email;
+  final String role;
   final DateTime createdAt;
+  final DateTime updatedAt;
 
-  const Family({
+  User({
     required this.id,
     required this.name,
-    required this.createdBy,
+    required this.email,
+    required this.role,
     required this.createdAt,
+    required this.updatedAt,
   });
 }

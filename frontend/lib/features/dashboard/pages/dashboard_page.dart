@@ -1,31 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/styles/app_theme.dart';
-import 'package:frontend/common/character_card.dart';
-import 'package:frontend/features/auth/services/auth_service.dart';
-import 'package:frontend/features/auth/pages/auth_page.dart';
+import 'package:frontend/features/components/styles/app_theme.dart';
+import 'package:frontend/features/components/ui/character_card.dart';
+import 'package:go_router/go_router.dart';
+import 'package:frontend/features/auth/controller/auth_controller.dart';
+import 'package:provider/provider.dart';
+import 'package:frontend/features/components/ui/root_page.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
+  static const routeName = '/dashboard';
   const DashboardPage({super.key});
+  
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+
+  void _submit() async {
+    final controller = context.read<AuthController>();
+    try {
+      await controller.logout();
+      context.go("/auth");
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Logout failed")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Caregiver Dashboard",
-          style: TextStyle(color: Colors.white, fontSize: 25),
-        ),
-        backgroundColor: AppTheme.primary,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await AuthService().clearToken();
-              Navigator.pushReplacementNamed(context, AuthPage.routeName);
-            },
-          ),
-        ],
-      ),
+    return RootPage(
+      title: "Dashboard",
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.logout),
+          onPressed: _submit,
+        )
+      ],
       body: ListView.builder(
         padding: const EdgeInsets.all(15),
         itemCount: mockUsers.length,
@@ -37,6 +49,7 @@ class DashboardPage extends StatelessWidget {
     );
   }
 }
+
 //user card
 class CaregiverUserCard extends StatelessWidget {
   final CareUser user;

@@ -15,7 +15,6 @@ class FamilyMapper extends ClassMapperBase<Family> {
   static FamilyMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = FamilyMapper._());
-      FamilyMemberMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -27,33 +26,31 @@ class FamilyMapper extends ClassMapperBase<Family> {
   static const Field<Family, String> _f$id = Field('id', _$id);
   static String _$name(Family v) => v.name;
   static const Field<Family, String> _f$name = Field('name', _$name);
+  static String _$createdBy(Family v) => v.createdBy;
+  static const Field<Family, String> _f$createdBy = Field(
+    'createdBy',
+    _$createdBy,
+  );
   static DateTime _$createdAt(Family v) => v.createdAt;
   static const Field<Family, DateTime> _f$createdAt = Field(
     'createdAt',
     _$createdAt,
-  );
-  static List<FamilyMember> _$members(Family v) => v.members;
-  static const Field<Family, List<FamilyMember>> _f$members = Field(
-    'members',
-    _$members,
-    opt: true,
-    def: const [],
   );
 
   @override
   final MappableFields<Family> fields = const {
     #id: _f$id,
     #name: _f$name,
+    #createdBy: _f$createdBy,
     #createdAt: _f$createdAt,
-    #members: _f$members,
   };
 
   static Family _instantiate(DecodingData data) {
     return Family(
       id: data.dec(_f$id),
       name: data.dec(_f$name),
+      createdBy: data.dec(_f$createdBy),
       createdAt: data.dec(_f$createdAt),
-      members: data.dec(_f$members),
     );
   }
 
@@ -103,18 +100,7 @@ extension FamilyValueCopy<$R, $Out> on ObjectCopyWith<$R, Family, $Out> {
 
 abstract class FamilyCopyWith<$R, $In extends Family, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  ListCopyWith<
-    $R,
-    FamilyMember,
-    FamilyMemberCopyWith<$R, FamilyMember, FamilyMember>
-  >
-  get members;
-  $R call({
-    String? id,
-    String? name,
-    DateTime? createdAt,
-    List<FamilyMember>? members,
-  });
+  $R call({String? id, String? name, String? createdBy, DateTime? createdAt});
   FamilyCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -125,36 +111,21 @@ class _FamilyCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Family, $Out>
   @override
   late final ClassMapperBase<Family> $mapper = FamilyMapper.ensureInitialized();
   @override
-  ListCopyWith<
-    $R,
-    FamilyMember,
-    FamilyMemberCopyWith<$R, FamilyMember, FamilyMember>
-  >
-  get members => ListCopyWith(
-    $value.members,
-    (v, t) => v.copyWith.$chain(t),
-    (v) => call(members: v),
-  );
-  @override
-  $R call({
-    String? id,
-    String? name,
-    DateTime? createdAt,
-    List<FamilyMember>? members,
-  }) => $apply(
-    FieldCopyWithData({
-      if (id != null) #id: id,
-      if (name != null) #name: name,
-      if (createdAt != null) #createdAt: createdAt,
-      if (members != null) #members: members,
-    }),
-  );
+  $R call({String? id, String? name, String? createdBy, DateTime? createdAt}) =>
+      $apply(
+        FieldCopyWithData({
+          if (id != null) #id: id,
+          if (name != null) #name: name,
+          if (createdBy != null) #createdBy: createdBy,
+          if (createdAt != null) #createdAt: createdAt,
+        }),
+      );
   @override
   Family $make(CopyWithData data) => Family(
     id: data.get(#id, or: $value.id),
     name: data.get(#name, or: $value.name),
+    createdBy: data.get(#createdBy, or: $value.createdBy),
     createdAt: data.get(#createdAt, or: $value.createdAt),
-    members: data.get(#members, or: $value.members),
   );
 
   @override

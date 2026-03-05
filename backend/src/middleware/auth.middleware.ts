@@ -7,18 +7,41 @@ import * as throwErr from "../utils/error.handling";
 
 declare module "express-serve-static-core" {
   interface Request {
-    user: { userId: string; role: string };
+    user: { 
+      id: string, 
+      name: string,
+      email: string,
+      role: string,
+      createdAt: string,
+      updatedAt: string
+    };
     session: { sessionToken: string; userId: string; expiresAt: Date };
   }
 };
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies.session_token;
-  
-  if (!token) return throwErr.unauthorized("No session token");
+  const token = req.headers["authorization"];
+  const rawToken = token?.split(" ")[1];
 
-  const decoded = jwt.verify(token, config.jwt_secret) as JwtPayload & { userId: string; role: string };
-  req.user = { userId: decoded.userId, role: decoded.role };
+  if (!rawToken) return throwErr.unauthorized("No session token");
+
+  const decoded = jwt.verify(token, config.jwt_secret) as JwtPayload & { 
+    id: string, 
+    name: string,
+    email: string,
+    role: string,
+    createdAt: string,
+    updatedAt: string
+  };
+  
+  req.user = { 
+    id: decoded.userId, 
+    name: decoded.name,
+    email: decoded.email,
+    role: decoded.role,
+    createdAt: decoded.createdAt,
+    updatedAt: decoded.updatedAt,
+  };
 
   const session = await getSessionByToken(token);
   if (!session) return res.status(401).json({ success: false, message: "Session not found" });

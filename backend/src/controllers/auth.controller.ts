@@ -7,41 +7,50 @@ import { createUser, createSessionToken, storeSession } from "../services/auth.s
 import * as throwErr from "../utils/error.handling"
 
 export const me = async (req: Request, res: Response): Promise <void> => {
-  if (!req.user) {
-    throwErr.unauthorized("Not Logged In");
-    return;
-  };
+  if (!req.user) return throwErr.unauthorized("Not Logged In");
   
   res.json({
     success: true,
     user: {
-      id: req.user.userId,
+      id: req.user.id,
+      name: req.user.name,
+      email: req.user.email,
       role: req.user.role,
-      session: req.session,
+      createdAt: req.user.createdAt,
+      updatedAt: req.user.updatedAt,
     },
   });
 };
 
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
+  console.log(
+    "Attempting to create user:",
+    req.body
+  );
+
   const registerUser = await createUser(req.body);
 
-  const payload = {id: registerUser.id, role: registerUser.role};
+  const payload = {
+    id: registerUser.id,
+    name: registerUser.name,
+    email: registerUser.email,
+    role: registerUser.role,
+    createdAt: registerUser.createdAt.toISOString(),
+    updatedAt: registerUser.updatedAt.toISOString()
+  };
+
   const sessionToken = await createSessionToken(payload);
   const expiresAt = addDays(new Date(), 30);
 
   await storeSession({userId: registerUser.id, sessionToken, expiresAt});
 
-  res.cookie("session_token", sessionToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-  });
+  res.setHeader("Authorization", `Bearer ${sessionToken}`);
 
-  console.log("User registered and logged in successfully.");
+  console.log("New user created");
+
   res.status(201).json({
     success: true,
-    message: "User registered and logged in successfully.",
+    message: "New user created",
     user: {
       id: registerUser.id,
       name: registerUser.name,

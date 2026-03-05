@@ -6,9 +6,12 @@ import {
   boolean,
   index,
   uniqueIndex,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { users } from "./users";
+
+export const riskLevelEnum = pgEnum("risk_level", ["low", "medium", "high"]);
 
 export const families = pgTable(
   "families",
@@ -35,7 +38,8 @@ export const familyMemberships = pgTable(
     familyId: uuid("family_id")
       .notNull()
       .references(() => families.id, { onDelete: "cascade" }),
-    is_admin: boolean("is_admin").default(false).notNull(),
+    riskLevel: riskLevelEnum("risk_level").notNull(),
+    isAdmin: boolean("is_admin").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [

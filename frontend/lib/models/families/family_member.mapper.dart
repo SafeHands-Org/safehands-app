@@ -34,18 +34,30 @@ class FamilyMemberMapper extends ClassMapperBase<FamilyMember> {
     'familyId',
     _$familyId,
   );
-  static String _$name(FamilyMember v) => v.name;
-  static const Field<FamilyMember, String> _f$name = Field('name', _$name);
-  static FamilyRole _$role(FamilyMember v) => v.role;
-  static const Field<FamilyMember, FamilyRole> _f$role = Field('role', _$role);
+  static String _$riskLevel(FamilyMember v) => v.riskLevel;
+  static const Field<FamilyMember, String> _f$riskLevel = Field(
+    'riskLevel',
+    _$riskLevel,
+  );
+  static bool _$isAdmin(FamilyMember v) => v.isAdmin;
+  static const Field<FamilyMember, bool> _f$isAdmin = Field(
+    'isAdmin',
+    _$isAdmin,
+  );
+  static DateTime _$createdAt(FamilyMember v) => v.createdAt;
+  static const Field<FamilyMember, DateTime> _f$createdAt = Field(
+    'createdAt',
+    _$createdAt,
+  );
 
   @override
   final MappableFields<FamilyMember> fields = const {
     #id: _f$id,
     #userId: _f$userId,
     #familyId: _f$familyId,
-    #name: _f$name,
-    #role: _f$role,
+    #riskLevel: _f$riskLevel,
+    #isAdmin: _f$isAdmin,
+    #createdAt: _f$createdAt,
   };
 
   static FamilyMember _instantiate(DecodingData data) {
@@ -53,8 +65,9 @@ class FamilyMemberMapper extends ClassMapperBase<FamilyMember> {
       id: data.dec(_f$id),
       userId: data.dec(_f$userId),
       familyId: data.dec(_f$familyId),
-      name: data.dec(_f$name),
-      role: data.dec(_f$role),
+      riskLevel: data.dec(_f$riskLevel),
+      isAdmin: data.dec(_f$isAdmin),
+      createdAt: data.dec(_f$createdAt),
     );
   }
 
@@ -124,8 +137,9 @@ abstract class FamilyMemberCopyWith<$R, $In extends FamilyMember, $Out>
     String? id,
     String? userId,
     String? familyId,
-    String? name,
-    FamilyRole? role,
+    String? riskLevel,
+    bool? isAdmin,
+    DateTime? createdAt,
   });
   FamilyMemberCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -143,15 +157,17 @@ class _FamilyMemberCopyWithImpl<$R, $Out>
     String? id,
     String? userId,
     String? familyId,
-    String? name,
-    FamilyRole? role,
+    String? riskLevel,
+    bool? isAdmin,
+    DateTime? createdAt,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
       if (userId != null) #userId: userId,
       if (familyId != null) #familyId: familyId,
-      if (name != null) #name: name,
-      if (role != null) #role: role,
+      if (riskLevel != null) #riskLevel: riskLevel,
+      if (isAdmin != null) #isAdmin: isAdmin,
+      if (createdAt != null) #createdAt: createdAt,
     }),
   );
   @override
@@ -159,8 +175,9 @@ class _FamilyMemberCopyWithImpl<$R, $Out>
     id: data.get(#id, or: $value.id),
     userId: data.get(#userId, or: $value.userId),
     familyId: data.get(#familyId, or: $value.familyId),
-    name: data.get(#name, or: $value.name),
-    role: data.get(#role, or: $value.role),
+    riskLevel: data.get(#riskLevel, or: $value.riskLevel),
+    isAdmin: data.get(#isAdmin, or: $value.isAdmin),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
   );
 
   @override

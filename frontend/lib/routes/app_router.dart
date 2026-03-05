@@ -1,19 +1,29 @@
-import 'package:flutter/material.dart';
+import 'package:frontend/features/auth/controller/auth_controller.dart';
+import 'package:frontend/features/dashboard/pages/dashboard_page.dart';
 import '../features/auth/pages/auth_page.dart';
+import 'package:go_router/go_router.dart';
 
-class AppRouter {
-  static Route<dynamic> generateRoute(RouteSettings routeSettings) {
-    switch (routeSettings.name) {
-      case AuthPage.routeName:
-        return MaterialPageRoute(
-          settings: routeSettings,
-          builder: (_) => const AuthPage(),
-        );
+GoRouter createRouter(AuthController authController) {
+  return GoRouter(
+    refreshListenable: authController,
+    redirect: (context, state) {
+      if (authController.state == AuthState.loading) return null;
+
+      if (authController.state == AuthState.unauthenticated) return "/auth";
       
-      default:
-        return MaterialPageRoute(
-          builder: (_) => const AuthPage(),
-        );
-    }
-  }
+      if (authController.state == AuthState.authenticated && state.matchedLocation == "/auth") return "/dashboard";
+      
+      return null;
+    },
+    routes: [
+      GoRoute(
+        path: '/auth',
+        builder: (context, state) => const AuthPage(),
+      ),
+      GoRoute(
+        path: '/dashboard',
+        builder: (context, state) => const DashboardPage(),
+      ),
+    ],
+  );
 }

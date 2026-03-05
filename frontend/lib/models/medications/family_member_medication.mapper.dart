@@ -25,51 +25,56 @@ class FamilyMemberMedicationMapper
 
   static String _$id(FamilyMemberMedication v) => v.id;
   static const Field<FamilyMemberMedication, String> _f$id = Field('id', _$id);
-  static String _$familyMemberId(FamilyMemberMedication v) => v.familyMemberId;
-  static const Field<FamilyMemberMedication, String> _f$familyMemberId = Field(
-    'familyMemberId',
-    _$familyMemberId,
-  );
   static String _$medicationId(FamilyMemberMedication v) => v.medicationId;
   static const Field<FamilyMemberMedication, String> _f$medicationId = Field(
     'medicationId',
     _$medicationId,
   );
-  static String _$scheduleId(FamilyMemberMedication v) => v.scheduleId;
-  static const Field<FamilyMemberMedication, String> _f$scheduleId = Field(
-    'scheduleId',
-    _$scheduleId,
+  static String _$familyMemberId(FamilyMemberMedication v) => v.familyMemberId;
+  static const Field<FamilyMemberMedication, String> _f$familyMemberId = Field(
+    'familyMemberId',
+    _$familyMemberId,
   );
-  static DateTime _$assignedAt(FamilyMemberMedication v) => v.assignedAt;
-  static const Field<FamilyMemberMedication, DateTime> _f$assignedAt = Field(
-    'assignedAt',
-    _$assignedAt,
+  static String _$priority(FamilyMemberMedication v) => v.priority;
+  static const Field<FamilyMemberMedication, String> _f$priority = Field(
+    'priority',
+    _$priority,
+  );
+  static DateTime _$startDate(FamilyMemberMedication v) => v.startDate;
+  static const Field<FamilyMemberMedication, DateTime> _f$startDate = Field(
+    'startDate',
+    _$startDate,
+  );
+  static DateTime _$endDate(FamilyMemberMedication v) => v.endDate;
+  static const Field<FamilyMemberMedication, DateTime> _f$endDate = Field(
+    'endDate',
+    _$endDate,
   );
   static bool _$active(FamilyMemberMedication v) => v.active;
   static const Field<FamilyMemberMedication, bool> _f$active = Field(
     'active',
     _$active,
-    opt: true,
-    def: true,
   );
 
   @override
   final MappableFields<FamilyMemberMedication> fields = const {
     #id: _f$id,
-    #familyMemberId: _f$familyMemberId,
     #medicationId: _f$medicationId,
-    #scheduleId: _f$scheduleId,
-    #assignedAt: _f$assignedAt,
+    #familyMemberId: _f$familyMemberId,
+    #priority: _f$priority,
+    #startDate: _f$startDate,
+    #endDate: _f$endDate,
     #active: _f$active,
   };
 
   static FamilyMemberMedication _instantiate(DecodingData data) {
     return FamilyMemberMedication(
       id: data.dec(_f$id),
-      familyMemberId: data.dec(_f$familyMemberId),
       medicationId: data.dec(_f$medicationId),
-      scheduleId: data.dec(_f$scheduleId),
-      assignedAt: data.dec(_f$assignedAt),
+      familyMemberId: data.dec(_f$familyMemberId),
+      priority: data.dec(_f$priority),
+      startDate: data.dec(_f$startDate),
+      endDate: data.dec(_f$endDate),
       active: data.dec(_f$active),
     );
   }
@@ -146,10 +151,11 @@ abstract class FamilyMemberMedicationCopyWith<
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({
     String? id,
-    String? familyMemberId,
     String? medicationId,
-    String? scheduleId,
-    DateTime? assignedAt,
+    String? familyMemberId,
+    String? priority,
+    DateTime? startDate,
+    DateTime? endDate,
     bool? active,
   });
   FamilyMemberMedicationCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
@@ -169,28 +175,31 @@ class _FamilyMemberMedicationCopyWithImpl<$R, $Out>
   @override
   $R call({
     String? id,
-    String? familyMemberId,
     String? medicationId,
-    String? scheduleId,
-    DateTime? assignedAt,
+    String? familyMemberId,
+    String? priority,
+    DateTime? startDate,
+    DateTime? endDate,
     bool? active,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
-      if (familyMemberId != null) #familyMemberId: familyMemberId,
       if (medicationId != null) #medicationId: medicationId,
-      if (scheduleId != null) #scheduleId: scheduleId,
-      if (assignedAt != null) #assignedAt: assignedAt,
+      if (familyMemberId != null) #familyMemberId: familyMemberId,
+      if (priority != null) #priority: priority,
+      if (startDate != null) #startDate: startDate,
+      if (endDate != null) #endDate: endDate,
       if (active != null) #active: active,
     }),
   );
   @override
   FamilyMemberMedication $make(CopyWithData data) => FamilyMemberMedication(
     id: data.get(#id, or: $value.id),
-    familyMemberId: data.get(#familyMemberId, or: $value.familyMemberId),
     medicationId: data.get(#medicationId, or: $value.medicationId),
-    scheduleId: data.get(#scheduleId, or: $value.scheduleId),
-    assignedAt: data.get(#assignedAt, or: $value.assignedAt),
+    familyMemberId: data.get(#familyMemberId, or: $value.familyMemberId),
+    priority: data.get(#priority, or: $value.priority),
+    startDate: data.get(#startDate, or: $value.startDate),
+    endDate: data.get(#endDate, or: $value.endDate),
     active: data.get(#active, or: $value.active),
   );
 

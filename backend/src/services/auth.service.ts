@@ -20,7 +20,7 @@ export const createUser = async (data: NewUserBody): Promise<User> => {
     .where(eq(users.email, data.email))
     .limit(1);
 
-  if (existingUser) throwErr.badRequest("User already exists");
+  if (existingUser) throwErr.badRequest();
 
   const hashedPassword = await bcrypt.hash(data.password, 12);
 

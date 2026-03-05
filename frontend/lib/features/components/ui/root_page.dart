@@ -1,16 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/styles/app_theme.dart';
+import 'package:frontend/features/components/styles/app_theme.dart';
+import 'package:frontend/services/api/models/user/user.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class RootPage extends StatelessWidget {
+  final String title;
+  final Widget body;
+  final List<Widget>? actions;
+  final User? user;
+
+  const RootPage({
+    super.key,
+    required this.title,
+    required this.body,
+    required this.actions,
+    this.user,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SafeHands'),
+        title: Text(title, style: TextStyle(color: Colors.white, fontSize: 25)), 
         backgroundColor: AppTheme.primary,
         foregroundColor: Colors.white,
+        actions: actions,
       ),
       drawer: Drawer(
         child: ListView(
@@ -33,7 +46,7 @@ class HomePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Text(
                     'SafeHands',
                     style: TextStyle(
@@ -44,7 +57,7 @@ class HomePage extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Welcome, User',
+                    'Welcome, ${user?.name ?? 'Guest'}',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 16,
@@ -67,12 +80,7 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-      body: const Center(
-        child: Text(
-          'Welcome to SafeHands!',
-          style: AppTheme.subtitle,
-        ),
-      ),
+      body: body
     );
   }
 }

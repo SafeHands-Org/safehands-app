@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/styles/app_theme.dart';
+import 'package:frontend/features/components/styles/app_theme.dart';
 import 'package:frontend/features/dashboard/pages/dashboard_page.dart';
 
 class CharacterCard extends StatelessWidget {

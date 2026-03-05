@@ -5,19 +5,20 @@ part 'family_member_medication.mapper.dart';
 @MappableClass()
 class FamilyMemberMedication with FamilyMemberMedicationMappable {
   final String id;
-  final String familyMemberId;
   final String medicationId;
-  final String scheduleId;
-
-  final DateTime assignedAt;
+  final String familyMemberId;
+  final String priority;
+  final DateTime startDate;
+  final DateTime endDate;
   final bool active;
 
   const FamilyMemberMedication({
     required this.id,
-    required this.familyMemberId,
     required this.medicationId,
-    required this.scheduleId,
-    required this.assignedAt,
-    this.active = true,
+    required this.familyMemberId,
+    required this.priority,
+    required this.startDate,
+    required this.endDate,
+    required this.active,
   });
 }

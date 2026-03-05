@@ -25,6 +25,7 @@ export const doseFormEnum = pgEnum("dose_form", [
   "suppository",
   "other",
 ]);
+export const priorityEnum = pgEnum("priority", ["low", "medium", "high"]);
 
 export const medications = pgTable(
   "medications",
@@ -55,6 +56,7 @@ export const familyMemberMedications = pgTable(
     familyMemberId: uuid("family_member_id")
       .notNull()
       .references(() => familyMemberships.id, { onDelete: "cascade" }),
+    priority: priorityEnum("priority").notNull(),
     startDate: date("start_date").notNull(),
     endDate: date("end_date"),
     active: boolean("active").default(true).notNull(),

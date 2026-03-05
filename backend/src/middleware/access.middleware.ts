@@ -23,17 +23,17 @@ export const accessMiddleware = (options: AccessOptions = {}) => {
       if (!req.user) return throwErr.unauthorized("User not authenticated");
       if (!familyId) return throwErr.badRequest("Family ID required");
 
-      const membership = await getFamilyMembership(req.user.userId, familyId);
+      const membership = await getFamilyMembership(req.user.id, familyId);
       if (!membership) return throwErr.forbidden("Not part of this family");
 
       req.familyId = familyId;
       req.membership = {
         familyId: membership.familyId,
         userId: membership.userId,
-        isAdmin: membership.is_admin,
+        isAdmin: membership.isAdmin,
       };
 
-      const isAdmin = req.user.role === "caregiver" || membership.is_admin;
+      const isAdmin = req.user.role === "caregiver" || membership.isAdmin;
       req.permissions = { isAdmin, canEditMedications: isAdmin };
     }
 

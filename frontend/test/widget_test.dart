@@ -9,11 +9,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:frontend/main.dart';
+import 'package:frontend/routes/app_router.dart';
+import 'package:frontend/features/auth/controller/auth_controller.dart';
+import 'package:frontend/services/auth_service.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    final authService = AuthService();
+    final authController = AuthController(authService)..restoreSession();
+    final router = createRouter(authController);
+    
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const SafeHandsApp());
+    await tester.pumpWidget(SafeHandsApp(router: router)
+);
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

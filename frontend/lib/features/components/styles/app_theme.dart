@@ -36,6 +36,7 @@ class AppTheme {
     IconData? icon,
     IconData? prefixIcon,
     Widget? suffixIcon,
+    Color? iconColor,
   }) {
     return InputDecoration(
       hintText: hintText,
@@ -45,7 +46,11 @@ class AppTheme {
       ),
       fillColor: inputFill,
       filled: true,
-      prefixIcon: icon != null ? Icon(icon, color: primary) : null,
+      prefixIcon: prefixIcon != null
+        ? Icon(prefixIcon, color: iconColor)
+        : icon != null
+            ? Icon(icon, color: iconColor)
+            : null,
       suffixIcon: suffixIcon,
     );
   }

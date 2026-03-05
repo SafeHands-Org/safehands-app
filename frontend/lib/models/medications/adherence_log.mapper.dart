@@ -35,8 +35,8 @@ class AdherenceLogMapper extends ClassMapperBase<AdherenceLog> {
     'scheduledTime',
     _$scheduledTime,
   );
-  static AdherenceStatus _$status(AdherenceLog v) => v.status;
-  static const Field<AdherenceLog, AdherenceStatus> _f$status = Field(
+  static String _$status(AdherenceLog v) => v.status;
+  static const Field<AdherenceLog, String> _f$status = Field(
     'status',
     _$status,
   );
@@ -44,13 +44,11 @@ class AdherenceLogMapper extends ClassMapperBase<AdherenceLog> {
   static const Field<AdherenceLog, DateTime> _f$takenAt = Field(
     'takenAt',
     _$takenAt,
-    opt: true,
   );
-  static String? _$notes(AdherenceLog v) => v.notes;
-  static const Field<AdherenceLog, String> _f$notes = Field(
-    'notes',
-    _$notes,
-    opt: true,
+  static String _$recordedBy(AdherenceLog v) => v.recordedBy;
+  static const Field<AdherenceLog, String> _f$recordedBy = Field(
+    'recordedBy',
+    _$recordedBy,
   );
 
   @override
@@ -60,7 +58,7 @@ class AdherenceLogMapper extends ClassMapperBase<AdherenceLog> {
     #scheduledTime: _f$scheduledTime,
     #status: _f$status,
     #takenAt: _f$takenAt,
-    #notes: _f$notes,
+    #recordedBy: _f$recordedBy,
   };
 
   static AdherenceLog _instantiate(DecodingData data) {
@@ -70,7 +68,7 @@ class AdherenceLogMapper extends ClassMapperBase<AdherenceLog> {
       scheduledTime: data.dec(_f$scheduledTime),
       status: data.dec(_f$status),
       takenAt: data.dec(_f$takenAt),
-      notes: data.dec(_f$notes),
+      recordedBy: data.dec(_f$recordedBy),
     );
   }
 
@@ -140,9 +138,9 @@ abstract class AdherenceLogCopyWith<$R, $In extends AdherenceLog, $Out>
     String? id,
     String? familyMemberMedicationId,
     DateTime? scheduledTime,
-    AdherenceStatus? status,
+    String? status,
     DateTime? takenAt,
-    String? notes,
+    String? recordedBy,
   });
   AdherenceLogCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -160,9 +158,9 @@ class _AdherenceLogCopyWithImpl<$R, $Out>
     String? id,
     String? familyMemberMedicationId,
     DateTime? scheduledTime,
-    AdherenceStatus? status,
+    String? status,
     Object? takenAt = $none,
-    Object? notes = $none,
+    String? recordedBy,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -171,7 +169,7 @@ class _AdherenceLogCopyWithImpl<$R, $Out>
       if (scheduledTime != null) #scheduledTime: scheduledTime,
       if (status != null) #status: status,
       if (takenAt != $none) #takenAt: takenAt,
-      if (notes != $none) #notes: notes,
+      if (recordedBy != null) #recordedBy: recordedBy,
     }),
   );
   @override
@@ -184,7 +182,7 @@ class _AdherenceLogCopyWithImpl<$R, $Out>
     scheduledTime: data.get(#scheduledTime, or: $value.scheduledTime),
     status: data.get(#status, or: $value.status),
     takenAt: data.get(#takenAt, or: $value.takenAt),
-    notes: data.get(#notes, or: $value.notes),
+    recordedBy: data.get(#recordedBy, or: $value.recordedBy),
   );
 
   @override

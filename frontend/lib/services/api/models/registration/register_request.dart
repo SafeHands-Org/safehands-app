@@ -1,20 +1,18 @@
-class RegistrationRequest {
+import 'package:dart_mappable/dart_mappable.dart';
+
+part 'register_request.mapper.dart';
+
+@MappableClass()
+class RegisterRequest with RegisterRequestMappable{
   final String name;
   final String email;
   final String password;
   final String role;
 
-  RegistrationRequest({
+  RegisterRequest({
     required this.name,
     required this.email,
     required this.password,
     required this.role,
   });
-
-  Map<String, dynamic> toJson() => {
-    'name': name,
-    'email': email,
-    'password': password,
-    'role': role.toLowerCase(),
-  };
 }
