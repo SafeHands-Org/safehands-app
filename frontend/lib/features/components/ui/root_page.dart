@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
 import 'package:frontend/services/api/models/user/user.dart';
+import 'package:go_router/go_router.dart';
 
 class RootPage extends StatelessWidget {
   final String title;
@@ -67,15 +68,15 @@ class RootPage extends StatelessWidget {
               ),
             ),
 
-            _MenuTile(icon: Icons.dashboard, label: 'Dashboard'),
-            _MenuTile(icon: Icons.group, label: 'Family Members'),
-            _MenuTile(icon: Icons.medication, label: 'Medications'),
-            _MenuTile(icon: Icons.alarm, label: 'Reminders'),
-            _MenuTile(icon: Icons.qr_code, label: 'Invite Family'),
+            _MenuTile(icon: Icons.dashboard, label: 'Dashboard', route: '/dashboard'),
+            _MenuTile(icon: Icons.group, label: 'Family Members', route: '/family'),
+            _MenuTile(icon: Icons.medication, label: 'Medications', route: '/medications'),
+            _MenuTile(icon: Icons.alarm, label: 'Reminders', route: '/reminders'),
+            _MenuTile(icon: Icons.qr_code, label: 'Invite Family', route: '/invite'),
 
             const Divider(),
 
-            _MenuTile(icon: Icons.settings, label: 'Account'),
+            _MenuTile(icon: Icons.settings, label: 'Account', route: '/account'),
             _MenuTile(icon: Icons.logout, label: 'Logout'),
           ],
         ),
@@ -88,10 +89,12 @@ class RootPage extends StatelessWidget {
 class _MenuTile extends StatelessWidget {
   final IconData icon;
   final String label;
+  final String? route;
 
   const _MenuTile({
     required this.icon,
     required this.label,
+    this.route,
   });
 
   @override
@@ -106,6 +109,9 @@ class _MenuTile extends StatelessWidget {
         title: Text(label, style: AppTheme.body),
         onTap: () {
           Navigator.pop(context); // closes drawer
+          if (route != null) {
+            context.go(route!);
+          }
         },
       ),
     );
