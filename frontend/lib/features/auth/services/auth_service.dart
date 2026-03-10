@@ -10,7 +10,7 @@ class AuthService {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   Future<AuthSession?> register(
-    String name, String email, String password, String roleStr) async {
+      String name, String email, String password, String roleStr) async {
     try {
       final request = RegistrationRequest(
         name: name,
@@ -18,19 +18,17 @@ class AuthService {
         password: password,
         role: roleStr.toLowerCase(),
       );
-
       final response = await http.post(
         Uri.parse('$baseUrl/auth/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(request.toJson()),
       );
-
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
         final user = User.fromJson(data['user']);
         final token = data['token'];
         await _saveToken(token);
-
+        await _secureStorage.write(key: 'user_id', value: user.id);
         return AuthSession(user: user, token: token);
       } else {
         return null;
@@ -43,20 +41,17 @@ class AuthService {
   Future<AuthSession?> login(String email, String password) async {
     try {
       await clearToken();
-
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
       );
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final user = User.fromJson(data['user']);
         final token = data['token'];
-
         await _saveToken(token);
-
+        await _secureStorage.write(key: 'user_id', value: user.id);
         return AuthSession(user: user, token: token);
       } else {
         await clearToken();
@@ -76,7 +71,12 @@ class AuthService {
     return await _secureStorage.read(key: 'auth_token');
   }
 
+  Future<String?> getUserId() async {
+    return await _secureStorage.read(key: 'user_id');
+  }
+
   Future<void> clearToken() async {
     await _secureStorage.delete(key: 'auth_token');
+    await _secureStorage.delete(key: 'user_id');
   }
 }

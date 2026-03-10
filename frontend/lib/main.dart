@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:frontend/styles/app_theme.dart';
 import 'package:frontend/features/auth/pages/auth_page.dart';
-import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/features/dashboard/pages/dashboard_page.dart';
-import 'package:frontend/routes/app_router.dart';
-import 'package:frontend/features/dashboard/pages/hamburger_menu.dart';
+import 'package:frontend/models/medications/medication_provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const SafeHandsApp());
 }
 
@@ -14,60 +15,18 @@ class SafeHandsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SafeHands',
-      debugShowCheckedModeBanner: false,
-      onGenerateRoute: AppRouter.generateRoute,
-      home: const AuthGate(),
+    return ChangeNotifierProvider(
+      create: (_) => MedicationProvider(),
+      child: MaterialApp(
+        title: 'SafeHands',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.themeData,
+        initialRoute: AuthPage.routeName,
+        routes: {
+          AuthPage.routeName:      (_) => const AuthPage(),
+          DashboardPage.routeName: (_) => const DashboardPage(),
+        },
+      ),
     );
-  }
-}
-
-class AuthGate extends StatefulWidget {
-  const AuthGate({super.key});
-
-  @override
-  State<AuthGate> createState() => _AuthGateState();
-}
-
-class _AuthGateState extends State<AuthGate> {
-
-  final AuthService authService = AuthService();
-
-  bool _loading = true;
-  bool _loggedIn = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkAuth();
-  }
-
-  Future<void> _checkAuth() async {
-
-    final token = await authService.getToken();
-
-    setState(() {
-      _loggedIn = token != null;
-      _loading = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    if (_loading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
-    if (_loggedIn) {
-      return const DashboardPage();
-    }
-
-    return const AuthPage();
   }
 }
