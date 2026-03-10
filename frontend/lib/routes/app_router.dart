@@ -2,6 +2,8 @@ import 'package:frontend/features/auth/controller/auth_controller.dart';
 import 'package:frontend/features/dashboard/pages/dashboard_page.dart';
 import '../features/auth/pages/auth_page.dart';
 import 'package:go_router/go_router.dart';
+import 'package:frontend/features/components/ui/family_members.dart';
+import 'package:frontend/features/components/ui/medications.dart';
 
 GoRouter createRouter(AuthController authController) {
   return GoRouter(
@@ -23,6 +25,14 @@ GoRouter createRouter(AuthController authController) {
       GoRoute(
         path: '/dashboard',
         builder: (context, state) => const DashboardPage(),
+      ),
+      GoRoute(
+        path: '/family',
+        builder: (context, state) => const FamilyMembersPage(),
+      ),
+      GoRoute(
+        path: '/medications',
+        builder: (context, state) => const MedicationsPage(),
       ),
     ],
   );
