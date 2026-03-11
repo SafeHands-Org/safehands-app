@@ -17,7 +17,7 @@ declare module "express-serve-static-core" {
     };
     session: { sessionToken: string; userId: string; expiresAt: Date };
   }
-};
+}
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers["authorization"];
@@ -44,8 +44,16 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
   };
 
   const session = await getSessionByToken(token);
-  if (!session) return res.status(401).json({ success: false, message: "Session not found" });
-  if (new Date(session.expiresAt) < new Date()) return res.status(401).json({ success: false, message: "Session expired" });
+  if (!session) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Session not found" });
+  }
+  if (new Date(session.expiresAt) < new Date()) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Session expired" });
+  }
 
   req.session = session;
   next();

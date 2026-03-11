@@ -18,6 +18,8 @@ class AuthController extends ChangeNotifier {
   late Session _session;
   Session get session => _session;
 
+  String get currentUserId => _session.user!.id;
+
   AuthController(this._service);
 
   Future<void> login(String email, String password) async {
