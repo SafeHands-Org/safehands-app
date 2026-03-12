@@ -5,6 +5,7 @@ import {
   timestamp,
   date,
   time,
+  integer,
   boolean,
   index,
   pgEnum,
@@ -25,6 +26,22 @@ export const doseFormEnum = pgEnum("dose_form", [
   "suppository",
   "other",
 ]);
+
+export const weekdayEnum = pgEnum("weekdays", [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+])
+
+export const frequencyUnitsEnum = pgEnum("frequency_units", [
+  "days",
+  "weeks",
+])
+
 export const priorityEnum = pgEnum("priority", ["low", "medium", "high"]);
 
 export const medications = pgTable(
@@ -74,9 +91,10 @@ export const medicationSchedules = pgTable(
     familyMemberMedicationId: uuid("family_member_medication_id")
       .notNull()
       .references(() => familyMemberMedications.id, { onDelete: "cascade" }),
-    timeOfDay: time("time_of_day").notNull(),
-    daysOfWeek: text("days_of_week"),
-    frequency: text("frequency").notNull(),
+    timesOfDay: time("times_of_day").array().notNull(),
+    daysOfWeek: weekdayEnum("days_of_week").array(),
+    frequency: integer("frequency").notNull(),
+    frequencyUnit: frequencyUnitsEnum("frequency_unit").notNull(),
   },
   (table) => [
     index("schedule_fmm_idx").on(table.familyMemberMedicationId),
@@ -90,7 +108,7 @@ export const medicationAdherenceLogs = pgTable(
     familyMemberMedicationId: uuid("family_member_medication_id")
       .notNull()
       .references(() => familyMemberMedications.id, { onDelete: "cascade" }),
-    scheduledTime: timestamp("scheduled_time").notNull(),
+    scheduledTime: time("scheduled_time").notNull(),
     takenAt: timestamp("taken_at"),
     status: text("status").notNull(),
     recordedBy: uuid("recorded_by")

@@ -1,5 +1,5 @@
 {
-  "id": "349324b4-57fc-41ef-b989-ddddea0f54b1",
+  "id": "b216e67c-55fb-447f-85fc-0748add5869d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -56,21 +56,6 @@
         }
       },
       "indexes": {
-        "users_email_idx": {
-          "name": "users_email_idx",
-          "columns": [
-            {
-              "expression": "email",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "users_role_idx": {
           "name": "users_role_idx",
           "columns": [
@@ -194,11 +179,19 @@
           "primaryKey": false,
           "notNull": true
         },
-        "role": {
-          "name": "role",
-          "type": "text",
+        "risk_level": {
+          "name": "risk_level",
+          "type": "risk_level",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
+        },
+        "is_admin": {
+          "name": "is_admin",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         },
         "created_at": {
           "name": "created_at",
@@ -436,17 +429,30 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "name": {
-          "name": "name",
+        "name_entered": {
+          "name": "name_entered",
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "rxcui": {
+          "name": "rxcui",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "dosage": {
           "name": "dosage",
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "dose_form": {
+          "name": "dose_form",
+          "type": "dose_form",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
         },
         "instructions": {
           "name": "instructions",
@@ -526,6 +532,13 @@
         "family_member_id": {
           "name": "family_member_id",
           "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "priority": {
+          "name": "priority",
+          "type": "priority",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
@@ -632,21 +645,29 @@
           "primaryKey": false,
           "notNull": true
         },
-        "time_of_day": {
-          "name": "time_of_day",
-          "type": "time",
+        "times_of_day": {
+          "name": "times_of_day",
+          "type": "time[]",
           "primaryKey": false,
           "notNull": true
         },
         "days_of_week": {
           "name": "days_of_week",
-          "type": "text",
+          "type": "weekdays[]",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
         "frequency": {
           "name": "frequency",
-          "type": "text",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "frequency_unit": {
+          "name": "frequency_unit",
+          "type": "frequency_units",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         }
@@ -708,7 +729,7 @@
         },
         "scheduled_time": {
           "name": "scheduled_time",
-          "type": "timestamp",
+          "type": "time",
           "primaryKey": false,
           "notNull": true
         },
@@ -796,6 +817,80 @@
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
+    },
+    "public.sessions": {
+      "name": "sessions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "session_token": {
+          "name": "session_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sessions_user_id_users_id_fk": {
+          "name": "sessions_user_id_users_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "sessions_session_token_unique": {
+          "name": "sessions_session_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "session_token"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     }
   },
   "enums": {
@@ -805,7 +900,62 @@
       "values": [
         "caregiver",
         "family_member",
-        "clinician"
+        "viewer"
+      ]
+    },
+    "public.risk_level": {
+      "name": "risk_level",
+      "schema": "public",
+      "values": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "public.dose_form": {
+      "name": "dose_form",
+      "schema": "public",
+      "values": [
+        "tablet",
+        "capsule",
+        "liquid",
+        "inhaler",
+        "injection",
+        "topical",
+        "drops",
+        "patch",
+        "suppository",
+        "other"
+      ]
+    },
+    "public.weekdays": {
+      "name": "weekdays",
+      "schema": "public",
+      "values": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday"
+      ]
+    },
+    "public.frequency_units": {
+      "name": "frequency_units",
+      "schema": "public",
+      "values": [
+        "days",
+        "weeks"
+      ]
+    },
+    "public.priority": {
+      "name": "priority",
+      "schema": "public",
+      "values": [
+        "low",
+        "medium",
+        "high"
       ]
     }
   },
