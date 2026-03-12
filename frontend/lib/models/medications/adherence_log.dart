@@ -6,7 +6,7 @@ part 'adherence_log.mapper.dart';
 class AdherenceLog with AdherenceLogMappable {
   final String id;
   final String familyMemberMedicationId;
-  final DateTime scheduledTime;
+  final String scheduledTime;
   final DateTime? takenAt;
   final String status;
   final String recordedBy;
@@ -16,7 +16,7 @@ class AdherenceLog with AdherenceLogMappable {
     required this.familyMemberMedicationId,
     required this.scheduledTime,
     required this.status,
-    required this.takenAt,
+    this.takenAt,
     required this.recordedBy,
   });
 }

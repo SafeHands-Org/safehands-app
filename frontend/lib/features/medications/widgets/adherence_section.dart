@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/medications/widgets/log_sheet.dart';
-import 'package:provider/provider.dart';
+import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
-import "../../../models/medications/medication_service.dart";
-import "../../../models/medications/medication_provider.dart";
+import 'package:frontend/features/medications/widgets/log_sheet.dart';
+import 'package:frontend/services/medication_service.dart';
+import 'package:provider/provider.dart';
 
 class AdherenceTab extends StatelessWidget {
   final String memberId;
   final String currentUserId;
-  const AdherenceTab({required this.memberId, required this.currentUserId});
+  const AdherenceTab({super.key, required this.memberId, required this.currentUserId});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MedicationProvider>(builder: (_, p, _) {
+    return Consumer<MedicationController>(builder: (_, p, _) {
       final active = p.forMember(memberId).where((m) => m.active).toList();
       if (active.isEmpty) {
         return const Center(
@@ -44,13 +44,13 @@ class _AdherenceSectionState extends State<_AdherenceSection> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => context.read<MedicationProvider>().loadLogs(widget.assignment.id),
+      (_) => context.read<MedicationController>().loadLogs(widget.assignment.id),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MedicationProvider>(builder: (_, p, _) {
+    return Consumer<MedicationController>(builder: (_, p, _) {
       final logs = p.logsFor(widget.assignment.id);
       return Card(
         elevation: 0,

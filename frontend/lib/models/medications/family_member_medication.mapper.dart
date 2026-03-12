@@ -45,10 +45,11 @@ class FamilyMemberMedicationMapper
     'startDate',
     _$startDate,
   );
-  static DateTime _$endDate(FamilyMemberMedication v) => v.endDate;
+  static DateTime? _$endDate(FamilyMemberMedication v) => v.endDate;
   static const Field<FamilyMemberMedication, DateTime> _f$endDate = Field(
     'endDate',
     _$endDate,
+    opt: true,
   );
   static bool _$active(FamilyMemberMedication v) => v.active;
   static const Field<FamilyMemberMedication, bool> _f$active = Field(
@@ -179,7 +180,7 @@ class _FamilyMemberMedicationCopyWithImpl<$R, $Out>
     String? familyMemberId,
     String? priority,
     DateTime? startDate,
-    DateTime? endDate,
+    Object? endDate = $none,
     bool? active,
   }) => $apply(
     FieldCopyWithData({
@@ -188,7 +189,7 @@ class _FamilyMemberMedicationCopyWithImpl<$R, $Out>
       if (familyMemberId != null) #familyMemberId: familyMemberId,
       if (priority != null) #priority: priority,
       if (startDate != null) #startDate: startDate,
-      if (endDate != null) #endDate: endDate,
+      if (endDate != $none) #endDate: endDate,
       if (active != null) #active: active,
     }),
   );

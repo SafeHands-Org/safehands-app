@@ -1,14 +1,15 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
-import "../../../models/medications/medication_service.dart";
-import "../../../models/medications/medication_provider.dart";
+import 'package:frontend/services/medication_service.dart';
+import 'package:provider/provider.dart';
 
 class LogSheet extends StatefulWidget {
   final MemberMedication assignment;
   final String currentUserId;
-  const LogSheet({required this.assignment, required this.currentUserId});
+  const LogSheet({super.key, required this.assignment, required this.currentUserId});
   @override
   State<LogSheet> createState() => LogSheetState();
 }
@@ -43,10 +44,10 @@ class LogSheetState extends State<LogSheet> {
                     duration: const Duration(milliseconds: 150),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: selected ? color : color.withOpacity(0.08),
+                      color: selected ? color : color.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                          color: color.withOpacity(selected ? 1 : 0.3)),
+                          color: color.withValues(alpha: selected ? 1 : 0.3)),
                     ),
                     child: Center(
                       child: Text(
@@ -82,7 +83,7 @@ class LogSheetState extends State<LogSheet> {
   Future<void> _log() async {
     setState(() => _saving = true);
     final now = DateTime.now().toUtc().toIso8601String();
-    final ok = await context.read<MedicationProvider>().logAdherence(
+    final ok = await context.read<MedicationController>().logAdherence(
       familyMemberMedicationId: widget.assignment.id,
       scheduledTime: now,
       status: _status,

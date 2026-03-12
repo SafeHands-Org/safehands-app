@@ -63,7 +63,7 @@ class _ProfileSection extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 35,
-          backgroundColor: AppTheme.primary.withOpacity(.7),
+          backgroundColor: AppTheme.primary.withValues(alpha: 0.7),
           child: const Icon(Icons.person, size: 35),
         ),
         const SizedBox(width: 15),

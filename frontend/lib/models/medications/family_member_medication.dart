@@ -9,7 +9,7 @@ class FamilyMemberMedication with FamilyMemberMedicationMappable {
   final String familyMemberId;
   final String priority;
   final DateTime startDate;
-  final DateTime endDate;
+  final DateTime? endDate;
   final bool active;
 
   const FamilyMemberMedication({
@@ -18,7 +18,7 @@ class FamilyMemberMedication with FamilyMemberMedicationMappable {
     required this.familyMemberId,
     required this.priority,
     required this.startDate,
-    required this.endDate,
+    this.endDate,
     required this.active,
   });
 }

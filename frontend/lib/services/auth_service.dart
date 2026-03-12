@@ -15,13 +15,13 @@ class AuthService {
     print(jsonEncode(request.toMap()));
 
     final response = await http.post(
-      Uri.parse("$baseUrl/auth/register"),
+      Uri.parse('$baseUrl/auth/register'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(request.toMap()),
     );
 
     if (response.statusCode != 201) {
-      throw Exception("Registration failed: ${response.body}");
+      throw Exception('Registration failed: ${response.body}');
     }
 
     final decoded = jsonDecode(response.body);
@@ -36,13 +36,13 @@ class AuthService {
 
   Future<LoginResponse> login(LoginRequest request) async {
     final response = await http.post(
-      Uri.parse("$baseUrl/auth/login"),
+      Uri.parse('$baseUrl/auth/login'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(request.toMap())
     );
 
     if (response.statusCode != 200) {
-      throw Exception("Login failed: ${response.body}");
+      throw Exception('Login failed: ${response.body}');
     }
 
     final decoded = jsonDecode(response.body);
@@ -61,7 +61,7 @@ class AuthService {
     if (token == null) return null;
     
     final response = await http.get(
-      Uri.parse("$baseUrl/auth/me"),
+      Uri.parse('$baseUrl/auth/me'),
       headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
     );
 

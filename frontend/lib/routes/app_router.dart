@@ -1,9 +1,10 @@
-import 'package:frontend/features/auth/controller/auth_controller.dart';
+import 'package:frontend/controllers/auth_controller.dart';
+import 'package:frontend/features/auth/pages/signin_page.dart';
+import 'package:frontend/features/auth/pages/signup_page.dart';
+import 'package:frontend/features/auth/pages/startup_page.dart';
 import 'package:frontend/features/dashboard/pages/dashboard_page.dart';
-import '../features/auth/pages/auth_page.dart';
-import 'package:go_router/go_router.dart';
 import 'package:frontend/features/family/family_members.dart';
-import 'package:frontend/features/medications/pages/member_medications_page.dart';
+import 'package:go_router/go_router.dart';
 
 GoRouter createRouter(AuthController authController) {
   return GoRouter(
@@ -11,16 +12,25 @@ GoRouter createRouter(AuthController authController) {
     redirect: (context, state) {
       if (authController.state == AuthState.loading) return null;
 
-      if (authController.state == AuthState.unauthenticated) return "/auth";
-      
-      if (authController.state == AuthState.authenticated && state.matchedLocation == "/auth") return "/dashboard";
+      final loggingIn = state.matchedLocation == '/signin' || state.matchedLocation == '/signup';
+
+      if (authController.state == AuthState.unauthenticated) return loggingIn ? null : '/auth';
+      if (authController.state == AuthState.authenticated && state.matchedLocation == '/auth') return '/dashboard';
       
       return null;
     },
     routes: [
       GoRoute(
         path: '/auth',
-        builder: (context, state) => const AuthPage(),
+        builder: (context, state) => const StartUpPage(),
+      ),
+      GoRoute(
+        path: '/signup',
+        builder: (context, state) => const SignUpPage(),
+      ),
+      GoRoute(
+        path: '/signin',
+        builder: (context, state) => const SignInPage(),
       ),
       GoRoute(
         path: '/dashboard',
@@ -30,10 +40,10 @@ GoRouter createRouter(AuthController authController) {
         path: '/family',
         builder: (context, state) => const FamilyMembersPage(),
       ),
-      GoRoute(
+      /* GoRoute(
         path: '/medications',
         builder: (context, state) => const MemberMedicationsPage(),
-      ),
+      ), */
     ],
   );
 }

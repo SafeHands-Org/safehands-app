@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/medication_controller.dart';
+import 'package:frontend/features/components/styles/app_theme.dart';
 import 'package:frontend/features/medications/widgets/adherence_section.dart';
 import 'package:frontend/features/medications/widgets/medication_tab.dart';
 import 'package:frontend/features/medications/widgets/schedule_section.dart';
 import 'package:provider/provider.dart';
-import 'package:frontend/features/components/styles/app_theme.dart';
-import "../../../models/medications/medication_provider.dart";
 
 class MemberMedicationsPage extends StatefulWidget {
   final String memberId;
@@ -32,7 +32,7 @@ class MemberMedicationsPageState extends State<MemberMedicationsPage>
     _tabs = TabController(length: 3, vsync: this);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<MedicationProvider>().loadMemberMeds(widget.memberId);
+      context.read<MedicationController>().loadMemberMeds(widget.memberId);
     });
   }
 

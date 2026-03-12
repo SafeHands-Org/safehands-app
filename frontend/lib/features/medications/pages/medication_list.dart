@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
-import 'medication_provider.dart';
-import 'medication_form.dart';
+import 'package:frontend/features/medications/pages/medication_form.dart';
+import 'package:provider/provider.dart';
 
 class MedicationListPage extends StatefulWidget {
   static const routeName = '/medications';
@@ -17,7 +17,7 @@ class _MedicationListPageState extends State<MedicationListPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => context.read<MedicationProvider>().loadMedications(),
+      (_) => context.read<MedicationController>().loadMedications(),
     );
   }
 
@@ -30,16 +30,16 @@ class _MedicationListPageState extends State<MedicationListPage> {
         backgroundColor: AppTheme.primary,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Consumer<MedicationProvider>(builder: (_, p, _) {
+      body: Consumer<MedicationController>(builder: (_, p, _) {
         if (p.loading) {
-          return const Center(child: CircularProgressIndicator(color: AppTheme.primary));
+          return Center(child: CircularProgressIndicator(color: AppTheme.primary));
         }
         if (p.error != null) {
           return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text(p.error!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: p.loadMedications, child: const Text('Retry'),
-                style: AppTheme.buttonStyle),
+            ElevatedButton(onPressed: p.loadMedications,
+                style: AppTheme.buttonStyle, child: const Text('Retry')),
           ]));
         }
         if (p.medications.isEmpty) {
@@ -108,7 +108,7 @@ class _MedCard extends StatelessWidget {
         ),
         trailing: PopupMenuButton<String>(
           onSelected: (v) async {
-            final p = context.read<MedicationProvider>();
+            final p = context.read<MedicationController>();
             if (v == 'edit') {
               await Navigator.push(context,
                   MaterialPageRoute(builder: (_) => MedicationForm(medication: med)));
@@ -129,18 +129,17 @@ class _MedCard extends StatelessWidget {
     );
   }
 
-  Future<bool> _confirm(BuildContext ctx, String msg) async =>
-      await showDialog<bool>(
-        context: ctx,
-        builder: (c) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          content: Text(msg),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancel')),
-            ElevatedButton(onPressed: () => Navigator.pop(c, true),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red, shape: const StadiumBorder()),
-                child: const Text('Delete', style: TextStyle(color: Colors.white))),
-          ],
-        ),
-      ) ?? false;
+  Future<bool> _confirm(BuildContext ctx, String msg) async => await showDialog<bool>(
+    context: ctx,
+    builder: (c) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      content: Text(msg),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancel')),
+        ElevatedButton(onPressed: () => Navigator.pop(c, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, shape: const StadiumBorder()),
+            child: const Text('Delete', style: TextStyle(color: Colors.white))),
+      ],
+    ),
+  ) ?? false;
 }

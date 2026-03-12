@@ -1,13 +1,14 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
-import "../../../models/medications/medication_service.dart";
-import "../../../models/medications/medication_provider.dart";
+import 'package:frontend/services/medication_service.dart';
+import 'package:provider/provider.dart';
 
 class AddScheduleSheet extends StatefulWidget {
   final MemberMedication assignment;
-  const AddScheduleSheet({required this.assignment});
+  const AddScheduleSheet({super.key, required this.assignment});
   @override
   State<AddScheduleSheet> createState() => AddScheduleSheetState();
 }
@@ -32,7 +33,7 @@ class AddScheduleSheetState extends State<AddScheduleSheet> {
               context: context, initialTime: _time,
               builder: (ctx, child) => Theme(
                 data: Theme.of(ctx).copyWith(
-                    colorScheme: const ColorScheme.light(primary: AppTheme.primary)),
+                    colorScheme: ColorScheme.light(primary: AppTheme.primary)),
                 child: child!,
               ),
             );
@@ -44,7 +45,7 @@ class AddScheduleSheetState extends State<AddScheduleSheet> {
                 color: AppTheme.inputFill,
                 borderRadius: BorderRadius.circular(18)),
             child: Row(children: [
-              const Icon(Icons.access_time, color: AppTheme.primary, size: 18),
+              Icon(Icons.access_time, color: AppTheme.primary, size: 18),
               const SizedBox(width: 10),
               Text('Time: ${_time.format(context)}', style: AppTheme.body),
             ]),
@@ -52,7 +53,7 @@ class AddScheduleSheetState extends State<AddScheduleSheet> {
         ),
         const SizedBox(height: 14),
         DropdownButtonFormField<String>(
-          value: _frequency,
+          initialValue: _frequency,
           decoration: AppTheme.inputDecoration(hintText: 'Frequency'),
           items: ['daily', 'weekly', 'specific_days', 'as_needed']
               .map((f) => DropdownMenuItem(
@@ -82,7 +83,7 @@ class AddScheduleSheetState extends State<AddScheduleSheet> {
     setState(() => _saving = true);
     final hh = _time.hour.toString().padLeft(2, '0');
     final mm = _time.minute.toString().padLeft(2, '0');
-    final ok = await context.read<MedicationProvider>().addSchedule(
+    final ok = await context.read<MedicationController>().addSchedule(
       familyMemberMedicationId: widget.assignment.id,
       timeOfDay: '$hh:$mm',
       frequency: _frequency,

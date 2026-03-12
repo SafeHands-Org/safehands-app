@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'medication_service.dart';
+import 'package:frontend/services/medication_service.dart';
 
-class MedicationProvider extends ChangeNotifier {
+class MedicationController extends ChangeNotifier {
   List<Medication> medications = [];
   bool loading = false;
   String? error;
