@@ -1,14 +1,15 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
-import "../../../models/medications/medication_service.dart";
-import "../../../models/medications/medication_provider.dart";
+import 'package:frontend/services/medication_service.dart';
+import 'package:provider/provider.dart';
 
 class MedicationCard extends StatelessWidget {
   final MemberMedication med;
   final String memberId;
-  const MedicationCard({required this.med, required this.memberId});
+  const MedicationCard({super.key, required this.med, required this.memberId});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class MedicationCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: (med.active ? Colors.green : Colors.orange).withOpacity(0.1),
+              color: (med.active ? Colors.green : Colors.orange).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(med.active ? 'Active' : 'Inactive',
@@ -48,7 +49,7 @@ class MedicationCard extends StatelessWidget {
                 final ok = await _confirm(context,
                     'Remove "${med.nameEntered ?? 'this medication'}" from this member?');
                 if (ok && context.mounted) {
-                  context.read<MedicationProvider>().removeAssign(med.id, memberId);
+                  context.read<MedicationController>().removeAssign(med.id, memberId);
                 }
               },
             ),

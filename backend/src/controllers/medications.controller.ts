@@ -10,14 +10,14 @@ const getParam = (param: string | string[], name = "parameter"): string => {
 
 export const getMedications = async (req: Request, res: Response) => {
   console.log("GET /medications hit");
-  const userId = req.user?.userId;
+  const userId = req.user?.id;
   if (!userId) return throwErr.unauthorized("No user");
   const meds = await service.getAllMedications(userId);
   res.json(meds);
 };
 
 export const createMedication = async (req: Request, res: Response) => {
-  const userId = req.user?.userId;
+  const userId = req.user?.id;
   if (!userId) return throwErr.unauthorized("No user");
 
   const data: Medication = {

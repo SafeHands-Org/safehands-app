@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/medications/widgets/add_schedule_sheet.dart';
-import 'package:provider/provider.dart';
+import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
-import "../../../models/medications/medication_service.dart";
-import "../../../models/medications/medication_provider.dart";
+import 'package:frontend/features/medications/widgets/add_schedule_sheet.dart';
+import 'package:frontend/services/medication_service.dart';
+import 'package:provider/provider.dart';
 
 class SchedulesTab extends StatelessWidget {
   final String memberId;
-  const SchedulesTab({required this.memberId});
+  const SchedulesTab({super.key, required this.memberId});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MedicationProvider>(builder: (_, p, _) {
+    return Consumer<MedicationController>(builder: (_, p, _) {
       final active = p.forMember(memberId).where((m) => m.active).toList();
       if (active.isEmpty) {
         return const Center(
@@ -38,13 +38,13 @@ class _ScheduleSectionState extends State<_ScheduleSection> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => context.read<MedicationProvider>().loadSchedules(widget.assignment.id),
+      (_) => context.read<MedicationController>().loadSchedules(widget.assignment.id),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MedicationProvider>(builder: (_, p, _) {
+    return Consumer<MedicationController>(builder: (_, p, _) {
       final schedules = p.schedulesFor(widget.assignment.id);
       return Card(
         elevation: 0,
@@ -75,7 +75,7 @@ class _ScheduleSectionState extends State<_ScheduleSection> {
             else
               ...schedules.map((s) => ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.access_time, color: AppTheme.primary),
+                leading: Icon(Icons.access_time, color: AppTheme.primary),
                 title: Text(s.displayTime, style: AppTheme.body),
                 subtitle: Text(
                   '${s.frequency.replaceAll('_', ' ')}${s.daysOfWeek != null ? ' · ${s.daysOfWeek}' : ''}',

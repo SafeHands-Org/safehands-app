@@ -1,18 +1,19 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
-import "../../../models/medications/medication_service.dart";
-import "../../../models/medications/medication_provider.dart";
-import "../services/rxnorm_service.dart";
+import 'package:frontend/services/medication_service.dart';
+import 'package:frontend/services/rxnorm_service.dart';
 
 class AddMedicationSheet extends StatefulWidget {
   final String memberId;
   final String currentUserId;
-  final MedicationProvider provider;
-  const AddMedicationSheet({
+  final MedicationController controller;
+  const AddMedicationSheet({super.key, 
     required this.memberId,
     required this.currentUserId,
-    required this.provider,
+    required this.controller,
   });
 
   @override
@@ -80,7 +81,7 @@ class AddMedicationSheetState extends State<AddMedicationSheet> {
         rxcui: _rxcui,
       );
 
-      final ok = await widget.provider.assign(
+      final ok = await widget.controller.assign(
         medicationId: med.id,
         familyMemberId: widget.memberId,
         startDate: start,
@@ -92,7 +93,7 @@ class AddMedicationSheetState extends State<AddMedicationSheet> {
           Navigator.pop(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(widget.provider.error ?? 'Failed to assign'),
+            content: Text(widget.controller.error ?? 'Failed to assign'),
             backgroundColor: Colors.red,
           ));
         }
@@ -134,7 +135,7 @@ class AddMedicationSheetState extends State<AddMedicationSheet> {
               hintText: 'Medication name *',
               icon: Icons.medication_outlined,
               suffixIcon: _searching
-                  ? const Padding(padding: EdgeInsets.all(12),
+                  ? Padding(padding: const EdgeInsets.all(12),
                       child: SizedBox(width: 16, height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primary)))
                   : null,
@@ -148,13 +149,13 @@ class AddMedicationSheetState extends State<AddMedicationSheet> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: Colors.grey.shade200),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 10, offset: const Offset(0, 4))],
               ),
               child: Column(
                 children: _suggestions.map((s) => ListTile(
                   dense: true,
-                  leading: const Icon(Icons.medication_outlined,
+                  leading: Icon(Icons.medication_outlined,
                       color: AppTheme.primary, size: 18),
                   title: Text(s.name, style: AppTheme.body),
                   subtitle: Text('RxCUI: ${s.rxcui}',
@@ -178,7 +179,7 @@ class AddMedicationSheetState extends State<AddMedicationSheet> {
           const SizedBox(height: 14),
 
           DropdownButtonFormField<String>(
-            value: _doseForm,
+            initialValue: _doseForm,
             decoration: AppTheme.inputDecoration(hintText: 'Dose form'),
             items: _doseForms.map((f) => DropdownMenuItem(
               value: f,
@@ -203,7 +204,7 @@ class AddMedicationSheetState extends State<AddMedicationSheet> {
                 firstDate: DateTime(2020), lastDate: DateTime(2100),
                 builder: (ctx, child) => Theme(
                   data: Theme.of(ctx).copyWith(
-                      colorScheme: const ColorScheme.light(primary: AppTheme.primary)),
+                      colorScheme: ColorScheme.light(primary: AppTheme.primary)),
                   child: child!,
                 ),
               );
@@ -215,7 +216,7 @@ class AddMedicationSheetState extends State<AddMedicationSheet> {
                   color: AppTheme.inputFill,
                   borderRadius: BorderRadius.circular(18)),
               child: Row(children: [
-                const Icon(Icons.calendar_today, color: AppTheme.primary, size: 18),
+                Icon(Icons.calendar_today, color: AppTheme.primary, size: 18),
                 const SizedBox(width: 10),
                 Text(
                   'Start: ${_startDate.year}-${_startDate.month.toString().padLeft(2,'0')}-${_startDate.day.toString().padLeft(2,'0')}',

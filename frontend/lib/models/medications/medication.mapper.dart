@@ -29,19 +29,28 @@ class MedicationMapper extends ClassMapperBase<Medication> {
     'nameEntered',
     _$nameEntered,
   );
-  static String _$rxcui(Medication v) => v.rxcui;
-  static const Field<Medication, String> _f$rxcui = Field('rxcui', _$rxcui);
-  static String _$dosage(Medication v) => v.dosage;
-  static const Field<Medication, String> _f$dosage = Field('dosage', _$dosage);
+  static String? _$rxcui(Medication v) => v.rxcui;
+  static const Field<Medication, String> _f$rxcui = Field(
+    'rxcui',
+    _$rxcui,
+    opt: true,
+  );
+  static String? _$dosage(Medication v) => v.dosage;
+  static const Field<Medication, String> _f$dosage = Field(
+    'dosage',
+    _$dosage,
+    opt: true,
+  );
   static String _$doseForm(Medication v) => v.doseForm;
   static const Field<Medication, String> _f$doseForm = Field(
     'doseForm',
     _$doseForm,
   );
-  static String _$instructions(Medication v) => v.instructions;
+  static String? _$instructions(Medication v) => v.instructions;
   static const Field<Medication, String> _f$instructions = Field(
     'instructions',
     _$instructions,
+    opt: true,
   );
   static String _$createdBy(Medication v) => v.createdBy;
   static const Field<Medication, String> _f$createdBy = Field(
@@ -164,20 +173,20 @@ class _MedicationCopyWithImpl<$R, $Out>
   $R call({
     String? id,
     String? nameEntered,
-    String? rxcui,
-    String? dosage,
+    Object? rxcui = $none,
+    Object? dosage = $none,
     String? doseForm,
-    String? instructions,
+    Object? instructions = $none,
     String? createdBy,
     String? createdAt,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
       if (nameEntered != null) #nameEntered: nameEntered,
-      if (rxcui != null) #rxcui: rxcui,
-      if (dosage != null) #dosage: dosage,
+      if (rxcui != $none) #rxcui: rxcui,
+      if (dosage != $none) #dosage: dosage,
       if (doseForm != null) #doseForm: doseForm,
-      if (instructions != null) #instructions: instructions,
+      if (instructions != $none) #instructions: instructions,
       if (createdBy != null) #createdBy: createdBy,
       if (createdAt != null) #createdAt: createdAt,
     }),

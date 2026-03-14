@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/auth_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
 import 'package:frontend/features/components/ui/character_card.dart';
-import 'package:go_router/go_router.dart';
-import 'package:frontend/features/auth/controller/auth_controller.dart';
-import 'package:provider/provider.dart';
 import 'package:frontend/features/components/ui/root_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class DashboardPage extends StatefulWidget {
   static const routeName = '/dashboard';
@@ -30,7 +30,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return RootPage(
+    return SafeHandsAppBar(
       title: "Dashboard",
       actions: [
         IconButton(
@@ -94,7 +94,7 @@ class _UserProfile extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 25,
-          backgroundColor: AppTheme.primary.withOpacity(.7),
+          backgroundColor: AppTheme.primary.withValues(alpha: 0.7),
           child: const Icon(Icons.person),
         ),
         const SizedBox(height: 10),

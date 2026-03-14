@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/auth/controller/auth_controller.dart';
-import 'package:frontend/services/auth_service.dart';
+import 'package:frontend/controllers/auth_controller.dart';
 import 'package:frontend/routes/app_router.dart';
-import 'package:provider/provider.dart';
+import 'package:frontend/services/auth_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

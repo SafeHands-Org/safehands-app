@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
-import 'medication_service.dart';
-import 'medication_provider.dart';
+import 'package:frontend/services/medication_service.dart';
+import 'package:provider/provider.dart';
 
 const _doseForms = [
   'tablet', 'capsule', 'liquid', 'inhaler', 'injection',
@@ -45,7 +45,7 @@ class _MedicationFormState extends State<MedicationForm> {
   Future<void> _save() async {
     if (!_key.currentState!.validate()) return;
     setState(() => _saving = true);
-    final p = context.read<MedicationProvider>();
+    final p = context.read<MedicationController>();
 
     final ok = _isEdit
         ? await p.updateMed(widget.medication!.id,
@@ -96,7 +96,7 @@ class _MedicationFormState extends State<MedicationForm> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _doseForm,
+              initialValue: _doseForm,
               decoration: AppTheme.inputDecoration(hintText: 'Dose form'),
               items: _doseForms.map((f) => DropdownMenuItem(
                 value: f,

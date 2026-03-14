@@ -1,4 +1,9 @@
-CREATE TYPE "public"."user_role" AS ENUM('caregiver', 'family_member', 'clinician');--> statement-breakpoint
+CREATE TYPE "public"."user_role" AS ENUM('caregiver', 'family_member', 'viewer');--> statement-breakpoint
+CREATE TYPE "public"."risk_level" AS ENUM('low', 'medium', 'high');--> statement-breakpoint
+CREATE TYPE "public"."dose_form" AS ENUM('tablet', 'capsule', 'liquid', 'inhaler', 'injection', 'topical', 'drops', 'patch', 'suppository', 'other');--> statement-breakpoint
+CREATE TYPE "public"."weekdays" AS ENUM('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');--> statement-breakpoint
+CREATE TYPE "public"."frequency_units" AS ENUM('days', 'weeks');--> statement-breakpoint
+CREATE TYPE "public"."priority" AS ENUM('low', 'medium', 'high');--> statement-breakpoint
 CREATE TABLE "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"full_name" text NOT NULL,
@@ -21,7 +26,8 @@ CREATE TABLE "family_memberships" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
 	"family_id" uuid NOT NULL,
-	"role" text NOT NULL,
+	"risk_level" "risk_level" NOT NULL,
+	"is_admin" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
@@ -39,8 +45,10 @@ CREATE TABLE "invitations" (
 --> statement-breakpoint
 CREATE TABLE "medications" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" text NOT NULL,
+	"name_entered" text NOT NULL,
+	"rxcui" text,
 	"dosage" text,
+	"dose_form" "dose_form" NOT NULL,
 	"instructions" text,
 	"created_by" uuid NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
@@ -50,6 +58,7 @@ CREATE TABLE "family_member_medications" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"medication_id" uuid NOT NULL,
 	"family_member_id" uuid NOT NULL,
+	"priority" "priority" NOT NULL,
 	"start_date" date NOT NULL,
 	"end_date" date,
 	"active" boolean DEFAULT true NOT NULL
@@ -58,18 +67,29 @@ CREATE TABLE "family_member_medications" (
 CREATE TABLE "medication_schedules" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"family_member_medication_id" uuid NOT NULL,
-	"time_of_day" time NOT NULL,
-	"days_of_week" text,
-	"frequency" text NOT NULL
+	"times_of_day" time[] NOT NULL,
+	"days_of_week" "weekdays"[],
+	"frequency" integer NOT NULL,
+	"frequency_unit" "frequency_units" NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "medication_adherence_logs" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"family_member_medication_id" uuid NOT NULL,
-	"scheduled_time" timestamp NOT NULL,
+	"scheduled_time" time NOT NULL,
 	"taken_at" timestamp,
 	"status" text NOT NULL,
 	"recorded_by" uuid NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "sessions" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"session_token" text NOT NULL,
+	"expires_at" timestamp NOT NULL,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now(),
+	CONSTRAINT "sessions_session_token_unique" UNIQUE("session_token")
 );
 --> statement-breakpoint
 ALTER TABLE "families" ADD CONSTRAINT "families_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -83,7 +103,7 @@ ALTER TABLE "family_member_medications" ADD CONSTRAINT "family_member_medication
 ALTER TABLE "medication_schedules" ADD CONSTRAINT "medication_schedules_family_member_medication_id_family_member_medications_id_fk" FOREIGN KEY ("family_member_medication_id") REFERENCES "public"."family_member_medications"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "medication_adherence_logs" ADD CONSTRAINT "medication_adherence_logs_family_member_medication_id_family_member_medications_id_fk" FOREIGN KEY ("family_member_medication_id") REFERENCES "public"."family_member_medications"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "medication_adherence_logs" ADD CONSTRAINT "medication_adherence_logs_recorded_by_users_id_fk" FOREIGN KEY ("recorded_by") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "users_email_idx" ON "users" USING btree ("email");--> statement-breakpoint
+ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "users_role_idx" ON "users" USING btree ("role");--> statement-breakpoint
 CREATE INDEX "families_created_by_idx" ON "families" USING btree ("created_by");--> statement-breakpoint
 CREATE INDEX "family_memberships_user_idx" ON "family_memberships" USING btree ("user_id");--> statement-breakpoint

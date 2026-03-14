@@ -3,17 +3,17 @@ import 'package:frontend/features/components/styles/app_theme.dart';
 import 'package:frontend/services/api/models/user/user.dart';
 import 'package:go_router/go_router.dart';
 
-class RootPage extends StatelessWidget {
+class SafeHandsAppBar extends StatelessWidget {
   final String title;
   final Widget body;
   final List<Widget>? actions;
   final User? user;
 
-  const RootPage({
+  const SafeHandsAppBar({
     super.key,
     required this.title,
     required this.body,
-    required this.actions,
+    this.actions,
     this.user,
   });
 
@@ -21,7 +21,9 @@ class RootPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title, style: TextStyle(color: Colors.white, fontSize: 25)), 
+        title: Text(
+          title, 
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white)), 
         backgroundColor: AppTheme.primary,
         foregroundColor: Colors.white,
         actions: actions,
@@ -58,7 +60,7 @@ class RootPage extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Welcome, ${user?.name ?? 'Guest'}',
+                    'Welcome, ${user?.name ?? 'Sarah'}',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 16,
@@ -68,11 +70,9 @@ class RootPage extends StatelessWidget {
               ),
             ),
 
-            _MenuTile(icon: Icons.dashboard, label: 'Dashboard', route: '/dashboard'),
-            _MenuTile(icon: Icons.group, label: 'Family Members', route: '/family'),
-            _MenuTile(icon: Icons.medication, label: 'Medications', route: '/medications'),
-            _MenuTile(icon: Icons.alarm, label: 'Reminders', route: '/reminders'),
-            _MenuTile(icon: Icons.qr_code, label: 'Invite Family', route: '/invite'),
+            _MenuTile(icon: Icons.dashboard, label: 'Dashboard'),
+            _MenuTile(icon: Icons.group, label: 'Family Members'),
+            _MenuTile(icon: Icons.qr_code, label: 'Invite Family'),
 
             const Divider(),
 
@@ -81,7 +81,24 @@ class RootPage extends StatelessWidget {
           ],
         ),
       ),
-      body: body
+      body: body,
+      bottomNavigationBar: NavigationBar(
+        destinations: const <Widget>[
+          NavigationDestination(
+            selectedIcon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Badge(label: Text('2'), child: Icon(Icons.notifications_sharp)),
+            label: 'Reminders',
+          ),
+          NavigationDestination(
+            icon: Badge(child: Icon(Icons.medical_information_sharp)),
+            label: 'Medications',
+          ),
+        ],
+      ),
     );
   }
 }

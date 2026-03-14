@@ -191,10 +191,10 @@ Future<Medication> updateMedication(String id, {
   final r = await http.put(Uri.parse('$_base/medications/$id'),
     headers: await _headers(),
     body: jsonEncode({
-      if (nameEntered != null) 'nameEntered': nameEntered,
-      if (doseForm != null) 'doseForm': doseForm,
-      if (dosage != null) 'dosage': dosage,
-      if (instructions != null) 'instructions': instructions,
+      'nameEntered': ?nameEntered,
+      'doseForm': ?doseForm,
+      'dosage': ?dosage,
+      'instructions': ?instructions,
     }),
   );
   final data = _parse(r);
@@ -226,7 +226,7 @@ Future<MemberMedication> assignMedication({
       'medicationId':   medicationId,
       'familyMemberId': familyMemberId,
       'startDate':      startDate,
-      if (endDate != null) 'endDate': endDate,
+      'endDate': ?endDate,
     }),
   );
   final data = _parse(r);
@@ -262,7 +262,7 @@ Future<MedSchedule> createSchedule({
       'familyMemberMedicationId': familyMemberMedicationId,
       'timeOfDay':  timeOfDay,
       'frequency':  frequency,
-      if (daysOfWeek != null) 'daysOfWeek': daysOfWeek,
+      'daysOfWeek': ?daysOfWeek,
     }),
   );
   final data = _parse(r);
@@ -301,7 +301,7 @@ Future<AdherenceLog> createAdherenceLog({
       'scheduledTime': scheduledTime,
       'status':        status,
       'recordedBy':    recordedBy,
-      if (takenAt != null) 'takenAt': takenAt,
+      'takenAt': ?takenAt,
     }),
   );
   final data = _parse(r);
@@ -317,7 +317,7 @@ Future<AdherenceLog> updateAdherenceLog(String id, {
     headers: await _headers(),
     body: jsonEncode({
       'status': status,
-      if (takenAt != null) 'takenAt': takenAt,
+      'takenAt': ?takenAt,
     }),
   );
   final data = _parse(r);

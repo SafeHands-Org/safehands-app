@@ -9,7 +9,7 @@ class FamilyMembersPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RootPage(
+    return SafeHandsAppBar(
       title: "Family Members",
       actions: [],
       body: mockUsers.isEmpty
@@ -56,7 +56,7 @@ class _FamilyMemberCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundColor: AppTheme.primary.withOpacity(.7),
+                  backgroundColor: AppTheme.primary.withValues(alpha: 0.7),
                   child: const Icon(Icons.person, size: 30),
                 ),
                 const SizedBox(width: 15),

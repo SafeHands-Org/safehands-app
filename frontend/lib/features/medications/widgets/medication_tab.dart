@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controllers/medication_controller.dart';
+import 'package:frontend/features/components/styles/app_theme.dart';
 import 'package:frontend/features/medications/widgets/add_medication_sheet.dart';
 import 'package:frontend/features/medications/widgets/medication_card.dart';
 import 'package:provider/provider.dart';
-import 'package:frontend/features/components/styles/app_theme.dart';
-import "../../../models/medications/medication_provider.dart";
 
 class MedicationsTab extends StatelessWidget {
   final String memberId;
   final String memberName;
   final String currentUserId;
-  const MedicationsTab({
+  const MedicationsTab({super.key, 
     required this.memberId,
     required this.memberName,
     required this.currentUserId,
@@ -17,7 +17,7 @@ class MedicationsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MedicationProvider>(builder: (_, p, _) {
+    return Consumer<MedicationController>(builder: (_, p, _) {
       final meds = p.forMember(memberId);
       return Stack(children: [
         meds.isEmpty
@@ -46,7 +46,7 @@ class MedicationsTab extends StatelessWidget {
     });
   }
 
-  void _showAddSheet(BuildContext context, MedicationProvider p) {
+  void _showAddSheet(BuildContext context, MedicationController p) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -55,7 +55,7 @@ class MedicationsTab extends StatelessWidget {
       builder: (_) => AddMedicationSheet(
         memberId: memberId,
         currentUserId: currentUserId,
-        provider: p,
+        controller: p,
       ),
     );
   }

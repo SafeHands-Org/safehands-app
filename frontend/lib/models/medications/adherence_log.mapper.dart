@@ -30,8 +30,8 @@ class AdherenceLogMapper extends ClassMapperBase<AdherenceLog> {
     'familyMemberMedicationId',
     _$familyMemberMedicationId,
   );
-  static DateTime _$scheduledTime(AdherenceLog v) => v.scheduledTime;
-  static const Field<AdherenceLog, DateTime> _f$scheduledTime = Field(
+  static String _$scheduledTime(AdherenceLog v) => v.scheduledTime;
+  static const Field<AdherenceLog, String> _f$scheduledTime = Field(
     'scheduledTime',
     _$scheduledTime,
   );
@@ -44,6 +44,7 @@ class AdherenceLogMapper extends ClassMapperBase<AdherenceLog> {
   static const Field<AdherenceLog, DateTime> _f$takenAt = Field(
     'takenAt',
     _$takenAt,
+    opt: true,
   );
   static String _$recordedBy(AdherenceLog v) => v.recordedBy;
   static const Field<AdherenceLog, String> _f$recordedBy = Field(
@@ -137,7 +138,7 @@ abstract class AdherenceLogCopyWith<$R, $In extends AdherenceLog, $Out>
   $R call({
     String? id,
     String? familyMemberMedicationId,
-    DateTime? scheduledTime,
+    String? scheduledTime,
     String? status,
     DateTime? takenAt,
     String? recordedBy,
@@ -157,7 +158,7 @@ class _AdherenceLogCopyWithImpl<$R, $Out>
   $R call({
     String? id,
     String? familyMemberMedicationId,
-    DateTime? scheduledTime,
+    String? scheduledTime,
     String? status,
     Object? takenAt = $none,
     String? recordedBy,
