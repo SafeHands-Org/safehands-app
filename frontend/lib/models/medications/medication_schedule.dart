@@ -19,5 +19,16 @@ class MedicationSchedule with MedicationScheduleMappable {
     required this.frequency,
     required this.frequencyUnit,
   });
+  String get displayTime {
+    if (timesOfDay.isEmpty) return '';
+    final timeOfDay = timesOfDay.first;
+    final parts = timeOfDay.split(':');
+    if (parts.length < 2) return timeOfDay;
+    final h = int.tryParse(parts[0]) ?? 0;
+    final m = parts[1];
+    final period = h >= 12 ? 'PM' : 'AM';
+    final h12 = h > 12 ? h - 12 : (h == 0 ? 12 : h);
+    return '$h12:$m $period';
+  }
 }
 

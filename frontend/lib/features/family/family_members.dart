@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
-import 'package:frontend/features/components/ui/character_card.dart';
 import 'package:frontend/features/components/ui/root_page.dart';
 import 'package:frontend/features/dashboard/pages/dashboard_page.dart';
+import 'package:go_router/go_router.dart';
 
 class FamilyMembersPage extends StatelessWidget {
   const FamilyMembersPage({super.key});
@@ -43,11 +43,12 @@ class _FamilyMemberCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(15),
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => CharacterCard(user: user),
-              ),
+            context.push(
+              '/medications',
+              extra: {
+                'memberId': user.name,
+                'memberName': user.name,
+              },
             );
           },
           child: Padding(

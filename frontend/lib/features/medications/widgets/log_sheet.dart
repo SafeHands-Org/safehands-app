@@ -5,9 +5,10 @@ import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
 import 'package:frontend/services/medication_service.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/models/medications/family_member_medication.dart';
 
 class LogSheet extends StatefulWidget {
-  final MemberMedication assignment;
+  final FamilyMemberMedication assignment;
   final String currentUserId;
   const LogSheet({super.key, required this.assignment, required this.currentUserId});
   @override
@@ -24,7 +25,7 @@ class LogSheetState extends State<LogSheet> {
       padding: EdgeInsets.fromLTRB(
           20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Text('Log: ${widget.assignment.nameEntered ?? 'Medication'}',
+        Text('Log: ${widget.assignment.medication.nameEntered ?? 'Medication'}',
             style: AppTheme.subtitle),
         const SizedBox(height: 16),
         Row(

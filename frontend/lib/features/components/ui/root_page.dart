@@ -70,9 +70,10 @@ class SafeHandsAppBar extends StatelessWidget {
               ),
             ),
 
-            _MenuTile(icon: Icons.dashboard, label: 'Dashboard'),
-            _MenuTile(icon: Icons.group, label: 'Family Members'),
-            _MenuTile(icon: Icons.qr_code, label: 'Invite Family'),
+            _MenuTile(icon: Icons.dashboard, label: 'Dashboard', route: '/dashboard'),
+            _MenuTile(icon: Icons.group, label: 'Family Members', route: '/family'),
+            _MenuTile(icon: Icons.group, label: 'Medications', route: '/medications'),
+            _MenuTile(icon: Icons.qr_code, label: 'Invite Family', route: '/invite'),
 
             const Divider(),
 

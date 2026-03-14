@@ -4,6 +4,7 @@ import 'package:frontend/features/auth/pages/signup_page.dart';
 import 'package:frontend/features/auth/pages/startup_page.dart';
 import 'package:frontend/features/dashboard/pages/dashboard_page.dart';
 import 'package:frontend/features/family/family_members.dart';
+import 'package:frontend/features/medications/pages/member_medications_page.dart';
 import 'package:go_router/go_router.dart';
 
 GoRouter createRouter(AuthController authController) {
@@ -40,10 +41,17 @@ GoRouter createRouter(AuthController authController) {
         path: '/family',
         builder: (context, state) => const FamilyMembersPage(),
       ),
-      /* GoRoute(
+      GoRoute(
         path: '/medications',
-        builder: (context, state) => const MemberMedicationsPage(),
-      ), */
+        builder: (context, state) {
+          final data = state.extra as Map<String, String>;
+
+          return MemberMedicationsPage(
+            memberId: data['memberId']!,
+            memberName: data['memberName']!,
+          );
+        },
+      ),
     ],
   );
 }

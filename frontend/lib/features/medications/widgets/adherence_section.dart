@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
 import 'package:frontend/features/medications/widgets/log_sheet.dart';
-import 'package:frontend/services/medication_service.dart';
+import 'package:frontend/models/medications/family_member_medication.dart';
 import 'package:provider/provider.dart';
 
 class AdherenceTab extends StatelessWidget {
@@ -31,7 +31,7 @@ class AdherenceTab extends StatelessWidget {
 }
 
 class _AdherenceSection extends StatefulWidget {
-  final MemberMedication assignment;
+  final FamilyMemberMedication assignment;
   final String currentUserId;
   const _AdherenceSection(
       {required this.assignment, required this.currentUserId});
@@ -64,7 +64,7 @@ class _AdherenceSectionState extends State<_AdherenceSection> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               const SizedBox(width: 8),
-              Expanded(child: Text(widget.assignment.nameEntered ?? 'Medication',
+              Expanded(child: Text(widget.assignment.medication.nameEntered ?? 'Medication',
                   style: AppTheme.body.copyWith(fontWeight: FontWeight.bold))),
               TextButton.icon(
                 onPressed: () => _showLogSheet(context),

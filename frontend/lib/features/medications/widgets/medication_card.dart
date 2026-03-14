@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
-import 'package:frontend/services/medication_service.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/models/medications/family_member_medication.dart';
 
 class MedicationCard extends StatelessWidget {
-  final MemberMedication med;
+  final FamilyMemberMedication med;
   final String memberId;
   const MedicationCard({super.key, required this.med, required this.memberId});
 
@@ -24,10 +24,10 @@ class MedicationCard extends StatelessWidget {
         child: Row(children: [
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(med.nameEntered ?? 'Medication',
+            Text(med.medication.nameEntered ?? 'Medication',
                 style: AppTheme.body.copyWith(fontWeight: FontWeight.bold, fontSize: 15)),
-            if (med.dosage != null)
-              Text(med.dosage!, style: AppTheme.body.copyWith(color: Colors.grey)),
+            if (med.medication.dosage != null)
+              Text(med.medication.dosage!, style: AppTheme.body.copyWith(color: Colors.grey)),
             Text('Since ${med.startDate}',
                 style: AppTheme.body.copyWith(color: Colors.grey, fontSize: 12)),
           ])),
@@ -47,7 +47,7 @@ class MedicationCard extends StatelessWidget {
               icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
               onPressed: () async {
                 final ok = await _confirm(context,
-                    'Remove "${med.nameEntered ?? 'this medication'}" from this member?');
+                    'Remove "${med.medication.nameEntered ?? 'this medication'}" from this member?');
                 if (ok && context.mounted) {
                   context.read<MedicationController>().removeAssign(med.id, memberId);
                 }

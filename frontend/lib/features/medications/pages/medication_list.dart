@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
 import 'package:frontend/features/medications/pages/medication_form.dart';
+import 'package:frontend/models/medications/medication.dart';
 import 'package:provider/provider.dart';
 
 class MedicationListPage extends StatefulWidget {
@@ -80,7 +81,7 @@ class _MedicationListPageState extends State<MedicationListPage> {
 }
 
 class _MedCard extends StatelessWidget {
-  final med;
+  final Medication med;
   const _MedCard({required this.med});
 
   @override

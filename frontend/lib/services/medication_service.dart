@@ -1,5 +1,10 @@
 import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:frontend/models/medications/adherence_log.dart';
+import 'package:frontend/models/medications/family_member_medication.dart';
+import 'package:frontend/models/medications/medication.dart';
+import 'package:frontend/models/medications/medication_schedule.dart';
 import 'package:http/http.dart' as http;
 
 const _base = 'http://127.0.0.1:8000/api';
@@ -27,138 +32,10 @@ dynamic _parse(http.Response r) {
   throw ApiError(msg, r.statusCode);
 }
 
-class Medication {
-  final String id;
-  final String nameEntered;
-  final String? rxcui;
-  final String? dosage;
-  final String doseForm;
-  final String? instructions;
-  final String createdBy;
-
-  const Medication({
-    required this.id,
-    required this.nameEntered,
-    this.rxcui,
-    this.dosage,
-    required this.doseForm,
-    this.instructions,
-    required this.createdBy,
-  });
-
-  factory Medication.fromJson(Map<String, dynamic> j) => Medication(
-    id:           j['id'],
-    nameEntered:  j['nameEntered'],
-    rxcui:        j['rxcui'],
-    dosage:       j['dosage'],
-    doseForm:     j['doseForm'] ?? 'other',
-    instructions: j['instructions'],
-    createdBy:    j['createdBy'] ?? '',
-  );
-
-}
-
-class MemberMedication {
-  final String id;
-  final String medicationId;
-  final String familyMemberId;
-  final String? nameEntered;
-  final String? dosage;
-  final String? doseForm;
-  final String startDate;
-  final String? endDate;
-  final bool active;
-
-  const MemberMedication({
-    required this.id,
-    required this.medicationId,
-    required this.familyMemberId,
-    this.nameEntered,
-    this.dosage,
-    this.doseForm,
-    required this.startDate,
-    this.endDate,
-    required this.active,
-  });
-
-  factory MemberMedication.fromJson(Map<String, dynamic> j) => MemberMedication(
-    id:             j['id'],
-    medicationId:   j['medicationId'],
-    familyMemberId: j['familyMemberId'],
-    nameEntered:    j['nameEntered'],
-    dosage:         j['dosage'],
-    doseForm:       j['doseForm'],
-    startDate:      j['startDate'] ?? '',
-    endDate:        j['endDate'],
-    active:         j['active'] ?? true,
-  );
-
-}
-
-class MedSchedule {
-  final String id;
-  final String familyMemberMedicationId;
-  final String timeOfDay;
-  final String? daysOfWeek;
-  final String frequency;
-
-  const MedSchedule({
-    required this.id,
-    required this.familyMemberMedicationId,
-    required this.timeOfDay,
-    this.daysOfWeek,
-    required this.frequency,
-  });
-
-  factory MedSchedule.fromJson(Map<String, dynamic> j) => MedSchedule(
-    id:                       j['id'],
-    familyMemberMedicationId: j['familyMemberMedicationId'],
-    timeOfDay:                j['timeOfDay'],
-    daysOfWeek:               j['daysOfWeek'],
-    frequency:                j['frequency'],
-  );
-
-  String get displayTime {
-    final parts = timeOfDay.split(':');
-    if (parts.length < 2) return timeOfDay;
-    final h = int.tryParse(parts[0]) ?? 0;
-    final m = parts[1];
-    final period = h >= 12 ? 'PM' : 'AM';
-    final h12 = h > 12 ? h - 12 : (h == 0 ? 12 : h);
-    return '$h12:$m $period';
-  }
-}
-
-class AdherenceLog {
-  final String id;
-  final String familyMemberMedicationId;
-  final String scheduledTime;
-  final String? takenAt;
-  final String status;
-  final String recordedBy;
-
-  const AdherenceLog({
-    required this.id,
-    required this.familyMemberMedicationId,
-    required this.scheduledTime,
-    this.takenAt,
-    required this.status,
-    required this.recordedBy,
-  });
-
-  factory AdherenceLog.fromJson(Map<String, dynamic> j) => AdherenceLog(
-    id:                       j['id'],
-    familyMemberMedicationId: j['familyMemberMedicationId'],
-    scheduledTime:            j['scheduledTime'],
-    takenAt:                  j['takenAt'],
-    status:                   j['status'],
-    recordedBy:               j['recordedBy'],
-  );
-}
-
 Future<List<Medication>> getMedications() async {
   final r = await http.get(Uri.parse('$_base/medications'), headers: await _headers());
-  return (_parse(r) as List).map((e) => Medication.fromJson(e)).toList();
+  final data = _parse(r) as List;
+  return data.map((e) => MedicationMapper.fromMap(e as Map<String, dynamic>)).toList();
 }
 
 Future<Medication> createMedication({
@@ -168,37 +45,40 @@ Future<Medication> createMedication({
   String? instructions,
   String? rxcui,
 }) async {
-  final r = await http.post(Uri.parse('$_base/medications'),
+  final r = await http.post(
+    Uri.parse('$_base/medications'),
     headers: await _headers(),
     body: jsonEncode({
       'nameEntered': nameEntered,
       'doseForm': doseForm,
-      if (dosage?.isNotEmpty == true) 'dosage': dosage,
-      if (instructions?.isNotEmpty == true) 'instructions': instructions,
-      if (rxcui?.isNotEmpty == true) 'rxcui': rxcui,
+      'dosage': dosage,
+      'instructions': instructions,
+      'rxcui': rxcui,
     }),
   );
-  final data = _parse(r);
-  return Medication.fromJson(data is List ? data[0] : data);
+  final data = _parse(r) as Map<String, dynamic>;
+  return MedicationMapper.fromMap(data);
 }
 
-Future<Medication> updateMedication(String id, {
+Future<Medication> updateMedication(
+  String id, {
   String? nameEntered,
   String? doseForm,
   String? dosage,
   String? instructions,
 }) async {
-  final r = await http.put(Uri.parse('$_base/medications/$id'),
+  final r = await http.put(
+    Uri.parse('$_base/medications/$id'),
     headers: await _headers(),
     body: jsonEncode({
-      'nameEntered': ?nameEntered,
-      'doseForm': ?doseForm,
-      'dosage': ?dosage,
-      'instructions': ?instructions,
+      if (nameEntered != null) 'nameEntered': nameEntered,
+      if (doseForm != null) 'doseForm': doseForm,
+      if (dosage != null) 'dosage': dosage,
+      if (instructions != null) 'instructions': instructions,
     }),
   );
-  final data = _parse(r);
-  return Medication.fromJson(data is List ? data[0] : data);
+  final data = _parse(r) as Map<String, dynamic>;
+  return MedicationMapper.fromMap(data);
 }
 
 Future<void> deleteMedication(String id) async {
@@ -206,31 +86,33 @@ Future<void> deleteMedication(String id) async {
   _parse(r);
 }
 
-Future<List<MemberMedication>> getMemberMedications(String memberId) async {
+Future<List<FamilyMemberMedication>> getMemberMedications(String memberId) async {
   final r = await http.get(
     Uri.parse('$_base/medications/members/$memberId/medications'),
     headers: await _headers(),
   );
-  return (_parse(r) as List).map((e) => MemberMedication.fromJson(e)).toList();
+  final data = _parse(r) as List;
+  return data.map((e) => FamilyMemberMedicationMapper.fromMap(e as Map<String, dynamic>)).toList();
 }
 
-Future<MemberMedication> assignMedication({
+Future<FamilyMemberMedication> assignMedication({
   required String medicationId,
   required String familyMemberId,
   required String startDate,
   String? endDate,
 }) async {
-  final r = await http.post(Uri.parse('$_base/medications/member-medications'),
+  final r = await http.post(
+    Uri.parse('$_base/medications/member-medications'),
     headers: await _headers(),
     body: jsonEncode({
-      'medicationId':   medicationId,
+      'medicationId': medicationId,
       'familyMemberId': familyMemberId,
-      'startDate':      startDate,
-      'endDate': ?endDate,
+      'startDate': startDate,
+      if (endDate != null) 'endDate': endDate,
     }),
   );
-  final data = _parse(r);
-  return MemberMedication.fromJson(data is List ? data[0] : data);
+  final data = _parse(r) as Map<String, dynamic>;
+  return FamilyMemberMedicationMapper.fromMap(data);
 }
 
 Future<void> removeAssignment(String id) async {
@@ -241,15 +123,16 @@ Future<void> removeAssignment(String id) async {
   _parse(r);
 }
 
-Future<List<MedSchedule>> getSchedules(String assignmentId) async {
+Future<List<MedicationSchedule>> getSchedules(String assignmentId) async {
   final r = await http.get(
     Uri.parse('$_base/medications/member-medications/$assignmentId/schedules'),
     headers: await _headers(),
   );
-  return (_parse(r) as List).map((e) => MedSchedule.fromJson(e)).toList();
+  final data = _parse(r) as List;
+  return data.map((e) => MedicationScheduleMapper.fromMap(e as Map<String, dynamic>)).toList();
 }
 
-Future<MedSchedule> createSchedule({
+Future<MedicationSchedule> createSchedule({
   required String familyMemberMedicationId,
   required String timeOfDay,
   required String frequency,
@@ -260,13 +143,13 @@ Future<MedSchedule> createSchedule({
     headers: await _headers(),
     body: jsonEncode({
       'familyMemberMedicationId': familyMemberMedicationId,
-      'timeOfDay':  timeOfDay,
-      'frequency':  frequency,
-      'daysOfWeek': ?daysOfWeek,
+      'timeOfDay': timeOfDay,
+      'frequency': frequency,
+      if (daysOfWeek != null) 'daysOfWeek': daysOfWeek,
     }),
   );
-  final data = _parse(r);
-  return MedSchedule.fromJson(data is List ? data[0] : data);
+  final data = _parse(r) as Map<String, dynamic>;
+  return MedicationScheduleMapper.fromMap(data);
 }
 
 Future<void> deleteSchedule(String id) async {
@@ -277,13 +160,13 @@ Future<void> deleteSchedule(String id) async {
   _parse(r);
 }
 
-
 Future<List<AdherenceLog>> getAdherenceLogs(String assignmentId) async {
   final r = await http.get(
     Uri.parse('$_base/medications/member-medications/$assignmentId/logs'),
     headers: await _headers(),
   );
-  return (_parse(r) as List).map((e) => AdherenceLog.fromJson(e)).toList();
+  final data = _parse(r) as List;
+  return data.map((e) => AdherenceLogMapper.fromMap(e as Map<String, dynamic>)).toList();
 }
 
 Future<AdherenceLog> createAdherenceLog({
@@ -291,7 +174,7 @@ Future<AdherenceLog> createAdherenceLog({
   required String scheduledTime,
   required String status,
   required String recordedBy,
-  String? takenAt,
+  DateTime? takenAt,
 }) async {
   final r = await http.post(
     Uri.parse('$_base/medications/member-medications/$familyMemberMedicationId/logs'),
@@ -299,27 +182,28 @@ Future<AdherenceLog> createAdherenceLog({
     body: jsonEncode({
       'familyMemberMedicationId': familyMemberMedicationId,
       'scheduledTime': scheduledTime,
-      'status':        status,
-      'recordedBy':    recordedBy,
-      'takenAt': ?takenAt,
+      'status': status,
+      'recordedBy': recordedBy,
+      if (takenAt != null) 'takenAt': takenAt.toIso8601String(),
     }),
   );
-  final data = _parse(r);
-  return AdherenceLog.fromJson(data is List ? data[0] : data);
+  final data = _parse(r) as Map<String, dynamic>;
+  return AdherenceLogMapper.fromMap(data);
 }
 
-Future<AdherenceLog> updateAdherenceLog(String id, {
+Future<AdherenceLog> updateAdherenceLog(
+  String id, {
   required String status,
-  String? takenAt,
+  DateTime? takenAt,
 }) async {
   final r = await http.put(
     Uri.parse('$_base/medications/member-medications/logs/$id'),
     headers: await _headers(),
     body: jsonEncode({
       'status': status,
-      'takenAt': ?takenAt,
+      if (takenAt != null) 'takenAt': takenAt.toIso8601String(),
     }),
   );
-  final data = _parse(r);
-  return AdherenceLog.fromJson(data is List ? data[0] : data);
+  final data = _parse(r) as Map<String, dynamic>;
+  return AdherenceLogMapper.fromMap(data);
 }

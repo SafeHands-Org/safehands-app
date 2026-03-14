@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
 import 'package:frontend/features/medications/widgets/add_schedule_sheet.dart';
-import 'package:frontend/services/medication_service.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/models/medications/family_member_medication.dart';
 
 class SchedulesTab extends StatelessWidget {
   final String memberId;
@@ -27,7 +27,7 @@ class SchedulesTab extends StatelessWidget {
 }
 
 class _ScheduleSection extends StatefulWidget {
-  final MemberMedication assignment;
+  final FamilyMemberMedication assignment;
   const _ScheduleSection({required this.assignment});
   @override
   State<_ScheduleSection> createState() => _ScheduleSectionState();
@@ -58,7 +58,7 @@ class _ScheduleSectionState extends State<_ScheduleSection> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               const SizedBox(width: 8),
-              Expanded(child: Text(widget.assignment.nameEntered ?? 'Medication',
+              Expanded(child: Text(widget.assignment.medication.nameEntered ?? 'Medication',
                   style: AppTheme.body.copyWith(fontWeight: FontWeight.bold))),
               TextButton.icon(
                 onPressed: () => _showAddSheet(context),
@@ -78,7 +78,7 @@ class _ScheduleSectionState extends State<_ScheduleSection> {
                 leading: Icon(Icons.access_time, color: AppTheme.primary),
                 title: Text(s.displayTime, style: AppTheme.body),
                 subtitle: Text(
-                  '${s.frequency.replaceAll('_', ' ')}${s.daysOfWeek != null ? ' · ${s.daysOfWeek}' : ''}',
+                  '${s.frequency.toString()} ${s.frequencyUnit}${s.daysOfWeek != null ? ' · ${s.daysOfWeek?.join(', ')}' : ''}',
                   style: AppTheme.body.copyWith(color: Colors.grey, fontSize: 12),
                 ),
                 trailing: IconButton(

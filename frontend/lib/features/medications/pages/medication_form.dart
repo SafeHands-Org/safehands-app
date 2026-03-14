@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/medication_controller.dart';
 import 'package:frontend/features/components/styles/app_theme.dart';
-import 'package:frontend/services/medication_service.dart';
+import 'package:frontend/models/medications/medication.dart';
 import 'package:provider/provider.dart';
 
 const _doseForms = [

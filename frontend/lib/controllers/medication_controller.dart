@@ -1,4 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:frontend/models/medications/adherence_log.dart';
+import 'package:frontend/models/medications/family_member_medication.dart';
+import 'package:frontend/models/medications/medication.dart';
+import 'package:frontend/models/medications/medication_schedule.dart';
 import 'package:frontend/services/medication_service.dart';
 
 class MedicationController extends ChangeNotifier {
@@ -61,9 +65,9 @@ class MedicationController extends ChangeNotifier {
     }
   }
 
-  final Map<String, List<MemberMedication>> _memberMeds = {};
+  final Map<String, List<FamilyMemberMedication>> _memberMeds = {};
 
-  List<MemberMedication> forMember(String memberId) => _memberMeds[memberId] ?? [];
+  List<FamilyMemberMedication> forMember(String memberId) => _memberMeds[memberId] ?? [];
 
   Future<void> loadMemberMeds(String memberId) async {
     try {
@@ -101,9 +105,9 @@ class MedicationController extends ChangeNotifier {
     }
   }
 
-  final Map<String, List<MedSchedule>> _schedules = {};
+  final Map<String, List<MedicationSchedule>> _schedules = {};
 
-  List<MedSchedule> schedulesFor(String assignmentId) => _schedules[assignmentId] ?? [];
+  List<MedicationSchedule> schedulesFor(String assignmentId) => _schedules[assignmentId] ?? [];
 
   Future<void> loadSchedules(String assignmentId) async {
     try {
@@ -165,7 +169,7 @@ class MedicationController extends ChangeNotifier {
       final log = await createAdherenceLog(
         familyMemberMedicationId: familyMemberMedicationId,
         scheduledTime: scheduledTime, status: status,
-        recordedBy: recordedBy, takenAt: takenAt,
+        recordedBy: recordedBy, takenAt: DateTime.tryParse(takenAt ?? ''),
       );
       _logs[familyMemberMedicationId] = [...(_logs[familyMemberMedicationId] ?? []), log];
       notifyListeners(); return true;

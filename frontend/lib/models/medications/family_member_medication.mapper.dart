@@ -16,6 +16,7 @@ class FamilyMemberMedicationMapper
   static FamilyMemberMedicationMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = FamilyMemberMedicationMapper._());
+      MedicationMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -25,6 +26,11 @@ class FamilyMemberMedicationMapper
 
   static String _$id(FamilyMemberMedication v) => v.id;
   static const Field<FamilyMemberMedication, String> _f$id = Field('id', _$id);
+  static Medication _$medication(FamilyMemberMedication v) => v.medication;
+  static const Field<FamilyMemberMedication, Medication> _f$medication = Field(
+    'medication',
+    _$medication,
+  );
   static String _$medicationId(FamilyMemberMedication v) => v.medicationId;
   static const Field<FamilyMemberMedication, String> _f$medicationId = Field(
     'medicationId',
@@ -60,6 +66,7 @@ class FamilyMemberMedicationMapper
   @override
   final MappableFields<FamilyMemberMedication> fields = const {
     #id: _f$id,
+    #medication: _f$medication,
     #medicationId: _f$medicationId,
     #familyMemberId: _f$familyMemberId,
     #priority: _f$priority,
@@ -71,6 +78,7 @@ class FamilyMemberMedicationMapper
   static FamilyMemberMedication _instantiate(DecodingData data) {
     return FamilyMemberMedication(
       id: data.dec(_f$id),
+      medication: data.dec(_f$medication),
       medicationId: data.dec(_f$medicationId),
       familyMemberId: data.dec(_f$familyMemberId),
       priority: data.dec(_f$priority),
@@ -150,8 +158,10 @@ abstract class FamilyMemberMedicationCopyWith<
   $Out
 >
     implements ClassCopyWith<$R, $In, $Out> {
+  MedicationCopyWith<$R, Medication, Medication> get medication;
   $R call({
     String? id,
+    Medication? medication,
     String? medicationId,
     String? familyMemberId,
     String? priority,
@@ -174,8 +184,12 @@ class _FamilyMemberMedicationCopyWithImpl<$R, $Out>
   late final ClassMapperBase<FamilyMemberMedication> $mapper =
       FamilyMemberMedicationMapper.ensureInitialized();
   @override
+  MedicationCopyWith<$R, Medication, Medication> get medication =>
+      $value.medication.copyWith.$chain((v) => call(medication: v));
+  @override
   $R call({
     String? id,
+    Medication? medication,
     String? medicationId,
     String? familyMemberId,
     String? priority,
@@ -185,6 +199,7 @@ class _FamilyMemberMedicationCopyWithImpl<$R, $Out>
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
+      if (medication != null) #medication: medication,
       if (medicationId != null) #medicationId: medicationId,
       if (familyMemberId != null) #familyMemberId: familyMemberId,
       if (priority != null) #priority: priority,
@@ -196,6 +211,7 @@ class _FamilyMemberMedicationCopyWithImpl<$R, $Out>
   @override
   FamilyMemberMedication $make(CopyWithData data) => FamilyMemberMedication(
     id: data.get(#id, or: $value.id),
+    medication: data.get(#medication, or: $value.medication),
     medicationId: data.get(#medicationId, or: $value.medicationId),
     familyMemberId: data.get(#familyMemberId, or: $value.familyMemberId),
     priority: data.get(#priority, or: $value.priority),

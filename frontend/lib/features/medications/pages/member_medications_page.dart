@@ -5,17 +5,16 @@ import 'package:frontend/features/medications/widgets/adherence_section.dart';
 import 'package:frontend/features/medications/widgets/medication_tab.dart';
 import 'package:frontend/features/medications/widgets/schedule_section.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/controllers/auth_controller.dart';
 
 class MemberMedicationsPage extends StatefulWidget {
   final String memberId;
   final String memberName;
-  final String currentUserId;
 
   const MemberMedicationsPage({
     super.key,
     required this.memberId,
     required this.memberName,
-    required this.currentUserId,
   });
 
   @override
@@ -44,6 +43,7 @@ class MemberMedicationsPageState extends State<MemberMedicationsPage>
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = context.read<AuthController>().currentUserId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -70,12 +70,12 @@ class MemberMedicationsPageState extends State<MemberMedicationsPage>
           MedicationsTab(
             memberId: widget.memberId,
             memberName: widget.memberName,
-            currentUserId: widget.currentUserId,
+            currentUserId: widget.memberId,
           ),
           SchedulesTab(memberId: widget.memberId),
           AdherenceTab(
             memberId: widget.memberId,
-            currentUserId: widget.currentUserId,
+            currentUserId: widget.memberId,
           ),
         ],
       ),
