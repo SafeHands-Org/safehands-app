@@ -21,7 +21,7 @@ In order to run this application through an emulator or simulator, Docker must b
 
 `docker compose up --build` This will build the image again using. You’ll know the backend is now running if it says “Server running on port 8000”
 
-These steps must be succesfully completed before you can run the emulator. If the Docker isn't working use `docker compose down -v` to start over with a clean slate. Once Docker is up and running, run the following commands in a new terminal. Do NOT close Docker. If you do, the build will fail.
+These steps must be succesfully completed before you can run the emulator. If the Docker isn't working use `docker compose down -v` to start over with a clean slate. Once Docker is up and running, run the following commands in a new terminal. Do NOT close Docker. If you do, the build will fail. Once Docker has been successfully set up you only need to run `docker compose up` going forward. To start the Flutter app, follow the following commands:
 
 `cd frontend` This will switch you to the frontend directory where the Flutter files live.
 
