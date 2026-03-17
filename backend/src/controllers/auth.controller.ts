@@ -23,11 +23,6 @@ export const me = async (req: Request, res: Response): Promise <void> => {
 };
 
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
-  console.log(
-    "Attempting to create user:",
-    req.body
-  );
-
   const registerUser = await createUser(req.body);
 
   const payload = {
@@ -45,9 +40,6 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
   await storeSession({userId: registerUser.id, sessionToken, expiresAt});
 
   res.setHeader("Authorization", `Bearer ${sessionToken}`);
-
-  console.log("New user created");
-
   res.status(201).json({
     success: true,
     message: "New user created",
@@ -68,7 +60,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
   const user = await getUserByEmail(email);
   if (!user) {
-    throwErr.unauthorized("Invalid email or password");
+    throwErr.notFound("Invalid email or password");
     return;
   }
 
@@ -83,13 +75,6 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
   const expiresAt = addDays(new Date(), 30);
 
   await storeSession({userId: user.id, sessionToken, expiresAt});
-
-  res.cookie("session_token", sessionToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-  });
 
   console.log("Logged in successfully");
   res.status(200).json({

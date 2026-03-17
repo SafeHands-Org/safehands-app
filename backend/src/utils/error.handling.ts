@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { z, ZodError } from 'zod';
 
-export const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+export const globalErrorHandler = (err: any, request: Request, response: Response, next: NextFunction) => {
   if (err instanceof ZodError) {
-    return res.status(400).json({
+    return response.status(400).json({
       status: "fail",
       type: "ValidationError",
       errors: z.treeifyError(err),
@@ -11,14 +11,14 @@ export const globalErrorHandler = (err: any, req: Request, res: Response, next: 
   };
 
   if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
+    return response.status(err.statusCode).json({
       status: "error",
       message: err.message,
     });
   };
 
   console.log(err);
-  res.status(500).json({
+  response.status(500).json({
     status: "error",
     message: "Internal Server Error",
   });

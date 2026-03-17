@@ -45,9 +45,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
   const session = await getSessionByToken(token);
   if (!session) {
-    return res
-      .status(401)
-      .json({ success: false, message: "Session not found" });
+    return res.status(401).json({ success: false, message: "Session not found" });
   }
   if (new Date(session.expiresAt) < new Date()) {
     return res
@@ -57,4 +55,16 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
   req.session = session;
   next();
+};
+
+export const requireRole = (...roles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ success: false, message: "Forbidden" });
+    }
+    next();
+  };
 };
