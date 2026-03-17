@@ -3,6 +3,7 @@ services:
     build: .
     ports:
       - "${APP_PORT}:${APP_PORT}"
+      - "4983:4983"
     env_file:
       - ./.env
     depends_on:
