@@ -26,6 +26,8 @@ router.route("/:id")
 
 router.route("/:id/members")
   .post(addFamilyMember)
+
+router.route("/:id/members/:memberId")
   .put(updateFamilyMember)
   .delete(removeFamilyMember);
 

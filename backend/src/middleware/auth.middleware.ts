@@ -17,8 +17,18 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
   
   if (!token) return throwErr.unauthorized("No session token");
 
-  const decoded = jwt.verify(token, config.jwt_secret) as JwtPayload & { userId: string; role: string };
-  req.user = { userId: decoded.userId, role: decoded.role };
+  const decoded = jwt.verify(token, config.jwt_secret) as any;
+
+  const userId = decoded.userId ?? decoded.id;
+
+  if (!userId) {
+    return throwErr.unauthorized("Invalid token payload");
+  }
+
+  req.user = {
+    userId,
+    role: decoded.role,
+};
 
   const session = await getSessionByToken(token);
   if (!session) return res.status(401).json({ success: false, message: "Session not found" });
