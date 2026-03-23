@@ -11,7 +11,7 @@ import { families } from "./families";
 import { familyMemberships } from "./families";
 import { medicationAdherenceLogs } from "./medications";
 
-export const userRoleEnum = pgEnum("user_role", ["caregiver", "family_member", "viewer",]);
+export const userRoleEnum = pgEnum("user_role", ["caregiver", "family_member", "viewer", "tester"]);
 
 export const users = pgTable(
   "users",

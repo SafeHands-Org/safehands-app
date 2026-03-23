@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware";
-import { accessMiddleware } from "../middleware/access.middleware";
 import {
   validateMedication,
   validateFamilyMemberMedication,
@@ -30,7 +29,6 @@ import {
 const router = Router();
 
 router.use(authMiddleware);
-router.use(accessMiddleware);
 
 router.route("/")
   .get(getMedications)

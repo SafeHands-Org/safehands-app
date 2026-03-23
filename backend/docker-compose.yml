@@ -9,8 +9,8 @@ services:
     depends_on:
       - db
     volumes:
-      - ./:/app
-      - /app/node_modules
+      - ./:/safehands-app
+      - /safehands-app/node_modules
   db:
     image: postgres:17
     container_name: postgres_container

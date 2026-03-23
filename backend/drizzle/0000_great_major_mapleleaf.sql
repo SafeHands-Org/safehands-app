@@ -1,8 +1,6 @@
-CREATE TYPE "public"."user_role" AS ENUM('caregiver', 'family_member', 'viewer');--> statement-breakpoint
+CREATE TYPE "public"."user_role" AS ENUM('caregiver', 'family_member', 'viewer', 'tester');--> statement-breakpoint
 CREATE TYPE "public"."risk_level" AS ENUM('low', 'medium', 'high');--> statement-breakpoint
-CREATE TYPE "public"."dose_form" AS ENUM('tablet', 'capsule', 'liquid', 'inhaler', 'injection', 'topical', 'drops', 'patch', 'suppository', 'other');--> statement-breakpoint
 CREATE TYPE "public"."weekdays" AS ENUM('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');--> statement-breakpoint
-CREATE TYPE "public"."frequency_units" AS ENUM('days', 'weeks');--> statement-breakpoint
 CREATE TYPE "public"."priority" AS ENUM('low', 'medium', 'high');--> statement-breakpoint
 CREATE TABLE "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
@@ -34,10 +32,8 @@ CREATE TABLE "family_memberships" (
 CREATE TABLE "invitations" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"family_id" uuid NOT NULL,
-	"role" text NOT NULL,
 	"token" text NOT NULL,
-	"expires_at" timestamp NOT NULL,
-	"used" boolean DEFAULT false NOT NULL,
+	"expiration" timestamp NOT NULL,
 	"created_by" uuid NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "invitations_token_unique" UNIQUE("token")
@@ -45,11 +41,11 @@ CREATE TABLE "invitations" (
 --> statement-breakpoint
 CREATE TABLE "medications" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name_entered" text NOT NULL,
+	"names" text[] NOT NULL,
 	"rxcui" text,
-	"dosage" text,
-	"dose_form" "dose_form" NOT NULL,
-	"instructions" text,
+	"dosage" text NOT NULL,
+	"dosage_form" text NOT NULL,
+	"instructions" text NOT NULL,
 	"created_by" uuid NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
@@ -59,8 +55,7 @@ CREATE TABLE "family_member_medications" (
 	"medication_id" uuid NOT NULL,
 	"family_member_id" uuid NOT NULL,
 	"priority" "priority" NOT NULL,
-	"start_date" date NOT NULL,
-	"end_date" date,
+	"quantity" integer NOT NULL,
 	"active" boolean DEFAULT true NOT NULL
 );
 --> statement-breakpoint
@@ -69,8 +64,7 @@ CREATE TABLE "medication_schedules" (
 	"family_member_medication_id" uuid NOT NULL,
 	"times_of_day" time[] NOT NULL,
 	"days_of_week" "weekdays"[],
-	"frequency" integer NOT NULL,
-	"frequency_unit" "frequency_units" NOT NULL
+	"frequency" integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "medication_adherence_logs" (

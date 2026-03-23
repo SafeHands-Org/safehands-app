@@ -1,6 +1,10 @@
 import { Router } from "express";
-import { getDashboard } from "../controllers/dashboard.controller";
+import { getCaregiverDashboard, getFamilyMemberDashboard } from "../controllers/dashboard.controller";
+import { authMiddleware } from "../middleware/auth.middleware";
 
 const router = Router();
 
-router.get("/", getDashboard);
+router.get("/caregiver", authMiddleware, getCaregiverDashboard);
+router.get("/family-member", authMiddleware, getFamilyMemberDashboard);
+
+export default router;
