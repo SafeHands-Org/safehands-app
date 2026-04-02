@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { 
+import {
   getUserFamilies,
   createFamily,
   getFamilyById,
@@ -10,7 +10,6 @@ import {
   removeFamilyMember,
   createInvitation,
   checkInvitation,
-  acceptInvitation
 } from "../controllers/families.controller";
 
 const router = Router();
@@ -26,6 +25,8 @@ router.route("/:id")
 
 router.route("/:id/members")
   .post(addFamilyMember)
+
+router.route("/:id/members/:memberId")
   .put(updateFamilyMember)
   .delete(removeFamilyMember);
 
@@ -34,6 +35,5 @@ router.route("/:id/invitations")
 
 router.route("/invitations/:token")
   .get(checkInvitation)
-  .put(acceptInvitation);
 
 export default router;

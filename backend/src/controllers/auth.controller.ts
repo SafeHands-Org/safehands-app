@@ -8,16 +8,12 @@ import * as throwErr from "../utils/error.handling"
 
 export const me = async (req: Request, res: Response): Promise <void> => {
   if (!req.user) return throwErr.unauthorized("Not Logged In");
-  
-  res.json({
+
+  res.status(200).json({
     success: true,
     user: {
       id: req.user.id,
-      name: req.user.name,
-      email: req.user.email,
       role: req.user.role,
-      createdAt: req.user.createdAt,
-      updatedAt: req.user.updatedAt,
     },
   });
 };
@@ -30,8 +26,6 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
     name: registerUser.name,
     email: registerUser.email,
     role: registerUser.role,
-    createdAt: registerUser.createdAt.toISOString(),
-    updatedAt: registerUser.updatedAt.toISOString()
   };
 
   const sessionToken = await createSessionToken(payload);
@@ -43,14 +37,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
   res.status(201).json({
     success: true,
     message: "New user created",
-    user: {
-      id: registerUser.id,
-      name: registerUser.name,
-      email: registerUser.email,
-      role: registerUser.role,
-      createdAt: registerUser.createdAt.toISOString(),
-      updatedAt: registerUser.updatedAt.toISOString(),
-    },
+    user: registerUser,
     token: sessionToken,
   });
 };
@@ -70,7 +57,13 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  const payload = {id: user.id, role: user.role};
+  const payload = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
+
   const sessionToken = await createSessionToken(payload);
   const expiresAt = addDays(new Date(), 30);
 
@@ -80,14 +73,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
   res.status(200).json({
     success: true,
     message: "Logged in successfully",
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      createdAt: user.createdAt.toISOString(),
-      updatedAt: user.updatedAt.toISOString(),
-    },
+    user: user,
     token: sessionToken,
   });
 };

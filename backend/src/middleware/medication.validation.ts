@@ -4,33 +4,27 @@ import { Request, Response, NextFunction } from "express";
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be yyyy-MM-dd");
 const hhMm    = z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/, "Must be HH:MM");
 const isoTs   = z.string().refine(v => !isNaN(Date.parse(v)), "Must be a valid ISO timestamp");
-const uuid    = z.string().uuid();
+const uuid    = z.uuid();
 
 const medicationSchema = z.object({
-  nameEntered:  z.string().min(1),
-  doseForm:     z.enum(["tablet","capsule","liquid","inhaler","injection","topical","drops","patch","suppository","other"]),
-  dosage:       z.string().optional(),
-  instructions: z.string().optional(),
-  rxcui:        z.string().optional(),
+  names:        z.array(z.string()),
+  doseForm:     z.string().min(1),
+  dosage:       z.string().min(1),
+  instructions: z.string().min(1),
+  rxcui:        z.string().min(1),
 });
 
-const familyMemberMedicationBase = z.object({
+const familyMemberMedicationSchema = z.object({
   medicationId:   uuid,
   familyMemberId: uuid,
-  startDate:      isoDate,
-  endDate:        isoDate.nullable().optional(),
   active:         z.boolean().optional(),
 });
-const familyMemberMedicationSchema = familyMemberMedicationBase.refine(
-  d => !d.endDate || d.endDate >= d.startDate,
-  { message: "endDate cannot be before startDate", path: ["endDate"] }
-);
 
 const scheduleSchema = z.object({
   familyMemberMedicationId: uuid,
-  timeOfDay:  hhMm,
-  frequency:  z.enum(["daily", "weekly", "specific_days", "as_needed"]),
-  daysOfWeek: z.string().nullable().optional(),
+  timeOfDay:  z.array(hhMm),
+  frequency:  z.int().min(10),
+  daysOfWeek: z.array(z.string()).nullable().optional(),
 });
 
 const adherenceLogSchema = z.object({
@@ -59,7 +53,7 @@ export const validateMedication = makeValidator(
 
 export const validateFamilyMemberMedication = makeValidator(
   familyMemberMedicationSchema,
-  familyMemberMedicationBase.partial()
+  familyMemberMedicationSchema.partial()
 );
 
 export const validateSchedule = makeValidator(
