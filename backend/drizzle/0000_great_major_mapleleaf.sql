@@ -44,7 +44,7 @@ CREATE TABLE "medications" (
 	"names" text[] NOT NULL,
 	"rxcui" text,
 	"dosage" text NOT NULL,
-	"dosage_form" text NOT NULL,
+	"dose_form" text NOT NULL,
 	"instructions" text NOT NULL,
 	"created_by" uuid NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL

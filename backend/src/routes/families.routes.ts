@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  getUserFamilies,
+  getFamilies,
   createFamily,
   getFamilyById,
   updateFamily,
@@ -10,30 +10,30 @@ import {
   removeFamilyMember,
   createInvitation,
   checkInvitation,
+  getFamilyMembers
 } from "../controllers/families.controller";
 
 const router = Router();
 
 router.route("/")
-  .get(getUserFamilies)
+  .get(getFamilies)
   .post(createFamily);
+
+router.route("/members/:fmId")
+  .put(updateFamilyMember)
+  .delete(removeFamilyMember);
+
+router.route("/members")
+  .get(getFamilyMembers)
+  .post(addFamilyMember);
+
+router.route("/invitations/:token")
+  .get(checkInvitation)
+  .put(createInvitation);
 
 router.route("/:id")
   .get(getFamilyById)
   .put(updateFamily)
   .delete(deleteFamily);
-
-router.route("/:id/members")
-  .post(addFamilyMember)
-
-router.route("/:id/members/:memberId")
-  .put(updateFamilyMember)
-  .delete(removeFamilyMember);
-
-router.route("/:id/invitations")
-  .post(createInvitation);
-
-router.route("/invitations/:token")
-  .get(checkInvitation)
 
 export default router;

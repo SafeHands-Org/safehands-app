@@ -1,40 +1,24 @@
 import { Request, Response } from "express";
 import * as service from "../services/family.service";
 import * as throwErr from "../utils/error.handling";
-import { CreateFamilyBody } from "../models/families.model";
 import { Family, Memberships, Invitation } from "../db/types";
+import { getParam } from "../middleware/auth.middleware";
 
-const getParam = (param: string | string[], name = "parameter"): string => {
-  if (!param) throwErr.badRequest(`Missing ${name}`);
-  return Array.isArray(param) ? param[0] : param;
-};
+export const getFamilies = async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  const userRole = req.user!.role;
 
-const getReqUser = (req: Request) => ({
-	id: req.user?.id,
-	role: req.user?.role,
-});
-
-export const getUserFamilies = async (req: Request, res: Response) => {
-  try {
-    const userId = getReqUser(req).id;
-
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const families = await service.getUserFamilies(userId);
-    return res.json(families);
-  } catch (error) {
-    return res.status(500).json({ message: "Failed to fetch user families" });
+  if (userRole == 'caregiver') {
+    const families = await service.getAdminFamilies(userId);
+    return res.status(200).json(families);
   }
+
+  const family = await service.getUserFamily(userId);
+  return res.status(200).json(family);
 };
 
 export const createFamily = async (req: Request, res: Response) => {
-  const userId = getReqUser(req).id;
-  if (!userId) return throwErr.unauthorized("No user");
-
-  CreateFamilyBody.parse(req.body);
-
+  const userId = req.user?.id;
   const data: Family = {
     ...req.body,
     createdBy: userId,
@@ -45,25 +29,37 @@ export const createFamily = async (req: Request, res: Response) => {
 };
 
 export const getFamilyById = async (req: Request, res: Response) => {
-  const id = getParam(req.params.id, "family id");
+  const id = getParam(req.params.id, "id");
   const family = await service.getFamilyById(id);
-  if (!family) return throwErr.notFound("Family not found");
 
-  return res.json(family);
+  return res.status(200).json(family);
 };
 
 export const updateFamily = async (req: Request, res: Response) => {
-  const id = getParam(req.params.id, "family id");
-  const data: Partial<Family> = req.body;
+  const id = getParam(req.params.id, "id");
+  const data = req.body;
 
   const result = await service.updateFamily(id, data);
-  return res.json(result);
+  return res.status(200).json(result);
 };
 
 export const deleteFamily = async (req: Request, res: Response) => {
-  const id = getParam(req.params.id, "family id");
+  const id = getParam(req.params.id, "id");
   await service.deleteFamily(id);
   return res.status(204).send();
+};
+
+export const getFamilyMembers = async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  const userRole = req.user!.role;
+
+  if (userRole == 'caregiver') {
+    const members = await service.getAdminMemberships(userId);
+    return res.status(200).json(members);
+  }
+
+  const members = await service.getUserMemberships(userId);
+  return res.status(200).json(members);
 };
 
 export const addFamilyMember = async (req: Request, res: Response) => {
@@ -73,22 +69,21 @@ export const addFamilyMember = async (req: Request, res: Response) => {
 };
 
 export const updateFamilyMember = async (req: Request, res: Response) => {
-  const memberId = getParam(req.params.memberId, "family membership id");
-  const data: Partial<Memberships> = req.body;
+  const memberId = getParam(req.params.fmId, "fmId");
+  const data = req.body;
 
   const result = await service.updateFamilyMember(memberId, data);
-  return res.json(result);
+  return res.status(200).json(result);
 };
 
 export const removeFamilyMember = async (req: Request, res: Response) => {
-  const memberId = getParam(req.params.memberId, "family membership id");
+  const memberId = getParam(req.params.fmId, "fmId");
   await service.removeFamilyMember(memberId);
   return res.status(204).send();
 };
 
 export const createInvitation = async (req: Request, res: Response) => {
-  const userId = getReqUser(req).id;
-  if (!userId) return throwErr.unauthorized("No user");
+  const userId = req.user!.id;
 
   const data: Invitation = {
     ...req.body,
@@ -100,9 +95,9 @@ export const createInvitation = async (req: Request, res: Response) => {
 };
 
 export const checkInvitation = async (req: Request, res: Response) => {
-  const token = getParam(req.params.token, "invitation token");
+  const token = getParam(req.params.token, "token");
   const invitation = await service.checkInvitation(token);
   if (!invitation) return throwErr.notFound("Invitation not found");
 
-  return res.json(invitation);
+  return res.status(200).json(invitation);
 };

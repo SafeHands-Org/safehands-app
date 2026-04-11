@@ -1,52 +1,119 @@
 import { db } from "../db";
-import { medications, familyMemberMedications, medicationSchedules, medicationAdherenceLogs } from "../db/schema/medications";
+import { medications, familyMemberMedications, medicationSchedules, medicationAdherenceLogs, users, familyMemberships, families} from "../db/schema";
 import { eq } from "drizzle-orm";
 import { Medication, FamilyMemberMedication, MedicationSchedule, MedicationAdherenceLog } from "../db/types";
 
-export const getAllMedications = (userId: string) =>
-  db.select().from(medications).where(eq(medications.createdBy, userId));
+export const getAllMedications = async (userId: string) => {
+  const meds = await db
+    .select({ medication : medications })
+    .from(medications)
+    .innerJoin(users, eq(users.id, medications.createdBy))
+    .where(eq(medications.createdBy, userId));
+  return meds
+}
 
-export const createMedication = (data: Medication) =>
-  db.insert(medications).values(data).returning();
+export const createMedication = async (data: Medication) =>
+  await db.insert(medications).values(data).returning();
 
-export const getMedicationById = (id: string) =>
-  db.select().from(medications).where(eq(medications.id, id)).then(r => r[0] ?? null);
+export const getMedicationById = async (id: string) =>
+  await db.select().from(medications).where(eq(medications.id, id));
 
-export const updateMedication = (id: string, data: Partial<Medication>) =>
-  db.update(medications).set(data).where(eq(medications.id, id)).returning();
+export const updateMedication = async (id: string, data: Partial<Medication>) =>
+  await db.update(medications).set(data).where(eq(medications.id, id)).returning();
 
-export const deleteMedication = (id: string) =>
-  db.delete(medications).where(eq(medications.id, id));
+export const deleteMedication = async (id: string) =>
+  await db.delete(medications).where(eq(medications.id, id));
 
-export const getFamilyMemberMedications = (memberId: string) =>
-  db.select().from(familyMemberMedications).where(eq(familyMemberMedications.familyMemberId, memberId));
+export const getFamilyMemberMedications = async (memberId: string) =>
+  await db.select().from(familyMemberMedications).where(eq(familyMemberMedications.familyMemberId, memberId));
 
-export const assignMedicationToMember = (data: FamilyMemberMedication) =>
-  db.insert(familyMemberMedications).values(data).returning();
+export const getCaregiverFamilyMedications = async (userId: string) => {
+  const medications = await db
+    .select({assignment: familyMemberMedications})
+    .from(familyMemberMedications)
+    .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
+    .innerJoin(families, eq(familyMemberships.familyId, families.id))
+    .where(eq(families.createdBy, userId));
+  return medications
+}
 
-export const updateFamilyMemberMedication = (id: string, data: Partial<FamilyMemberMedication>) =>
-  db.update(familyMemberMedications).set(data).where(eq(familyMemberMedications.id, id)).returning();
+export const assignMedicationToMember = async (data: FamilyMemberMedication) =>
+  await db.insert(familyMemberMedications).values(data).returning();
 
-export const removeFamilyMemberMedication = (id: string) =>
-  db.delete(familyMemberMedications).where(eq(familyMemberMedications.id, id));
+export const updateFamilyMemberMedication = async (id: string, data: Partial<FamilyMemberMedication>) =>
+  await db.update(familyMemberMedications).set(data).where(eq(familyMemberMedications.id, id)).returning();
 
-export const getMedicationSchedules = (fmmId: string) =>
-  db.select().from(medicationSchedules).where(eq(medicationSchedules.familyMemberMedicationId, fmmId));
+export const removeFamilyMemberMedication = async (id: string) =>
+  await db.delete(familyMemberMedications).where(eq(familyMemberMedications.id, id));
 
-export const createMedicationSchedule = (data: MedicationSchedule) =>
-  db.insert(medicationSchedules).values(data).returning();
+export const getMemberMedicationSchedules = async (userId: string) => {
+  const schedules = await db
+    .select()
+    .from(medicationSchedules)
+    .innerJoin(familyMemberMedications, eq(medicationSchedules.familyMemberMedicationId, familyMemberMedications.id))
+    .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
+    .where(eq(familyMemberships.userId, userId));
+  return schedules
+}
+export const getCaregiverMedicationSchedules = async (userId: string) => {
+  const medications = await db.select({
+    schedules: {
+      id: medicationSchedules.id,
+      fmmid: medicationSchedules.familyMemberMedicationId,
+      fmid: familyMemberships.id,
+      timesOfDay: medicationSchedules.timesOfDay,
+      daysOfWeek: medicationSchedules.daysOfWeek,
+      frequency: medicationSchedules.frequency,
+    }})
+    .from(medicationSchedules)
+    .innerJoin(familyMemberMedications, eq(medicationSchedules.familyMemberMedicationId, familyMemberMedications.id))
+    .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
+    .innerJoin(families, eq(familyMemberships.familyId, families.id))
+    .where(eq(families.createdBy, userId));
+  return medications
+}
 
-export const updateMedicationSchedule = (id: string, data: Partial<MedicationSchedule>) =>
-  db.update(medicationSchedules).set(data).where(eq(medicationSchedules.id, id)).returning();
+export const createMedicationSchedule = async (data: MedicationSchedule) =>
+  await db.insert(medicationSchedules).values(data).returning();
 
-export const deleteMedicationSchedule = (id: string) =>
-  db.delete(medicationSchedules).where(eq(medicationSchedules.id, id));
+export const updateMedicationSchedule = async (id: string, data: Partial<MedicationSchedule>) =>
+  await db.update(medicationSchedules).set(data).where(eq(medicationSchedules.id, id)).returning();
 
-export const getAdherenceLogs = (fmmId: string) =>
-  db.select().from(medicationAdherenceLogs).where(eq(medicationAdherenceLogs.familyMemberMedicationId, fmmId));
+export const deleteMedicationSchedule = async (id: string) =>
+  await db.delete(medicationSchedules).where(eq(medicationSchedules.id, id));
 
-export const createAdherenceLog = (data: MedicationAdherenceLog) =>
-  db.insert(medicationAdherenceLogs).values(data).returning();
+export const getMemberAdherenceLogs = async (userId: string) => {
+  const adherences = await db.select({ logs: medicationAdherenceLogs })
+    .from(medicationAdherenceLogs)
+    .innerJoin(familyMemberMedications, eq(medicationAdherenceLogs.familyMemberMedicationId, familyMemberMedications.id))
+    .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
+    .where(eq(familyMemberships.userId, userId));
+  return adherences
+}
 
-export const updateAdherenceLog = (id: string, data: Partial<MedicationAdherenceLog>) =>
-  db.update(medicationAdherenceLogs).set(data).where(eq(medicationAdherenceLogs.id, id)).returning();
+export const getCaregiverAdherenceLogs = async (userId: string) => {
+  const adherences = await db
+    .select({
+      logs: {
+        id: medicationAdherenceLogs.id,
+        fmid: familyMemberships.id,
+        fmmId: medicationAdherenceLogs.familyMemberMedicationId,
+        scheduledTime: medicationAdherenceLogs.scheduledTime,
+        takenAt: medicationAdherenceLogs.takenAt,
+        status: medicationAdherenceLogs.status,
+        recordedBy: medicationAdherenceLogs.recordedBy,
+      }
+    })
+    .from(medicationAdherenceLogs)
+    .innerJoin(familyMemberMedications, eq(medicationAdherenceLogs.familyMemberMedicationId, familyMemberMedications.id))
+    .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
+    .innerJoin(families, eq(familyMemberships.familyId, families.id))
+    .where(eq(families.createdBy, userId));
+  return adherences
+}
+
+export const createAdherenceLog = async (data: MedicationAdherenceLog) =>
+  await db.insert(medicationAdherenceLogs).values(data).returning();
+
+export const updateAdherenceLog = async (id: string, data: Partial<MedicationAdherenceLog>) =>
+  await db.update(medicationAdherenceLogs).set(data).where(eq(medicationAdherenceLogs.id, id)).returning();

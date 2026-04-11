@@ -2,34 +2,61 @@ import { db } from "../db";
 import { eq, and } from "drizzle-orm";
 import { Family, Memberships, Invitation } from "../db/types";
 import { families, familyMemberships, invitations } from "../db/schema/families";
+import { users } from "../db/schema";
 
-export const getFamilyMembership = async (
-  userId: string,
-  familyId: string
-): Promise<Memberships | null> => {
-  const [membership] = await db
-    .select()
-    .from(familyMemberships)
-    .where(
-      and(
-        eq(familyMemberships.userId, userId),
-        eq(familyMemberships.familyId, familyId)
-      )
-    )
-    .limit(1);
-
-  return membership ?? null;
-};
-
-export const getUserFamilies = async (userId: string) => {
-  const [family] = await db
+export const getUserMemberships = async (fid: string) => {
+  const memberships = await db
     .select({
-      membership: familyMemberships,
-      family: families,
+      member: {
+        id: familyMemberships.id,
+        name: users.name,
+        isAdmin: familyMemberships.isAdmin,
+      }
     })
     .from(familyMemberships)
+    .innerJoin(users, eq(users.id, familyMemberships.userId))
+    .innerJoin(families, eq(families.id, familyMemberships.familyId))
+    .where(eq(familyMemberships.familyId, fid))
+
+  return memberships ?? null;
+};
+
+export const getAdminMemberships = async (uid: string) => {
+  const memberships = await db
+  .select({
+    member: {
+      id: familyMemberships.id,
+      fmid: familyMemberships.userId,
+      fid: familyMemberships.familyId,
+      name: users.name,
+      risklevel: familyMemberships.riskLevel,
+      isAdmin: familyMemberships.isAdmin,
+      createdAt: familyMemberships.createdAt
+    }
+  })
+  .from(families)
+  .innerJoin(familyMemberships, eq(familyMemberships.familyId, families.id))
+  .innerJoin(users, eq(users.id, familyMemberships.userId))
+  .where(eq(families.createdBy, uid))
+
+  return memberships ?? null;
+};
+
+export const getUserFamily = async (userId: string) => {
+  const [family] = await db
+    .select({family: families})
+    .from(familyMemberships)
     .innerJoin(families, eq(familyMemberships.familyId, families.id))
-    .where(eq(familyMemberships.userId, userId));
+    .where(eq(familyMemberships.userId, userId))
+
+  return family;
+};
+
+export const getAdminFamilies = async (userId: string) => {
+  const family = await db
+    .select()
+    .from(families)
+    .where(eq(families.createdBy, userId));
   return family;
 };
 
@@ -103,7 +130,7 @@ export const createInvitation = async (data: Invitation) => {
     .values({
       familyId: data.familyId,
       token: data.token,
-      expiration: new Date(), // convert string to Date
+      expiration: new Date(),
       createdBy: data.createdBy,
     })
     .returning();

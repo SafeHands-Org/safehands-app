@@ -9,13 +9,7 @@ import * as throwErr from "../utils/error.handling"
 export const me = async (req: Request, res: Response): Promise <void> => {
   if (!req.user) return throwErr.unauthorized("Not Logged In");
 
-  res.status(200).json({
-    success: true,
-    user: {
-      id: req.user.id,
-      role: req.user.role,
-    },
-  });
+  res.status(200).json({ user: { id: req.user.id, role: req.user.role}});
 };
 
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
@@ -36,7 +30,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
   res.setHeader("Authorization", `Bearer ${sessionToken}`);
   res.status(201).json({
     success: true,
-    message: "New user created",
+    message: "Account Creation Successful",
     user: registerUser,
     token: sessionToken,
   });
@@ -46,16 +40,10 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   const user = await getUserByEmail(email);
-  if (!user) {
-    throwErr.notFound("Invalid email or password");
-    return;
-  }
+  if (!user) return throwErr.notFound("Invalid email or password");
 
   const validPassword = await bcrypt.compare(password, user.passwordHash);
-  if (!validPassword) {
-    throwErr.unauthorized("Invalid email or password");
-    return;
-  }
+  if (!validPassword) return throwErr.unauthorized("Invalid email or password");
 
   const payload = {
     id: user.id,
@@ -69,11 +57,15 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
   await storeSession({userId: user.id, sessionToken, expiresAt});
 
-  console.log("Logged in successfully");
+  res.setHeader("Authorization", `Bearer ${sessionToken}`);
   res.status(200).json({
     success: true,
-    message: "Logged in successfully",
-    user: user,
-    token: sessionToken,
+    message: "Authentication Successful",
+    user: {
+      id: user.id,
+      name: user.id,
+      email: user.email,
+      role: user.role
+    },
   });
 };

@@ -11,6 +11,7 @@ interface Config {
   postgres_db: string;
   jwt_secret: string,
   node_env: string;
+  test_mode: string;
 }
 
 const config: Config = {
@@ -21,7 +22,8 @@ const config: Config = {
   postgres_password: process.env.POSTGRES_PASSWORD || (() => { throw new Error("POSTGRES_PASSWORD not set"); })(),
   postgres_db: process.env.POSTGRES_DB || (() => { throw new Error("POSTGRES_DB not set"); })(),
   jwt_secret: process.env.JWT_SECRET || (() => { throw new Error("JWT_SECRET not set"); })(),
-  node_env: process.env.NODE_ENV || 'development'
+  node_env: process.env.NODE_ENV || 'development',
+  test_mode: process.env.TEST_MODE || 'true',
 }
 
 export default config;
