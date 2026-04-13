@@ -56,10 +56,8 @@ export const invitations = pgTable(
     familyId: uuid("family_id")
       .notNull()
       .references(() => families.id, { onDelete: "cascade" }),
-    role: text("role").notNull(),
     token: text("token").notNull().unique(),
-    expiresAt: timestamp("expires_at").notNull(),
-    used: boolean("used").default(false).notNull(),
+    expiration: timestamp("expiration").notNull(),
     createdBy: uuid("created_by")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),

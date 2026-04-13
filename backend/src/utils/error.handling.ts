@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { z, ZodError } from 'zod';
+import { z, ZodError, ZodRealError } from 'zod';
 
 export const globalErrorHandler = (err: any, request: Request, response: Response, next: NextFunction) => {
   if (err instanceof ZodError) {
@@ -7,6 +7,9 @@ export const globalErrorHandler = (err: any, request: Request, response: Respons
       status: "fail",
       type: "ValidationError",
       errors: z.treeifyError(err),
+      message: err.message,
+      stack: err.stack,
+      issues: err.issues,
     });
   };
 

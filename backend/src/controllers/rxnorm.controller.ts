@@ -1,13 +1,6 @@
 import { Request, Response } from "express";
 import * as rxnormService from "../services/rxnorm.service";
-
-const getParam = (param: string | string[], name: string): string => {
-  if (!param) {
-    throw new Error(`Missing ${name}`);
-  }
-
-  return Array.isArray(param) ? param[0] : param;
-};
+import { getParam } from "../middleware/auth.middleware";
 
 //search RxNorm medications
 export const searchMedications = async (req: Request, res: Response) => {

@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 export const validateBody = (schema: z.ZodTypeAny) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
-    req.body = schema.parse(req.body);
+    schema.safeParse(req.body);
     next();
   };
 };

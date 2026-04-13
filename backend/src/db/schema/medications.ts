@@ -3,29 +3,15 @@ import {
   uuid,
   text,
   timestamp,
-  date,
   time,
-  integer,
   boolean,
   index,
   pgEnum,
+  integer
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { users } from "./users";
 import { familyMemberships } from "./families";
-
-export const doseFormEnum = pgEnum("dose_form", [
-  "tablet",
-  "capsule",
-  "liquid",
-  "inhaler",
-  "injection",
-  "topical",
-  "drops",
-  "patch",
-  "suppository",
-  "other",
-]);
 
 export const weekdayEnum = pgEnum("weekdays", [
   "monday",
@@ -37,22 +23,17 @@ export const weekdayEnum = pgEnum("weekdays", [
   "sunday",
 ])
 
-export const frequencyUnitsEnum = pgEnum("frequency_units", [
-  "days",
-  "weeks",
-])
-
 export const priorityEnum = pgEnum("priority", ["low", "medium", "high"]);
 
 export const medications = pgTable(
   "medications",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    nameEntered: text("name_entered").notNull(),
+    names: text("names").array().notNull(),
     rxcui: text("rxcui"),
-    dosage: text("dosage"),
-    doseForm: doseFormEnum("dose_form").notNull(),
-    instructions: text("instructions"),
+    dosage: text("dosage").notNull(),
+    doseForm: text("dose_form").notNull(),
+    instructions: text("instructions").notNull(),
     createdBy: uuid("created_by")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
@@ -74,8 +55,7 @@ export const familyMemberMedications = pgTable(
       .notNull()
       .references(() => familyMemberships.id, { onDelete: "cascade" }),
     priority: priorityEnum("priority").notNull(),
-    startDate: date("start_date").notNull(),
-    endDate: date("end_date"),
+    quantity: integer("quantity").notNull(),
     active: boolean("active").default(true).notNull(),
   },
   (table) => [
@@ -94,7 +74,6 @@ export const medicationSchedules = pgTable(
     timesOfDay: time("times_of_day").array().notNull(),
     daysOfWeek: weekdayEnum("days_of_week").array(),
     frequency: integer("frequency").notNull(),
-    frequencyUnit: frequencyUnitsEnum("frequency_unit").notNull(),
   },
   (table) => [
     index("schedule_fmm_idx").on(table.familyMemberMedicationId),
