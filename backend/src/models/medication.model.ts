@@ -1,6 +1,19 @@
+import { stat } from "node:fs";
 import { z } from "zod";
 
 const uuid    = z.uuid();
+
+const dayEnum = z.enum([
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat",
+  "Sun",
+]);
+
+const statusEnum = z.enum(["taken", "missed"]);
 
 export const NewMedication = z.object({
   names:        z.array(z.string()),
@@ -13,7 +26,7 @@ export const NewMedication = z.object({
 export const NewFamilyMemberMedication = z.object({
   medicationId:   uuid.nonoptional(),
   familyMemberId: uuid.nonoptional(),
-  priority:       z.string().min(3).nonoptional(),
+  priority:       z.enum(["high", "medium", "low"]).nonoptional(),
   quantity:       z.int().gt(0).nonoptional(),
   active:         z.boolean().nonoptional(),
 });
@@ -22,14 +35,14 @@ export const NewSchedule = z.object({
   familyMemberMedicationId: uuid.nonoptional(),
   timesOfDay:  z.array(z.string()).min(1),
   frequency:  z.int().min(1),
-  daysOfWeek: z.array(z.string()).nullable().optional(),
+  daysOfWeek: z.array(dayEnum).optional(),
 });
 
 export const NewAdherenceLog = z.object({
   familyMemberMedicationId: uuid.nonoptional(),
   scheduledTime: z.coerce.string().min(1).nonoptional(),
   takenAt:       z.coerce.date().nullable().optional(),
-  status:        z.enum(["taken", "missed"]),
+  status:        statusEnum.nonoptional(),
   recordedBy:    uuid,
 });
 
@@ -41,7 +54,7 @@ export type  NewSchedule = z.infer<typeof NewSchedule>;
 export const UpdateAdherenceLog = z.object({
   scheduledTime: z.coerce.string().min(1).nonoptional(),
   takenAt:       z.coerce.date().nullable().optional(),
-  status:        z.enum(["taken", "missed"]),
+  status:        statusEnum.nonoptional(),
   recordedBy:    uuid,
 });
 
@@ -52,7 +65,7 @@ export const UpdateMedication = z.object({
 });
 
 export const UpdateFamilyMemberMedication = z.object({
-  priority:       z.string().min(3).nonoptional(),
+  priority:       z.enum(["high", "medium", "low"]).nonoptional(),
   quantity:       z.int().gt(0).nonoptional(),
   active:         z.boolean().nonoptional(),
 });
@@ -60,7 +73,7 @@ export const UpdateFamilyMemberMedication = z.object({
 export const UpdateSchedule = z.object({
   timesOfDay:  z.array(z.string()).min(1),
   frequency:  z.int().min(1),
-  daysOfWeek: z.array(z.string()).nullable().optional(),
+  daysOfWeek: z.array(dayEnum).optional()
 });
 
 export type  UpdateFamilyMemberMedication = z.infer<typeof UpdateFamilyMemberMedication>;
