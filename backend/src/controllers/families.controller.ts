@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as service from "../services/family.service";
 import * as throwErr from "../utils/error.handling";
-import { Family, Memberships, Invitation } from "../db/types";
+import { Family, Memberships, Invitation, CreateInvitation } from "../db/types";
 import { getParam } from "../middleware/auth.middleware";
 
 export const getFamilies = async (req: Request, res: Response) => {
@@ -83,11 +83,11 @@ export const removeFamilyMember = async (req: Request, res: Response) => {
 };
 
 export const createInvitation = async (req: Request, res: Response) => {
-  const userId = req.user!.id;
+  if (!req.user) return throwErr.unauthorized("Not authenticated");
 
-  const data: Invitation = {
-    ...req.body,
-    createdBy: userId,
+  const data: CreateInvitation = {
+    familyId: req.body.familyId,
+    createdBy: req.user.id,
   };
 
   const result = await service.createInvitation(data);
@@ -95,9 +95,29 @@ export const createInvitation = async (req: Request, res: Response) => {
 };
 
 export const checkInvitation = async (req: Request, res: Response) => {
-  const token = getParam(req.params.token, "token");
-  const invitation = await service.checkInvitation(token);
-  if (!invitation) return throwErr.notFound("Invitation not found");
+  const code = getParam(req.params.code, "code");
+  const invitation = await service.checkInvitation(code);
+  if (!invitation) {
+    return throwErr.notFound("Invalid or expired code");
+  }
 
   return res.status(200).json(invitation);
+};
+
+export const joinFamily = async (req: Request, res: Response) => {
+  if (!req.user) return throwErr.unauthorized("Not authenticated");
+
+  const joinCode = req.body.joinCode;
+
+  if (!joinCode) {
+    return throwErr.badRequest("Join code is required");
+  }
+
+  const result = await service.joinFamily(joinCode, req.user.id);
+
+  if (!result) {
+    return throwErr.notFound("Invalid or expired join code");
+  }
+
+  return res.status(201).json(result);
 };

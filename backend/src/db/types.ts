@@ -11,6 +11,10 @@ export type TokenPayload = Pick<InferSelectModel<typeof users>, "id" | "role">;
 export type Memberships = InferSelectModel<typeof familyMemberships>;
 export type Family = InferSelectModel<typeof families>;
 export type Invitation = InferSelectModel<typeof invitations>;
+export type CreateInvitation = {
+  familyId: string;
+  createdBy: string;
+};
 export type Medication = InferSelectModel<typeof medications>;
 export type FamilyMemberMedication = InferSelectModel<typeof familyMemberMedications>;
 export type MedicationSchedule = InferSelectModel<typeof medicationSchedules>;

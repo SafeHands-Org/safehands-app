@@ -45,7 +45,10 @@ export const familyMemberships = pgTable(
   (table) => [
     index("family_memberships_user_idx").on(table.userId),
     index("family_memberships_family_idx").on(table.familyId),
-    uniqueIndex("family_memberships_unique_member").on(table.userId, table.familyId),
+    uniqueIndex("family_memberships_unique_member").on(
+      table.userId,
+      table.familyId
+    ),
   ]
 );
 
@@ -53,19 +56,26 @@ export const invitations = pgTable(
   "invitations",
   {
     id: uuid("id").defaultRandom().primaryKey(),
+
     familyId: uuid("family_id")
       .notNull()
       .references(() => families.id, { onDelete: "cascade" }),
-    token: text("token").notNull().unique(),
+
+    code: text("code").notNull().unique(),
+
+    used: boolean("used").default(false).notNull(),
+
     expiration: timestamp("expiration").notNull(),
+
     createdBy: uuid("created_by")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    index("invitations_token_idx").on(table.token),
     index("invitations_family_idx").on(table.familyId),
+    index("invitations_code_idx").on(table.code),
   ]
 );
 

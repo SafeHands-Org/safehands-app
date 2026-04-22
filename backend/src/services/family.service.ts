@@ -3,6 +3,7 @@ import { eq, and } from "drizzle-orm";
 import { Family, Memberships, Invitation } from "../db/types";
 import { families, familyMemberships, invitations } from "../db/schema/families";
 import { users } from "../db/schema";
+import { generateCode } from '../utils/code.generator';
 
 export const getUserMemberships = async (fid: string) => {
   const memberships = await db
@@ -124,26 +125,85 @@ export const removeFamilyMember = async (id: string) => {
   await db.delete(familyMemberships).where(eq(familyMemberships.id, id));
 };
 
-export const createInvitation = async (data: Invitation) => {
+export type CreateInvitationInput = {
+  familyId: string;
+  createdBy: string;
+};
+
+export const createInvitation = async (data: CreateInvitationInput) => {
+  const code = generateCode(6);
+
+  const expiration = new Date();
+  expiration.setHours(expiration.getHours() + 24);
+
   const [invitation] = await db
     .insert(invitations)
     .values({
       familyId: data.familyId,
-      token: data.token,
-      expiration: new Date(),
+      code,
+      expiration,
       createdBy: data.createdBy,
+      used: false,
     })
     .returning();
 
   return invitation;
 };
 
-export const checkInvitation = async (token: string) => {
+export const checkInvitation = async (code: string) => {
   const [invitation] = await db
     .select()
     .from(invitations)
-    .where(eq(invitations.token, token))
+    .where(eq(invitations.code, code))
     .limit(1);
 
-  return invitation ?? null;
+  if (!invitation) return null;
+
+  if (new Date() > invitation.expiration) return null;
+
+  if (invitation.used) return null;
+
+  return invitation;
+};
+
+export const joinFamily = async (code: string, userId: string) => {
+  const [invitation] = await db
+    .select()
+    .from(invitations)
+    .where(eq(invitations.code, code))
+    .limit(1);
+
+  if (!invitation) return null;
+  if (invitation.used) return null;
+  if (new Date() > invitation.expiration) return null;
+
+  const existing = await db
+    .select()
+    .from(familyMemberships)
+    .where(
+      and(
+        eq(familyMemberships.userId, userId),
+        eq(familyMemberships.familyId, invitation.familyId)
+      )
+    )
+    .limit(1);
+
+  if (existing.length > 0) return existing[0];
+
+  const [membership] = await db
+    .insert(familyMemberships)
+    .values({
+      userId,
+      familyId: invitation.familyId,
+      riskLevel: "low",
+      isAdmin: false,
+    })
+    .returning();
+
+  await db
+    .update(invitations)
+    .set({ used: true })
+    .where(eq(invitations.code, code));
+
+  return membership;
 };
