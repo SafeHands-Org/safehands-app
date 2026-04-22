@@ -1,36 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/controllers/auth_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/features/components/styles/styles.dart';
+import 'package:frontend/features/providers/app/app_providers.dart';
 import 'package:frontend/routes/app_router.dart';
-import 'package:frontend/services/auth_service.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  final authService = AuthService();
-  final authController = AuthController(authService)..restoreSession();
+  runApp(ProviderScope(child: SafeHandsApp()));
 
-  final router = createRouter(authController);
-
-  runApp(
-    ChangeNotifierProvider.value(
-      value: authController,
-      child: SafeHandsApp(router: router),
-    ),
-  );
 }
 
-class SafeHandsApp extends StatelessWidget {
-  final GoRouter router;
-
-  const SafeHandsApp({super.key, required this.router});
+class SafeHandsApp extends ConsumerWidget {
+  const SafeHandsApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'SafeHands',
-      routerConfig: router,
-      debugShowCheckedModeBanner: false,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+    return _AppStartup(
+      child: MaterialApp.router(
+        key: navigatorKey,
+        title: 'SafeHands',
+        theme: AppTheme.light(),
+        routerConfig: router,
+        debugShowCheckedModeBanner: false,
+      ),
     );
+  }
+}
+
+class _AppStartup extends ConsumerWidget {
+  const _AppStartup({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(remoteStartupProvider);
+
+    return child;
   }
 }

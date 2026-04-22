@@ -26,7 +26,7 @@ export const getAdminMemberships = async (uid: string) => {
   .select({
     member: {
       id: familyMemberships.id,
-      fmid: familyMemberships.userId,
+      uid: familyMemberships.userId,
       fid: familyMemberships.familyId,
       name: users.name,
       risklevel: familyMemberships.riskLevel,
@@ -54,7 +54,7 @@ export const getUserFamily = async (userId: string) => {
 
 export const getAdminFamilies = async (userId: string) => {
   const family = await db
-    .select()
+    .select({family: families})
     .from(families)
     .where(eq(families.createdBy, userId));
   return family;

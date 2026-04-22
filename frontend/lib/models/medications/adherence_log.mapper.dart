@@ -8,67 +8,74 @@
 
 part of 'adherence_log.dart';
 
-class AdherenceLogMapper extends ClassMapperBase<AdherenceLog> {
-  AdherenceLogMapper._();
+class MedicationAdherenceLogMapper
+    extends ClassMapperBase<MedicationAdherenceLog> {
+  MedicationAdherenceLogMapper._();
 
-  static AdherenceLogMapper? _instance;
-  static AdherenceLogMapper ensureInitialized() {
+  static MedicationAdherenceLogMapper? _instance;
+  static MedicationAdherenceLogMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(_instance = AdherenceLogMapper._());
+      MapperContainer.globals.use(_instance = MedicationAdherenceLogMapper._());
     }
     return _instance!;
   }
 
   @override
-  final String id = 'AdherenceLog';
+  final String id = 'MedicationAdherenceLog';
 
-  static String _$id(AdherenceLog v) => v.id;
-  static const Field<AdherenceLog, String> _f$id = Field('id', _$id);
-  static String _$familyMemberMedicationId(AdherenceLog v) =>
-      v.familyMemberMedicationId;
-  static const Field<AdherenceLog, String> _f$familyMemberMedicationId = Field(
-    'familyMemberMedicationId',
-    _$familyMemberMedicationId,
+  static String _$id(MedicationAdherenceLog v) => v.id;
+  static const Field<MedicationAdherenceLog, String> _f$id = Field('id', _$id);
+  static String _$fmid(MedicationAdherenceLog v) => v.fmid;
+  static const Field<MedicationAdherenceLog, String> _f$fmid = Field(
+    'fmid',
+    _$fmid,
   );
-  static String _$scheduledTime(AdherenceLog v) => v.scheduledTime;
-  static const Field<AdherenceLog, String> _f$scheduledTime = Field(
+  static String _$fmmid(MedicationAdherenceLog v) => v.fmmid;
+  static const Field<MedicationAdherenceLog, String> _f$fmmid = Field(
+    'fmmid',
+    _$fmmid,
+  );
+  static String _$scheduledTime(MedicationAdherenceLog v) => v.scheduledTime;
+  static const Field<MedicationAdherenceLog, String> _f$scheduledTime = Field(
     'scheduledTime',
     _$scheduledTime,
   );
-  static String _$status(AdherenceLog v) => v.status;
-  static const Field<AdherenceLog, String> _f$status = Field(
-    'status',
-    _$status,
-  );
-  static DateTime? _$takenAt(AdherenceLog v) => v.takenAt;
-  static const Field<AdherenceLog, DateTime> _f$takenAt = Field(
+  static DateTime? _$takenAt(MedicationAdherenceLog v) => v.takenAt;
+  static const Field<MedicationAdherenceLog, DateTime> _f$takenAt = Field(
     'takenAt',
     _$takenAt,
     opt: true,
   );
-  static String _$recordedBy(AdherenceLog v) => v.recordedBy;
-  static const Field<AdherenceLog, String> _f$recordedBy = Field(
+  static String _$status(MedicationAdherenceLog v) => v.status;
+  static const Field<MedicationAdherenceLog, String> _f$status = Field(
+    'status',
+    _$status,
+  );
+  static String _$recordedBy(MedicationAdherenceLog v) => v.recordedBy;
+  static const Field<MedicationAdherenceLog, String> _f$recordedBy = Field(
     'recordedBy',
     _$recordedBy,
   );
 
   @override
-  final MappableFields<AdherenceLog> fields = const {
+  final MappableFields<MedicationAdherenceLog> fields = const {
     #id: _f$id,
-    #familyMemberMedicationId: _f$familyMemberMedicationId,
+    #fmid: _f$fmid,
+    #fmmid: _f$fmmid,
     #scheduledTime: _f$scheduledTime,
-    #status: _f$status,
     #takenAt: _f$takenAt,
+    #status: _f$status,
     #recordedBy: _f$recordedBy,
   };
 
-  static AdherenceLog _instantiate(DecodingData data) {
-    return AdherenceLog(
+  static MedicationAdherenceLog _instantiate(DecodingData data) {
+    return MedicationAdherenceLog(
       id: data.dec(_f$id),
-      familyMemberMedicationId: data.dec(_f$familyMemberMedicationId),
+      fmid: data.dec(_f$fmid),
+      fmmid: data.dec(_f$fmmid),
       scheduledTime: data.dec(_f$scheduledTime),
-      status: data.dec(_f$status),
       takenAt: data.dec(_f$takenAt),
+      status: data.dec(_f$status),
       recordedBy: data.dec(_f$recordedBy),
     );
   }
@@ -76,119 +83,130 @@ class AdherenceLogMapper extends ClassMapperBase<AdherenceLog> {
   @override
   final Function instantiate = _instantiate;
 
-  static AdherenceLog fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<AdherenceLog>(map);
+  static MedicationAdherenceLog fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<MedicationAdherenceLog>(map);
   }
 
-  static AdherenceLog fromJson(String json) {
-    return ensureInitialized().decodeJson<AdherenceLog>(json);
+  static MedicationAdherenceLog fromJson(String json) {
+    return ensureInitialized().decodeJson<MedicationAdherenceLog>(json);
   }
 }
 
-mixin AdherenceLogMappable {
+mixin MedicationAdherenceLogMappable {
   String toJson() {
-    return AdherenceLogMapper.ensureInitialized().encodeJson<AdherenceLog>(
-      this as AdherenceLog,
-    );
+    return MedicationAdherenceLogMapper.ensureInitialized()
+        .encodeJson<MedicationAdherenceLog>(this as MedicationAdherenceLog);
   }
 
   Map<String, dynamic> toMap() {
-    return AdherenceLogMapper.ensureInitialized().encodeMap<AdherenceLog>(
-      this as AdherenceLog,
-    );
+    return MedicationAdherenceLogMapper.ensureInitialized()
+        .encodeMap<MedicationAdherenceLog>(this as MedicationAdherenceLog);
   }
 
-  AdherenceLogCopyWith<AdherenceLog, AdherenceLog, AdherenceLog> get copyWith =>
-      _AdherenceLogCopyWithImpl<AdherenceLog, AdherenceLog>(
-        this as AdherenceLog,
-        $identity,
-        $identity,
-      );
+  MedicationAdherenceLogCopyWith<
+    MedicationAdherenceLog,
+    MedicationAdherenceLog,
+    MedicationAdherenceLog
+  >
+  get copyWith =>
+      _MedicationAdherenceLogCopyWithImpl<
+        MedicationAdherenceLog,
+        MedicationAdherenceLog
+      >(this as MedicationAdherenceLog, $identity, $identity);
   @override
   String toString() {
-    return AdherenceLogMapper.ensureInitialized().stringifyValue(
-      this as AdherenceLog,
+    return MedicationAdherenceLogMapper.ensureInitialized().stringifyValue(
+      this as MedicationAdherenceLog,
     );
   }
 
   @override
   bool operator ==(Object other) {
-    return AdherenceLogMapper.ensureInitialized().equalsValue(
-      this as AdherenceLog,
+    return MedicationAdherenceLogMapper.ensureInitialized().equalsValue(
+      this as MedicationAdherenceLog,
       other,
     );
   }
 
   @override
   int get hashCode {
-    return AdherenceLogMapper.ensureInitialized().hashValue(
-      this as AdherenceLog,
+    return MedicationAdherenceLogMapper.ensureInitialized().hashValue(
+      this as MedicationAdherenceLog,
     );
   }
 }
 
-extension AdherenceLogValueCopy<$R, $Out>
-    on ObjectCopyWith<$R, AdherenceLog, $Out> {
-  AdherenceLogCopyWith<$R, AdherenceLog, $Out> get $asAdherenceLog =>
-      $base.as((v, t, t2) => _AdherenceLogCopyWithImpl<$R, $Out>(v, t, t2));
+extension MedicationAdherenceLogValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, MedicationAdherenceLog, $Out> {
+  MedicationAdherenceLogCopyWith<$R, MedicationAdherenceLog, $Out>
+  get $asMedicationAdherenceLog => $base.as(
+    (v, t, t2) => _MedicationAdherenceLogCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
-abstract class AdherenceLogCopyWith<$R, $In extends AdherenceLog, $Out>
+abstract class MedicationAdherenceLogCopyWith<
+  $R,
+  $In extends MedicationAdherenceLog,
+  $Out
+>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({
     String? id,
-    String? familyMemberMedicationId,
+    String? fmid,
+    String? fmmid,
     String? scheduledTime,
-    String? status,
     DateTime? takenAt,
+    String? status,
     String? recordedBy,
   });
-  AdherenceLogCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+  MedicationAdherenceLogCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
 }
 
-class _AdherenceLogCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, AdherenceLog, $Out>
-    implements AdherenceLogCopyWith<$R, AdherenceLog, $Out> {
-  _AdherenceLogCopyWithImpl(super.value, super.then, super.then2);
+class _MedicationAdherenceLogCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, MedicationAdherenceLog, $Out>
+    implements
+        MedicationAdherenceLogCopyWith<$R, MedicationAdherenceLog, $Out> {
+  _MedicationAdherenceLogCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<AdherenceLog> $mapper =
-      AdherenceLogMapper.ensureInitialized();
+  late final ClassMapperBase<MedicationAdherenceLog> $mapper =
+      MedicationAdherenceLogMapper.ensureInitialized();
   @override
   $R call({
     String? id,
-    String? familyMemberMedicationId,
+    String? fmid,
+    String? fmmid,
     String? scheduledTime,
-    String? status,
     Object? takenAt = $none,
+    String? status,
     String? recordedBy,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
-      if (familyMemberMedicationId != null)
-        #familyMemberMedicationId: familyMemberMedicationId,
+      if (fmid != null) #fmid: fmid,
+      if (fmmid != null) #fmmid: fmmid,
       if (scheduledTime != null) #scheduledTime: scheduledTime,
-      if (status != null) #status: status,
       if (takenAt != $none) #takenAt: takenAt,
+      if (status != null) #status: status,
       if (recordedBy != null) #recordedBy: recordedBy,
     }),
   );
   @override
-  AdherenceLog $make(CopyWithData data) => AdherenceLog(
+  MedicationAdherenceLog $make(CopyWithData data) => MedicationAdherenceLog(
     id: data.get(#id, or: $value.id),
-    familyMemberMedicationId: data.get(
-      #familyMemberMedicationId,
-      or: $value.familyMemberMedicationId,
-    ),
+    fmid: data.get(#fmid, or: $value.fmid),
+    fmmid: data.get(#fmmid, or: $value.fmmid),
     scheduledTime: data.get(#scheduledTime, or: $value.scheduledTime),
-    status: data.get(#status, or: $value.status),
     takenAt: data.get(#takenAt, or: $value.takenAt),
+    status: data.get(#status, or: $value.status),
     recordedBy: data.get(#recordedBy, or: $value.recordedBy),
   );
 
   @override
-  AdherenceLogCopyWith<$R2, AdherenceLog, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  ) => _AdherenceLogCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  MedicationAdherenceLogCopyWith<$R2, MedicationAdherenceLog, $Out2>
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _MedicationAdherenceLogCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 

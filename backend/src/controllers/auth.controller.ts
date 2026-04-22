@@ -31,8 +31,13 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
   res.status(201).json({
     success: true,
     message: "Account Creation Successful",
-    user: registerUser,
-    token: sessionToken,
+    user: {
+      id: registerUser.id,
+      name: registerUser.name,
+      email: registerUser.email,
+      role: registerUser.role,
+      token: sessionToken
+    },
   });
 };
 
@@ -63,9 +68,10 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     message: "Authentication Successful",
     user: {
       id: user.id,
-      name: user.id,
+      name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role,
+      token: sessionToken
     },
   });
 };

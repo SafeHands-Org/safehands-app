@@ -63,7 +63,7 @@ export const getSessionByToken = async (token: string): Promise<Session| null> =
     .from(sessionsTable)
     .where(eq(sessionsTable.sessionToken, token))
     .limit(1);
-  
+
   if (!session) return null;
 
   return {

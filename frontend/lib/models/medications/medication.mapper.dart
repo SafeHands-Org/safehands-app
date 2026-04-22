@@ -24,41 +24,32 @@ class MedicationMapper extends ClassMapperBase<Medication> {
 
   static String _$id(Medication v) => v.id;
   static const Field<Medication, String> _f$id = Field('id', _$id);
-  static String _$nameEntered(Medication v) => v.nameEntered;
-  static const Field<Medication, String> _f$nameEntered = Field(
-    'nameEntered',
-    _$nameEntered,
+  static List<String> _$names(Medication v) => v.names;
+  static const Field<Medication, List<String>> _f$names = Field(
+    'names',
+    _$names,
   );
   static String? _$rxcui(Medication v) => v.rxcui;
-  static const Field<Medication, String> _f$rxcui = Field(
-    'rxcui',
-    _$rxcui,
-    opt: true,
-  );
-  static String? _$dosage(Medication v) => v.dosage;
-  static const Field<Medication, String> _f$dosage = Field(
-    'dosage',
-    _$dosage,
-    opt: true,
-  );
+  static const Field<Medication, String> _f$rxcui = Field('rxcui', _$rxcui);
+  static String _$dosage(Medication v) => v.dosage;
+  static const Field<Medication, String> _f$dosage = Field('dosage', _$dosage);
   static String _$doseForm(Medication v) => v.doseForm;
   static const Field<Medication, String> _f$doseForm = Field(
     'doseForm',
     _$doseForm,
   );
-  static String? _$instructions(Medication v) => v.instructions;
+  static String _$instructions(Medication v) => v.instructions;
   static const Field<Medication, String> _f$instructions = Field(
     'instructions',
     _$instructions,
-    opt: true,
   );
   static String _$createdBy(Medication v) => v.createdBy;
   static const Field<Medication, String> _f$createdBy = Field(
     'createdBy',
     _$createdBy,
   );
-  static String _$createdAt(Medication v) => v.createdAt;
-  static const Field<Medication, String> _f$createdAt = Field(
+  static DateTime _$createdAt(Medication v) => v.createdAt;
+  static const Field<Medication, DateTime> _f$createdAt = Field(
     'createdAt',
     _$createdAt,
   );
@@ -66,7 +57,7 @@ class MedicationMapper extends ClassMapperBase<Medication> {
   @override
   final MappableFields<Medication> fields = const {
     #id: _f$id,
-    #nameEntered: _f$nameEntered,
+    #names: _f$names,
     #rxcui: _f$rxcui,
     #dosage: _f$dosage,
     #doseForm: _f$doseForm,
@@ -78,7 +69,7 @@ class MedicationMapper extends ClassMapperBase<Medication> {
   static Medication _instantiate(DecodingData data) {
     return Medication(
       id: data.dec(_f$id),
-      nameEntered: data.dec(_f$nameEntered),
+      names: data.dec(_f$names),
       rxcui: data.dec(_f$rxcui),
       dosage: data.dec(_f$dosage),
       doseForm: data.dec(_f$doseForm),
@@ -148,15 +139,16 @@ extension MedicationValueCopy<$R, $Out>
 
 abstract class MedicationCopyWith<$R, $In extends Medication, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get names;
   $R call({
     String? id,
-    String? nameEntered,
+    List<String>? names,
     String? rxcui,
     String? dosage,
     String? doseForm,
     String? instructions,
     String? createdBy,
-    String? createdAt,
+    DateTime? createdAt,
   });
   MedicationCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -170,23 +162,30 @@ class _MedicationCopyWithImpl<$R, $Out>
   late final ClassMapperBase<Medication> $mapper =
       MedicationMapper.ensureInitialized();
   @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get names =>
+      ListCopyWith(
+        $value.names,
+        (v, t) => ObjectCopyWith(v, $identity, t),
+        (v) => call(names: v),
+      );
+  @override
   $R call({
     String? id,
-    String? nameEntered,
+    List<String>? names,
     Object? rxcui = $none,
-    Object? dosage = $none,
+    String? dosage,
     String? doseForm,
-    Object? instructions = $none,
+    String? instructions,
     String? createdBy,
-    String? createdAt,
+    DateTime? createdAt,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
-      if (nameEntered != null) #nameEntered: nameEntered,
+      if (names != null) #names: names,
       if (rxcui != $none) #rxcui: rxcui,
-      if (dosage != $none) #dosage: dosage,
+      if (dosage != null) #dosage: dosage,
       if (doseForm != null) #doseForm: doseForm,
-      if (instructions != $none) #instructions: instructions,
+      if (instructions != null) #instructions: instructions,
       if (createdBy != null) #createdBy: createdBy,
       if (createdAt != null) #createdAt: createdAt,
     }),
@@ -194,7 +193,7 @@ class _MedicationCopyWithImpl<$R, $Out>
   @override
   Medication $make(CopyWithData data) => Medication(
     id: data.get(#id, or: $value.id),
-    nameEntered: data.get(#nameEntered, or: $value.nameEntered),
+    names: data.get(#names, or: $value.names),
     rxcui: data.get(#rxcui, or: $value.rxcui),
     dosage: data.get(#dosage, or: $value.dosage),
     doseForm: data.get(#doseForm, or: $value.doseForm),

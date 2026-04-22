@@ -25,7 +25,7 @@ export const deleteMedication = async (id: string) =>
   await db.delete(medications).where(eq(medications.id, id));
 
 export const getFamilyMemberMedications = async (memberId: string) =>
-  await db.select().from(familyMemberMedications).where(eq(familyMemberMedications.familyMemberId, memberId));
+  await db.select({assignment: familyMemberMedications}).from(familyMemberMedications).where(eq(familyMemberMedications.familyMemberId, memberId));
 
 export const getCaregiverFamilyMedications = async (userId: string) => {
   const medications = await db
@@ -48,7 +48,14 @@ export const removeFamilyMemberMedication = async (id: string) =>
 
 export const getMemberMedicationSchedules = async (userId: string) => {
   const schedules = await db
-    .select()
+    .select({
+      schedules: {
+        id: medicationSchedules.id,
+        fmmid: medicationSchedules.familyMemberMedicationId,
+        timesOfDay: medicationSchedules.timesOfDay,
+        daysOfWeek: medicationSchedules.daysOfWeek,
+        frequency: medicationSchedules.frequency,
+      }})
     .from(medicationSchedules)
     .innerJoin(familyMemberMedications, eq(medicationSchedules.familyMemberMedicationId, familyMemberMedications.id))
     .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
@@ -56,15 +63,16 @@ export const getMemberMedicationSchedules = async (userId: string) => {
   return schedules
 }
 export const getCaregiverMedicationSchedules = async (userId: string) => {
-  const medications = await db.select({
-    schedules: {
-      id: medicationSchedules.id,
-      fmmid: medicationSchedules.familyMemberMedicationId,
-      fmid: familyMemberships.id,
-      timesOfDay: medicationSchedules.timesOfDay,
-      daysOfWeek: medicationSchedules.daysOfWeek,
-      frequency: medicationSchedules.frequency,
-    }})
+  const medications = await db
+    .select({
+      schedules: {
+        id: medicationSchedules.id,
+        fmmid: medicationSchedules.familyMemberMedicationId,
+        fmid: familyMemberships.id,
+        timesOfDay: medicationSchedules.timesOfDay,
+        daysOfWeek: medicationSchedules.daysOfWeek,
+        frequency: medicationSchedules.frequency,
+      }})
     .from(medicationSchedules)
     .innerJoin(familyMemberMedications, eq(medicationSchedules.familyMemberMedicationId, familyMemberMedications.id))
     .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
@@ -83,7 +91,17 @@ export const deleteMedicationSchedule = async (id: string) =>
   await db.delete(medicationSchedules).where(eq(medicationSchedules.id, id));
 
 export const getMemberAdherenceLogs = async (userId: string) => {
-  const adherences = await db.select({ logs: medicationAdherenceLogs })
+  const adherences = await db
+    .select({
+      logs: {
+        id: medicationAdherenceLogs.id,
+        fmmid: medicationAdherenceLogs.familyMemberMedicationId,
+        scheduledTime: medicationAdherenceLogs.scheduledTime,
+        takenAt: medicationAdherenceLogs.takenAt,
+        status: medicationAdherenceLogs.status,
+        recordedBy: medicationAdherenceLogs.recordedBy,
+      }
+    })
     .from(medicationAdherenceLogs)
     .innerJoin(familyMemberMedications, eq(medicationAdherenceLogs.familyMemberMedicationId, familyMemberMedications.id))
     .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
@@ -97,7 +115,7 @@ export const getCaregiverAdherenceLogs = async (userId: string) => {
       logs: {
         id: medicationAdherenceLogs.id,
         fmid: familyMemberships.id,
-        fmmId: medicationAdherenceLogs.familyMemberMedicationId,
+        fmmid: medicationAdherenceLogs.familyMemberMedicationId,
         scheduledTime: medicationAdherenceLogs.scheduledTime,
         takenAt: medicationAdherenceLogs.takenAt,
         status: medicationAdherenceLogs.status,

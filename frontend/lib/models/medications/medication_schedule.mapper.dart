@@ -24,50 +24,50 @@ class MedicationScheduleMapper extends ClassMapperBase<MedicationSchedule> {
 
   static String _$id(MedicationSchedule v) => v.id;
   static const Field<MedicationSchedule, String> _f$id = Field('id', _$id);
-  static String _$familyMemberMedicationId(MedicationSchedule v) =>
-      v.familyMemberMedicationId;
-  static const Field<MedicationSchedule, String> _f$familyMemberMedicationId =
-      Field('familyMemberMedicationId', _$familyMemberMedicationId);
+  static String _$fmmid(MedicationSchedule v) => v.fmmid;
+  static const Field<MedicationSchedule, String> _f$fmmid = Field(
+    'fmmid',
+    _$fmmid,
+  );
+  static String _$fmid(MedicationSchedule v) => v.fmid;
+  static const Field<MedicationSchedule, String> _f$fmid = Field(
+    'fmid',
+    _$fmid,
+  );
   static List<String> _$timesOfDay(MedicationSchedule v) => v.timesOfDay;
   static const Field<MedicationSchedule, List<String>> _f$timesOfDay = Field(
     'timesOfDay',
     _$timesOfDay,
   );
-  static List<String>? _$daysOfWeek(MedicationSchedule v) => v.daysOfWeek;
+  static List<String> _$daysOfWeek(MedicationSchedule v) => v.daysOfWeek;
   static const Field<MedicationSchedule, List<String>> _f$daysOfWeek = Field(
     'daysOfWeek',
     _$daysOfWeek,
-    opt: true,
   );
   static int _$frequency(MedicationSchedule v) => v.frequency;
   static const Field<MedicationSchedule, int> _f$frequency = Field(
     'frequency',
     _$frequency,
   );
-  static String _$frequencyUnit(MedicationSchedule v) => v.frequencyUnit;
-  static const Field<MedicationSchedule, String> _f$frequencyUnit = Field(
-    'frequencyUnit',
-    _$frequencyUnit,
-  );
 
   @override
   final MappableFields<MedicationSchedule> fields = const {
     #id: _f$id,
-    #familyMemberMedicationId: _f$familyMemberMedicationId,
+    #fmmid: _f$fmmid,
+    #fmid: _f$fmid,
     #timesOfDay: _f$timesOfDay,
     #daysOfWeek: _f$daysOfWeek,
     #frequency: _f$frequency,
-    #frequencyUnit: _f$frequencyUnit,
   };
 
   static MedicationSchedule _instantiate(DecodingData data) {
     return MedicationSchedule(
       id: data.dec(_f$id),
-      familyMemberMedicationId: data.dec(_f$familyMemberMedicationId),
+      fmmid: data.dec(_f$fmmid),
+      fmid: data.dec(_f$fmid),
       timesOfDay: data.dec(_f$timesOfDay),
       daysOfWeek: data.dec(_f$daysOfWeek),
       frequency: data.dec(_f$frequency),
-      frequencyUnit: data.dec(_f$frequencyUnit),
     );
   }
 
@@ -143,14 +143,14 @@ abstract class MedicationScheduleCopyWith<
 >
     implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get timesOfDay;
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>? get daysOfWeek;
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get daysOfWeek;
   $R call({
     String? id,
-    String? familyMemberMedicationId,
+    String? fmmid,
+    String? fmid,
     List<String>? timesOfDay,
     List<String>? daysOfWeek,
     int? frequency,
-    String? frequencyUnit,
   });
   MedicationScheduleCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -173,44 +173,38 @@ class _MedicationScheduleCopyWithImpl<$R, $Out>
         (v) => call(timesOfDay: v),
       );
   @override
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>?
-  get daysOfWeek => $value.daysOfWeek != null
-      ? ListCopyWith(
-          $value.daysOfWeek!,
-          (v, t) => ObjectCopyWith(v, $identity, t),
-          (v) => call(daysOfWeek: v),
-        )
-      : null;
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get daysOfWeek =>
+      ListCopyWith(
+        $value.daysOfWeek,
+        (v, t) => ObjectCopyWith(v, $identity, t),
+        (v) => call(daysOfWeek: v),
+      );
   @override
   $R call({
     String? id,
-    String? familyMemberMedicationId,
+    String? fmmid,
+    String? fmid,
     List<String>? timesOfDay,
-    Object? daysOfWeek = $none,
+    List<String>? daysOfWeek,
     int? frequency,
-    String? frequencyUnit,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
-      if (familyMemberMedicationId != null)
-        #familyMemberMedicationId: familyMemberMedicationId,
+      if (fmmid != null) #fmmid: fmmid,
+      if (fmid != null) #fmid: fmid,
       if (timesOfDay != null) #timesOfDay: timesOfDay,
-      if (daysOfWeek != $none) #daysOfWeek: daysOfWeek,
+      if (daysOfWeek != null) #daysOfWeek: daysOfWeek,
       if (frequency != null) #frequency: frequency,
-      if (frequencyUnit != null) #frequencyUnit: frequencyUnit,
     }),
   );
   @override
   MedicationSchedule $make(CopyWithData data) => MedicationSchedule(
     id: data.get(#id, or: $value.id),
-    familyMemberMedicationId: data.get(
-      #familyMemberMedicationId,
-      or: $value.familyMemberMedicationId,
-    ),
+    fmmid: data.get(#fmmid, or: $value.fmmid),
+    fmid: data.get(#fmid, or: $value.fmid),
     timesOfDay: data.get(#timesOfDay, or: $value.timesOfDay),
     daysOfWeek: data.get(#daysOfWeek, or: $value.daysOfWeek),
     frequency: data.get(#frequency, or: $value.frequency),
-    frequencyUnit: data.get(#frequencyUnit, or: $value.frequencyUnit),
   );
 
   @override

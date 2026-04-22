@@ -1,0 +1,57 @@
+import 'package:frontend/features/providers/providers.dart';
+import 'package:frontend/repositories/medication/medication_repository_remote.dart';
+import 'package:frontend/services/api/models/medication/medication_requests.dart';
+import 'package:frontend/utils/types.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'medication_providers.g.dart';
+
+@riverpod
+MedicationRepositoryRemote medicationRepository(Ref ref) => MedicationRepositoryRemote(
+  ref.watch(apiServiceProvider),
+  ref.read(medicationUrlProvider)
+);
+
+@riverpod
+Stream<void> medicationChanged(Ref ref) {
+  final repo = ref.watch(medicationRepositoryProvider);
+  return repo.changes;
+}
+
+@riverpod
+class Medications extends _$Medications {
+  @override
+  Future<UserMedications> build() async {
+    final repo = ref.read(medicationRepositoryProvider);
+    ref.watch(medicationChangedProvider);
+
+    return repo.getAllMedications();
+  }
+
+  Future<void> createMedication(MedicationRequest data) async {
+    state = const AsyncValue.loading();
+    try {
+      await ref.read(medicationRepositoryProvider).createMedication(data);
+    } catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+    }
+  }
+
+  Future<void> updateMedication(String medId, MedicationUpdate data) async {
+    state = const AsyncValue.loading();
+    try {
+      await ref.read(medicationRepositoryProvider).updateMedication(medId, data);
+    } catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+    }
+  }
+
+  Future<void> deleteMedication(String medId) async {
+    state = const AsyncValue.loading();
+    try {
+      await ref.read(medicationRepositoryProvider).deleteMedication(medId);
+    } catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+    }
+  }
+}

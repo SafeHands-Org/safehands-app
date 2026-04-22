@@ -29,50 +29,28 @@ class InvitationMapper extends ClassMapperBase<Invitation> {
     'familyId',
     _$familyId,
   );
-  static String _$role(Invitation v) => v.role;
-  static const Field<Invitation, String> _f$role = Field('role', _$role);
   static String _$token(Invitation v) => v.token;
   static const Field<Invitation, String> _f$token = Field('token', _$token);
-  static DateTime _$expiresAt(Invitation v) => v.expiresAt;
-  static const Field<Invitation, DateTime> _f$expiresAt = Field(
-    'expiresAt',
-    _$expiresAt,
-  );
-  static bool _$used(Invitation v) => v.used;
-  static const Field<Invitation, bool> _f$used = Field('used', _$used);
-  static String _$createdBy(Invitation v) => v.createdBy;
-  static const Field<Invitation, String> _f$createdBy = Field(
-    'createdBy',
-    _$createdBy,
-  );
-  static DateTime _$createdAt(Invitation v) => v.createdAt;
-  static const Field<Invitation, DateTime> _f$createdAt = Field(
-    'createdAt',
-    _$createdAt,
+  static DateTime _$expiration(Invitation v) => v.expiration;
+  static const Field<Invitation, DateTime> _f$expiration = Field(
+    'expiration',
+    _$expiration,
   );
 
   @override
   final MappableFields<Invitation> fields = const {
     #id: _f$id,
     #familyId: _f$familyId,
-    #role: _f$role,
     #token: _f$token,
-    #expiresAt: _f$expiresAt,
-    #used: _f$used,
-    #createdBy: _f$createdBy,
-    #createdAt: _f$createdAt,
+    #expiration: _f$expiration,
   };
 
   static Invitation _instantiate(DecodingData data) {
     return Invitation(
       id: data.dec(_f$id),
       familyId: data.dec(_f$familyId),
-      role: data.dec(_f$role),
       token: data.dec(_f$token),
-      expiresAt: data.dec(_f$expiresAt),
-      used: data.dec(_f$used),
-      createdBy: data.dec(_f$createdBy),
-      createdAt: data.dec(_f$createdAt),
+      expiration: data.dec(_f$expiration),
     );
   }
 
@@ -136,16 +114,7 @@ extension InvitationValueCopy<$R, $Out>
 
 abstract class InvitationCopyWith<$R, $In extends Invitation, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({
-    String? id,
-    String? familyId,
-    String? role,
-    String? token,
-    DateTime? expiresAt,
-    bool? used,
-    String? createdBy,
-    DateTime? createdAt,
-  });
+  $R call({String? id, String? familyId, String? token, DateTime? expiration});
   InvitationCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -161,34 +130,22 @@ class _InvitationCopyWithImpl<$R, $Out>
   $R call({
     String? id,
     String? familyId,
-    String? role,
     String? token,
-    DateTime? expiresAt,
-    bool? used,
-    String? createdBy,
-    DateTime? createdAt,
+    DateTime? expiration,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
       if (familyId != null) #familyId: familyId,
-      if (role != null) #role: role,
       if (token != null) #token: token,
-      if (expiresAt != null) #expiresAt: expiresAt,
-      if (used != null) #used: used,
-      if (createdBy != null) #createdBy: createdBy,
-      if (createdAt != null) #createdAt: createdAt,
+      if (expiration != null) #expiration: expiration,
     }),
   );
   @override
   Invitation $make(CopyWithData data) => Invitation(
     id: data.get(#id, or: $value.id),
     familyId: data.get(#familyId, or: $value.familyId),
-    role: data.get(#role, or: $value.role),
     token: data.get(#token, or: $value.token),
-    expiresAt: data.get(#expiresAt, or: $value.expiresAt),
-    used: data.get(#used, or: $value.used),
-    createdBy: data.get(#createdBy, or: $value.createdBy),
-    createdAt: data.get(#createdAt, or: $value.createdAt),
+    expiration: data.get(#expiration, or: $value.expiration),
   );
 
   @override

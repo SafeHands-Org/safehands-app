@@ -102,6 +102,7 @@ export const deleteMedicationSchedule = async (req: Request, res: Response) => {
 export const getAdherenceLogs = async (req: Request, res: Response) => {
   const id = req.user!.id;
   const result = await service.getCaregiverAdherenceLogs(id);
+  console.log(result.length)
   res.status(200).json(result);
 };
 

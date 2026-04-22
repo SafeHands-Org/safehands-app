@@ -24,20 +24,16 @@ class FamilyMemberMapper extends ClassMapperBase<FamilyMember> {
 
   static String _$id(FamilyMember v) => v.id;
   static const Field<FamilyMember, String> _f$id = Field('id', _$id);
-  static String _$userId(FamilyMember v) => v.userId;
-  static const Field<FamilyMember, String> _f$userId = Field(
-    'userId',
-    _$userId,
-  );
-  static String _$familyId(FamilyMember v) => v.familyId;
-  static const Field<FamilyMember, String> _f$familyId = Field(
-    'familyId',
-    _$familyId,
-  );
-  static String _$riskLevel(FamilyMember v) => v.riskLevel;
-  static const Field<FamilyMember, String> _f$riskLevel = Field(
-    'riskLevel',
-    _$riskLevel,
+  static String _$uid(FamilyMember v) => v.uid;
+  static const Field<FamilyMember, String> _f$uid = Field('uid', _$uid);
+  static String _$fid(FamilyMember v) => v.fid;
+  static const Field<FamilyMember, String> _f$fid = Field('fid', _$fid);
+  static String _$name(FamilyMember v) => v.name;
+  static const Field<FamilyMember, String> _f$name = Field('name', _$name);
+  static String _$risklevel(FamilyMember v) => v.risklevel;
+  static const Field<FamilyMember, String> _f$risklevel = Field(
+    'risklevel',
+    _$risklevel,
   );
   static bool _$isAdmin(FamilyMember v) => v.isAdmin;
   static const Field<FamilyMember, bool> _f$isAdmin = Field(
@@ -53,9 +49,10 @@ class FamilyMemberMapper extends ClassMapperBase<FamilyMember> {
   @override
   final MappableFields<FamilyMember> fields = const {
     #id: _f$id,
-    #userId: _f$userId,
-    #familyId: _f$familyId,
-    #riskLevel: _f$riskLevel,
+    #uid: _f$uid,
+    #fid: _f$fid,
+    #name: _f$name,
+    #risklevel: _f$risklevel,
     #isAdmin: _f$isAdmin,
     #createdAt: _f$createdAt,
   };
@@ -63,9 +60,10 @@ class FamilyMemberMapper extends ClassMapperBase<FamilyMember> {
   static FamilyMember _instantiate(DecodingData data) {
     return FamilyMember(
       id: data.dec(_f$id),
-      userId: data.dec(_f$userId),
-      familyId: data.dec(_f$familyId),
-      riskLevel: data.dec(_f$riskLevel),
+      uid: data.dec(_f$uid),
+      fid: data.dec(_f$fid),
+      name: data.dec(_f$name),
+      risklevel: data.dec(_f$risklevel),
       isAdmin: data.dec(_f$isAdmin),
       createdAt: data.dec(_f$createdAt),
     );
@@ -135,9 +133,10 @@ abstract class FamilyMemberCopyWith<$R, $In extends FamilyMember, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({
     String? id,
-    String? userId,
-    String? familyId,
-    String? riskLevel,
+    String? uid,
+    String? fid,
+    String? name,
+    String? risklevel,
     bool? isAdmin,
     DateTime? createdAt,
   });
@@ -155,17 +154,19 @@ class _FamilyMemberCopyWithImpl<$R, $Out>
   @override
   $R call({
     String? id,
-    String? userId,
-    String? familyId,
-    String? riskLevel,
+    String? uid,
+    String? fid,
+    String? name,
+    String? risklevel,
     bool? isAdmin,
     DateTime? createdAt,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
-      if (userId != null) #userId: userId,
-      if (familyId != null) #familyId: familyId,
-      if (riskLevel != null) #riskLevel: riskLevel,
+      if (uid != null) #uid: uid,
+      if (fid != null) #fid: fid,
+      if (name != null) #name: name,
+      if (risklevel != null) #risklevel: risklevel,
       if (isAdmin != null) #isAdmin: isAdmin,
       if (createdAt != null) #createdAt: createdAt,
     }),
@@ -173,9 +174,10 @@ class _FamilyMemberCopyWithImpl<$R, $Out>
   @override
   FamilyMember $make(CopyWithData data) => FamilyMember(
     id: data.get(#id, or: $value.id),
-    userId: data.get(#userId, or: $value.userId),
-    familyId: data.get(#familyId, or: $value.familyId),
-    riskLevel: data.get(#riskLevel, or: $value.riskLevel),
+    uid: data.get(#uid, or: $value.uid),
+    fid: data.get(#fid, or: $value.fid),
+    name: data.get(#name, or: $value.name),
+    risklevel: data.get(#risklevel, or: $value.risklevel),
     isAdmin: data.get(#isAdmin, or: $value.isAdmin),
     createdAt: data.get(#createdAt, or: $value.createdAt),
   );
