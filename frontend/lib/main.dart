@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/features/providers/app/app_providers.dart';
 import 'package:frontend/routes/app_router.dart';
+import 'package:frontend/services/notification_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService.init();
   runApp(ProviderScope(child: SafeHandsApp()));
-
 }
 
 class SafeHandsApp extends ConsumerWidget {
@@ -38,3 +40,4 @@ class _AppStartup extends ConsumerWidget {
     return child;
   }
 }
+
