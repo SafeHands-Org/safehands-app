@@ -16,7 +16,13 @@ class NotificationTestPage extends StatelessWidget {
 
             ElevatedButton(
               onPressed: () {
-                NotificationService.testNow();
+                NotificationService.sendNotification(
+                  notificationId: 1,
+                  title: 'Instant Test',
+                  body: 'Notifications are working!',
+                  scheduleTime: DateTime.now(),
+                  groupKey: 'test_group',
+                );
               },
               child: const Text("Instant Test"),
             ),
@@ -26,7 +32,7 @@ class NotificationTestPage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 NotificationService.sendNotification(
-                  notificationId: 1,
+                  notificationId: 2,
                   title: "Medication Reminder",
                   body: "Take your prescribed medicine",
                   scheduleTime: DateTime.now().add(
@@ -37,6 +43,7 @@ class NotificationTestPage extends StatelessWidget {
               },
               child: const Text("Schedule in 10 seconds"),
             ),
+
           ],
         ),
       ),

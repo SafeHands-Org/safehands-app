@@ -53,8 +53,13 @@ class MedicationCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 10),
-                Text(med.instructions),
-                const SizedBox(height: 10,)
+                Text(
+                  med.instructions,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ],
             ),
           ),

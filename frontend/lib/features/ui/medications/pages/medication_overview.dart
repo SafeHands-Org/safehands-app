@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/components/shared/section_header.dart';
 import 'package:frontend/features/providers/medication/medication_providers.dart';
 import 'package:frontend/features/ui/medications/pages/medication_form.dart';
+import 'package:frontend/features/ui/medications/pages/notifications_test_page.dart';
 import 'package:frontend/features/ui/medications/widgets/medication_card.dart';
 
 class MedicationsView extends ConsumerWidget {
@@ -77,7 +78,19 @@ class MedicationsView extends ConsumerWidget {
                     onPressed: () => _showAddSheet(context),
                     foregroundColor: cs.onTertiaryContainer,
                     backgroundColor: cs.tertiaryContainer,
-                    child: const Icon(Icons.add)
+                    child: const Icon(Icons.add),
+                  ),
+                ),
+                Positioned(
+                  bottom: MediaQuery.of(context).size.height * 0.07,
+                  left: MediaQuery.of(context).size.width * 0.07,
+                  child: FloatingActionButton(
+                    heroTag: 'test_notif',
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const NotificationTestPage()),
+                    ),
+                    child: const Icon(Icons.notifications),
                   ),
                 ),
               ],
@@ -105,6 +118,7 @@ class MedicationsView extends ConsumerWidget {
       },
     );
   }
+
   void _showAddSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
