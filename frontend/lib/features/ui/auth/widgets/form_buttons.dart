@@ -9,6 +9,11 @@ class FormButton extends StatelessWidget {
     this.trailingIcon,
     this.enabled = true,
     this.isLoading = false,
+    this.buttonColor,
+    this.borderColor,
+    this.textColor,
+    this.weight,
+    this.radius
   });
 
   final String label;
@@ -16,45 +21,52 @@ class FormButton extends StatelessWidget {
   final IconData? trailingIcon;
   final bool enabled;
   final bool isLoading;
+  final Color? buttonColor;
+  final Color? borderColor;
+  final Color? textColor;
+  final FontWeight? weight;
+  final BorderRadiusGeometry? radius;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final active = enabled && !isLoading;
+    final bt = Theme.of(context).elevatedButtonTheme;
+    final tt = Theme.of(context).textTheme;
 
-    return SizedBox(
-      width: double.infinity,
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: AppRadius.borderRadiusXl,
-        child: Ink(
-          decoration: BoxDecoration(
-            borderRadius: AppRadius.borderRadiusXl,
-            color: active ? cs.primary : cs.primaryContainer,
-          ),
-          child: InkWell(
-            borderRadius: AppRadius.borderRadiusXl,
-            onTap: active ? onPressed : null,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (isLoading)
-                    const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  else...[
-                    Text(label, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: active ? Colors.white : cs.onSurface.withValues(alpha: 0.38))),
-                    if (trailingIcon != null) ...[
-                      const SizedBox(width: 8),
-                      Icon(trailingIcon, color: active ? Colors.white : cs.onSurface.withValues(alpha: 0.38), size: 20),
-                    ],
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ),
+    final active = enabled && !isLoading;
+    return ElevatedButton(
+      onPressed: active ? onPressed : null,
+      style: bt.style?.copyWith(
+        backgroundColor: WidgetStatePropertyAll(active ? buttonColor ?? cs.primary : cs.primaryContainer),
+        side: WidgetStatePropertyAll(BorderSide(color: active ? borderColor ?? cs.primary : cs.primaryContainer)),
+        padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 12, horizontal: 16)),
+        splashFactory: InkSplash.splashFactory,
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: radius ?? AppRadius.borderRadiusPill)
+        )
       ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (isLoading) SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: cs.onInverseSurface, strokeWidth: 2))
+            else...[
+              Text(
+                label,
+                style: tt.bodyLarge?.copyWith(
+                  fontWeight: weight ?? FontWeight.bold,
+                  color: active ? textColor ?? cs.onInverseSurface: cs.onSurface.withValues(alpha: 0.38)
+                )
+              ),
+              if (trailingIcon != null) ...[
+                const SizedBox(width: 8),
+                Icon(trailingIcon, color: active ? Colors.white : cs.onSurface.withValues(alpha: 0.38), size: 20),
+              ],
+            ],
+          ],
+        )
+      )
     );
   }
 }

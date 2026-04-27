@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/services/api/api_service.dart';
 import 'package:frontend/services/shared_preferences.dart';
 import 'package:http/http.dart';
@@ -25,9 +26,30 @@ ApiService apiService(Ref ref) => ApiService(
   ref.watch(appClientProvider)
 );
 
+@Riverpod(keepAlive: true)
+Future<ColorScheme> colorScheme(Ref ref, BuildContext context) async {
+  return ColorScheme.of(context);
+}
+
+@Riverpod(keepAlive: true)
+Future<TextTheme >textTheme(Ref ref, BuildContext context) async {
+  TextTheme.of(context);
+  return Theme.of(context).textTheme;
+}
+
+@Riverpod(keepAlive: true)
+Future<PaletteExtension> palette(Ref ref, BuildContext? context) async {
+  return context!.palette;
+}
+
 @riverpod
 Future<void> remoteStartup(Ref ref) async {
   ref.watch(appClientProvider);
   ref.watch(sharedPreferenceServiceProvider);
   ref.watch(apiServiceProvider);
+}
+
+@riverpod
+Future<void> themeStartup(Ref ref, BuildContext context) async {
+
 }

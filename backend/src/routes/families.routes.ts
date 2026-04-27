@@ -29,6 +29,8 @@ router.route("/members")
 
 router.route("/invitations/:token")
   .get(checkInvitation)
+
+router.route("/invitations")
   .put(createInvitation);
 
 router.route("/:id")

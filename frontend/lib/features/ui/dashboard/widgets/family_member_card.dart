@@ -61,6 +61,8 @@ class _FamilyMemberCard extends ConsumerWidget {
         context.push('/family/members/${member.id}');
       },
       child: Card(
+        elevation: 5,
+        shadowColor: cs.shadow,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -105,6 +107,8 @@ class _FamilyMemberCard extends ConsumerWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 12),
+              Divider(height: 1, thickness: 1),
               const SizedBox(height: 12),
               _MedicationDetails(
                 dosesTaken: member.todayTakenCount,

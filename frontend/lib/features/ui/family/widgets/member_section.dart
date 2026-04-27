@@ -1,61 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/components/shared/app_gradient_header.dart';
-import 'package:frontend/features/components/shared/avatar_profile.dart';
 import 'package:frontend/features/components/shared/section_header.dart';
 import 'package:frontend/features/components/shared/settings_tile.dart';
-import 'package:frontend/features/components/shared/state_widget.dart';
 import 'package:frontend/features/components/styles/styles.dart';
+import 'package:frontend/features/ui/family/pages/edit_member.dart';
+import 'package:frontend/features/ui/family/widgets/family_headers.dart';
 import 'package:frontend/models/models.dart';
 import 'package:frontend/utils/utils.dart';
-import 'package:go_router/go_router.dart';
 
 class MemberProfileSection extends StatelessWidget {
-  const MemberProfileSection({super.key, required this.member, this.memberId});
+  const MemberProfileSection({super.key, required this.member});
 
   final Member member;
-  final String? memberId;
 
   @override
   Widget build(BuildContext context) {
-    final assignments = member.assignments;
+    final activeAssignments = member.assignments.where((a) => a.assignment.isActive);
+    final inactiveAssignments = member.assignments.where((a) => !a.assignment.isActive);
 
     final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
     final palette = context.palette;
 
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppGradientHeader(
-            leading: HeaderIconButton(
-              icon: Icons.arrow_back,
-              onPressed: () => context.go('/'),
-            ),
-            trailing: HeaderIconButton(
-              icon: Icons.edit_outlined,
-              onPressed: () {},
-            ),
-            profileRow: Row(
-              children: [
-                UserAvatar(name: member.name, radius: 40),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        member.name,
-                        style: tt.headlineLarge!.copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          MemberOverviewHeader(name: member.name),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
             child: Column(
@@ -88,18 +57,9 @@ class MemberProfileSection extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                SectionHeader(
-                  title: 'Active Medications (${assignments.length})',
-                  actionLabel: '+',
-                  onAction: () => context.push('/medication/new'),
-                ),
-                if (assignments.isEmpty)
-                  const EmptyCard(
-                    message: 'No active medications.',
-                    icon: Icons.medication_outlined,
-                  )
-                else
-                  ...assignments.map(
+                if (activeAssignments.isNotEmpty)...[
+                  SectionHeader(title: 'Active Medications (${activeAssignments.length})'),
+                  ...activeAssignments.map(
                     (med) => Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: _MedicationDetailCard(
@@ -108,27 +68,37 @@ class MemberProfileSection extends StatelessWidget {
                       ),
                     ),
                   ),
-                const SizedBox(height: 8),
+                  const SizedBox(height: 8),
+                ],
 
-                const SectionHeader(title: 'Admin Actions'),
-                Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: SettingsTile(
-                    icon: Icons.calendar_today_outlined,
-                    title: 'View Medication History',
-                    subtitle: 'Track adherence and patterns',
-                    iconBg: cs.primaryContainer,
-                    iconColor: cs.primary,
+                if (inactiveAssignments.isNotEmpty)...[
+                  SectionHeader(title: 'Inactive Medications (${activeAssignments.length})'),
+                  ...inactiveAssignments.map(
+                    (med) => Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: _MedicationDetailCard(
+                        medication: med.reference,
+                        schedule: med.schedule
+                      ),
+                    ),
                   ),
-                ),
-                SettingsTile(
-                  icon: Icons.delete_outline,
-                  title: 'Remove from Family',
-                  subtitle: 'This action cannot be undone',
-                  iconBg: cs.errorContainer,
-                  iconColor: cs.error,
-                  isDestructive: true,
-                ),
+                  const SizedBox(height: 8),
+                ],
+
+                if (member.isAdmin)...[
+                  const SectionHeader(title: 'Admin Actions'),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: SettingsTile(
+                      icon: Icons.calendar_today_outlined,
+                      title: "Configure Member's Information",
+                      subtitle: "Change ${member.name}'s risk level or remove them",
+                      iconBg: cs.primaryContainer,
+                      iconColor: cs.primary,
+                      onTap: () => _showEditSheet(context, member)
+                    ),
+                  ),
+                ]
               ],
             ),
           ),
@@ -138,6 +108,19 @@ class MemberProfileSection extends StatelessWidget {
   }
 }
 
+void _showEditSheet(BuildContext context, Member member) {
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    builder: (_) => DraggableScrollableSheet(
+      initialChildSize: 0.5,
+      minChildSize: 0.45,
+      maxChildSize: 0.55,
+      expand: false,
+      builder: (_, scrollController) => EditMemberView(member: member)
+    ),
+  );
+}
 
 class _ContactRow extends StatelessWidget {
   const _ContactRow({
@@ -258,7 +241,7 @@ class _MedicationDetailCard extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 6,
                 children: schedule.timesOfDay.map(
-                  ( time) => Container(
+                  (time) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       border: BoxBorder.all(color: cs.primary),

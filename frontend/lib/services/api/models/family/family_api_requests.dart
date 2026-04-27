@@ -34,3 +34,12 @@ class FamilyMemberUpdate with FamilyMemberRequestMappable {
     this.riskLevel,
   });
 }
+
+@MappableClass()
+class InvitationRequest with InvitationRequestMappable {
+  final String id;
+
+  const InvitationRequest({
+    required this.id
+  });
+}

@@ -1,4 +1,5 @@
 import 'package:frontend/features/providers/providers.dart';
+import 'package:frontend/models/models.dart';
 import 'package:frontend/repositories/family_member/family_member_repository_remote.dart';
 import 'package:frontend/services/api/models/family/family_api_requests.dart';
 import 'package:frontend/utils/types.dart';
@@ -14,8 +15,14 @@ FamilyMemberRepositoryRemote familyMemberRepository(Ref ref) => FamilyMemberRepo
 
 @riverpod
 Stream<void> memberChanged(Ref ref) {
-  final repo = ref.watch(familyMemberRepositoryProvider);
+  var repo = ref.watch(familyMemberRepositoryProvider);
   return repo.changes;
+}
+
+@riverpod
+Future<FamilyMember> memberById(Ref ref, String userId) async{
+  var members = await ref.watch(familyMembersProvider.future);
+  return members.values.firstWhere((e) => e.uid == userId);
 }
 
 @riverpod

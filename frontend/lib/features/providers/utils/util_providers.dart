@@ -50,16 +50,17 @@ Future<List<MedicationAdherenceLog>> todaysLogs(Ref ref) async {
 
 
 @riverpod
-Future<List<MedicationSchedule>> upcomingFamilyDoses(Ref ref, [String? fmid]) async {
-  final provider = await ref.watch(currentSchedulesProvider.future);
-  final reference = await ref.watch(todaysLogsProvider.future);
+Future<List<Member>> upcomingFamilyDoses(Ref ref) async {
+  final reference = await ref.watch(currentFamilyProvider.future);
+  final provider = await ref.watch(aggregateMembershipsProvider(reference).future);
+  final adherenceRef = await ref.watch(todaysLogsProvider.future);
 
-  final loggedToday = reference.map((e) => e.fmid).toList();
+  final loggedToday = adherenceRef.map((e) => e.fmid).toList();
 
-  return provider.values
-    .expand((e) => e)
-    .where((schedule) => schedule.isScheduledToday && !loggedToday
-    .contains(schedule.fmmid))
+  return provider
+    .where((e) => e.schedules
+    .any((v) => v.isScheduledToday &&  !loggedToday
+    .contains(v.fmid)))
     .toList();
 }
 

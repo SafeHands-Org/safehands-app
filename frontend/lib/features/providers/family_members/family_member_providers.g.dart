@@ -88,7 +88,82 @@ final class MemberChangedProvider
   }
 }
 
-String _$memberChangedHash() => r'b9ded5b0d0fbe43fc36047e8ddd2876d9f7fcf05';
+String _$memberChangedHash() => r'7044ea6a293873c796196d359007f59c1977bf19';
+
+@ProviderFor(memberById)
+final memberByIdProvider = MemberByIdFamily._();
+
+final class MemberByIdProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<FamilyMember>,
+          FamilyMember,
+          FutureOr<FamilyMember>
+        >
+    with $FutureModifier<FamilyMember>, $FutureProvider<FamilyMember> {
+  MemberByIdProvider._({
+    required MemberByIdFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'memberByIdProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$memberByIdHash();
+
+  @override
+  String toString() {
+    return r'memberByIdProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<FamilyMember> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<FamilyMember> create(Ref ref) {
+    final argument = this.argument as String;
+    return memberById(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MemberByIdProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$memberByIdHash() => r'3831f3acc3c0aa4f0d7296787853d163e23d1262';
+
+final class MemberByIdFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<FamilyMember>, String> {
+  MemberByIdFamily._()
+    : super(
+        retry: null,
+        name: r'memberByIdProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  MemberByIdProvider call(String userId) =>
+      MemberByIdProvider._(argument: userId, from: this);
+
+  @override
+  String toString() => r'memberByIdProvider';
+}
 
 @ProviderFor(FamilyMembers)
 final familyMembersProvider = FamilyMembersProvider._();

@@ -9,9 +9,8 @@ import 'package:frontend/features/components/styles/app_color.dart';
 import 'package:frontend/models/models.dart';
 import 'package:go_router/go_router.dart';
 
-
-class MemberProfileBody extends StatelessWidget {
-  const MemberProfileBody({super.key, required this.family, this.currentUserId});
+class MemberProfileView extends StatelessWidget {
+  const MemberProfileView({super.key, required this.family, this.currentUserId});
 
   final FamilyCollection family;
   final String? currentUserId;
@@ -128,7 +127,6 @@ class MemberProfileBody extends StatelessWidget {
 
                 SectionHeader(
                   title: 'Active Medications',
-                  actionLabel: '+',
                   onAction: () => context.push('/medication/new'),
                 ),
                 if (meds.isEmpty)

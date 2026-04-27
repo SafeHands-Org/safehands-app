@@ -1,4 +1,5 @@
 
+
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:frontend/models/models.dart';
 import 'package:frontend/utils/utils.dart';
@@ -22,6 +23,33 @@ class Assignment with AssignmentMappable {
   );
 
   String get medicationName => reference.names.first;
+
+  List<MedicationAdherenceLog> get todaysLogs {
+    final today = DateTime.now().toIso8601String().substring(0, 10);
+    return logs.where((log) {
+      final dt = DateTime.tryParse('$today ${log.scheduledTime}:00');
+      return dt != null;
+    }).toList();
+  }
+
+  List<MedicationAdherenceLog> get sortedLogs {
+    final dts = <MedicationAdherenceLog>[];
+    for (var m in logs) {
+      if (m.takenAt != null) dts.add(m);
+    }
+
+    dts.sort((a, b) {
+      if (a.takenAt != null && b.takenAt == null) return -1;
+      if (a.takenAt == null && b.takenAt != null) return 1;
+      return a.takenAt!.compareTo(b.takenAt!);
+    });
+
+    return dts;
+  }
+
+  List<MedicationAdherenceLog> get todaysTaken => todaysLogs.where((log) => log.taken).toList();
+  List<MedicationAdherenceLog> get allTakenLogs => logs.where((log) => log.taken).toList();
+  List<MedicationAdherenceLog> get allMissedLogs => logs.where((log) => !log.taken).toList();
 }
 
 @MappableClass()
@@ -51,6 +79,10 @@ class Member with MemberMappable {
     }).toList();
   }
 
+  List<MedicationAdherenceLog> get todaysTaken => todaysLogs.where((log) => log.taken).toList();
+  List<MedicationAdherenceLog> get allTakenLogs => logs.where((log) => log.taken).toList();
+  List<MedicationAdherenceLog> get allMissedLogs => logs.where((log) => !log.taken).toList();
+
   String get timeUntilNextDose {
     final diff = nextDoseTime.difference(DateTime.now());
 
@@ -74,7 +106,7 @@ class Member with MemberMappable {
   DateTime get nextDoseTime  => schedules.map((s) => s.nextDoseTime).reduce((a, b) => a.isBefore(b) ? a : b);
   Duration get membershipAge => DateTime.now().difference(member.createdAt);
 
-  int get todaysDoseCount     => schedules.where((schedule) => schedule.isScheduledToday).length;
+  int get todaysDoseCount    => schedules.where((schedule) => schedule.isScheduledToday).length;
   int get todayTakenCount    => todaysLogs.where((log) => log.taken).length;
   int get todayMissedCount   => todaysLogs.where((log) => log.isPastDueMissed).length;
   int get activeMedCount     => fmms.where((assignment) => assignment.active == true).length;

@@ -95,7 +95,7 @@ final class BaseUrlProvider extends $FunctionalProvider<String, String, String>
   }
 }
 
-String _$baseUrlHash() => r'362826d3678a2f7185b0c7257940c0ba802f5657';
+String _$baseUrlHash() => r'e9794e6ba8685e88bbf089de5c08807846a2027b';
 
 @ProviderFor(familyUrl)
 final familyUrlProvider = FamilyUrlProvider._();

@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 
 class StatChip extends StatelessWidget {
-  const StatChip({super.key, required this.value, required this.label, this.icon,});
+  const StatChip({
+    super.key,
+    this.value,
+    this.label,
+    this.icon
+  });
 
-  final String value;
-  final String label;
+  final String? value;
+  final String? label;
   final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 108,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.1),
@@ -24,15 +30,19 @@ class StatChip extends StatelessWidget {
             Icon(icon, color: Colors.white, size: 20),
             const SizedBox(height: 4),
           ],
-          Text(
-            value,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white, height: 1.1),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(fontSize: 11, color: Colors.white.withValues(alpha: 0.8), height: 1.2),
-          ),
+          if (value != null) ...[
+            Text(
+              value!,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white, height: 1.1),
+            ),
+          ],
+          if (label != null)...[
+            const SizedBox(height: 2),
+            Text(
+              label!,
+              style: TextStyle(fontSize: 11, color: Colors.white.withValues(alpha: 0.8), height: 1.2),
+            ),
+          ]
         ],
       ),
     );

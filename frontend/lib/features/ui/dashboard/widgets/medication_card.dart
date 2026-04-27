@@ -4,16 +4,33 @@ import 'package:frontend/features/components/shared/avatar_profile.dart';
 import 'package:frontend/features/components/shared/state_widget.dart';
 import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/features/providers/providers.dart';
+import 'package:frontend/features/ui/dashboard/pages/dashboard.dart';
+import 'package:frontend/models/models.dart';
 import 'package:frontend/utils/utils.dart';
 
 enum DoseStatus { upcoming, taken, missed }
+
+class MedicationDetails extends ConsumerWidget {
+  const MedicationDetails({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    UserRole user = ref.watch(userRoleProvider);
+    if(user == UserRole.caregiver) {
+      return CaregiverDashboardView();
+    } else {
+      return MemberDashboardView();
+    }
+  }
+}
+
 
 class MedicationCardList extends ConsumerWidget {
   const MedicationCardList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dosesAsync = ref.watch(todaysFamilyDosesProvider);
+    final dosesAsync = ref.watch(upcomingFamilyDosesProvider);
 
     switch (dosesAsync) {
       case AsyncLoading(): return const LoadingCard();

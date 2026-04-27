@@ -6,18 +6,25 @@ part 'invitation.mapper.dart';
 class Invitation with InvitationMappable{
   final String id;
   final String familyId;
-  final String token;
+  final String code;
+  final bool used;
   final DateTime expiration;
+  final String createdBy;
+  final DateTime createdAt;
 
   const Invitation({
     required this.id,
     required this.familyId,
-    required this.token,
-    required this.expiration
+    required this.code,
+    required this.used,
+    required this.expiration,
+    required this.createdBy,
+    required this.createdAt
   });
 
   bool get isExpired => DateTime.now().isAfter(expiration);
-  bool get isValid => !isExpired;
+  bool get isUsed => used;
+  bool get isValid => !isExpired || isUsed;
 
   Duration get timeRemaining => expiration.difference(DateTime.now());
   String get expirationLabel {
