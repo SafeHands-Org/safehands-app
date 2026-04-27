@@ -11,6 +11,7 @@ import 'package:frontend/features/ui/family/pages/member_details.dart';
 import 'package:frontend/features/ui/medications/pages/medication_details.dart';
 import 'package:frontend/features/ui/medications/pages/medication_form.dart';
 import 'package:frontend/features/ui/medications/pages/medication_overview.dart';
+import 'package:frontend/features/ui/medications/pages/notifications_test_page.dart';
 import 'package:frontend/features/ui/user/pages/user_profile.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -74,6 +75,11 @@ GoRouter router(Ref ref) => GoRouter(
       builder: (context, state) => FamilyInviteView()
     ),
 
+   GoRoute(
+      path: '/notifications-test',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => const NotificationTestPage(),
+    ), 
     GoRoute(
       path: '/medications',
       parentNavigatorKey: rootNavigatorKey,

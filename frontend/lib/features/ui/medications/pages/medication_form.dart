@@ -4,6 +4,7 @@ import 'package:frontend/features/components/shared/form_section.dart';
 import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/features/providers/medication/medication_providers.dart';
 import 'package:frontend/services/api/models/medication/medication_requests.dart';
+import 'package:frontend/services/notification_service.dart';
 import 'package:go_router/go_router.dart';
 
 class MedicationFormView extends ConsumerStatefulWidget {
@@ -66,6 +67,16 @@ class _MedicationFormState extends ConsumerState<MedicationFormView> {
             instructions: _instructionsController.text.trim()
           )
         );
+
+        // Send notification when medication is successfully added
+        await NotificationService.sendNotification(
+          notificationId: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+          title: 'Medication Added',
+          body: '${_names!.first} has been added to your medications.',
+          scheduleTime: DateTime.now(),
+          groupKey: 'med_added',
+        );
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -214,9 +225,7 @@ class _MedicationFormState extends ConsumerState<MedicationFormView> {
   };
 
   static String _capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
-
 }
-
 
 class _GradientButton extends StatelessWidget {
   const _GradientButton({
