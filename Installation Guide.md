@@ -35,10 +35,12 @@ NODE_ENV=development
 
 These steps must be succesfully completed before you can run the frontend. If Docker fails to start or the database becomes corrupted, reset everything using `docker compose down -v`. Once Docker is up and running, do NOT close Docker. If you do, the front end will fail to build. Once Docker has been successfully set up you only need to run `docker compose up` going forward.
 
+---
+
 # Flutter
 While Docker is running, in a new terminal run:
 `cd frontend` This will switch you to the frontend directory where the Flutter files live.
 
 `flutter run -d <device_id>` This builds the app and allows you to choose which device to run it on (IOS Simulator/Android Emulator).
 
-***This app has not been deployed on app stores and is only available on GitHub.***
+***This app has not been deployed on app stores and is only available through GitHub.***

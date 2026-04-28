@@ -100,5 +100,3 @@ For family members, the **Main Dashboard** displays:
 - Reminders and adherence tracking (if enabled)
 
 Family members will not have access to caregiver-only pages such as family management or medication editing for other members.
-
----
