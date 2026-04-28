@@ -46,7 +46,7 @@ abstract final class AppColorsLight {
     shadow                   : Color(0xFF000000),
     scrim                    : Color(0xFF000000),
     inverseSurface           : Color(0xFF262327),
-    onInverseSurface         : Color(0xFFF6EEF6),
+    onInverseSurface         : Color(0xFFFFFFFF),
     inversePrimary           : Color(0xFFD9BAFA),
     surfaceTint              : Color(0xFF6D538B),
   );

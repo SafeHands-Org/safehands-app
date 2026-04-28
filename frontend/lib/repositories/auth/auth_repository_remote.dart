@@ -5,7 +5,6 @@ import 'package:frontend/repositories/auth/auth_repository.dart';
 import 'package:frontend/services/api/api_service.dart';
 import 'package:frontend/services/api/models/user/user_api_requests.dart';
 import 'package:frontend/services/shared_preferences.dart';
-import 'package:http/http.dart';
 
 class AuthRepositoryRemote extends AuthRepository {
   final ApiService _api;
@@ -17,7 +16,7 @@ class AuthRepositoryRemote extends AuthRepository {
   @override
   Future<AuthUser> login(LoginRequest request) async {
     try {
-      final Response response = await _api.post('$_baseUrl/login', request.toMap());
+      final response = await _api.post('$_baseUrl/login', request.toMap());
 
       final data = jsonDecode(response.body);
 

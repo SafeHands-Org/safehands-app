@@ -74,16 +74,16 @@ class ApiService {
       case 202: return res;
       case 204: return res;
 
-      case 400: return ServerRequestException();
-      case 401: return SessionException();
-      case 403: return ForbiddenException();
-      case 404: return NotFoundException();
-      case 408: return ServerTimeoutException();
-      case 409: return DuplicateException();
-      case 429: return TooManyRequestsException();
-      case 500: return ServerException();
+      case 400: throw ServerRequestException();
+      case 401: throw CredentialException();
+      case 403: throw ForbiddenException();
+      case 404: throw NotFoundException();
+      case 408: throw ServerTimeoutException();
+      case 409: throw DuplicateException();
+      case 429: throw TooManyRequestsException();
+      case 500: throw ServerException();
 
-      default: return UnexpectedErrorException();
+      default: throw UnexpectedErrorException();
     }
   }
 }

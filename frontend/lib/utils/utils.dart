@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 const dayMap = {
@@ -40,8 +41,15 @@ DateTime futureTimeToDateTime(String time, {int daysAhead = 0}) {
   );
 }
 
-String timeToDisplay(String time) {
-  final dt = DateTime.parse("1970-01-01 $time");
+String timeToDisplay(String raw) {
+  final timePart = raw.contains(' ') ? raw.split(' ').last : raw;
+  final parts = timePart.split(':');
+
+  if (parts.length < 2) return raw;
+
+  final hour = int.tryParse(parts[0]) ?? 0;
+  final minute = int.tryParse(parts[1]) ?? 0;
+  final dt = DateTime(2000, 1, 1, hour, minute);
 
   return DateFormat('h:mm a').format(dt);
 }
@@ -52,9 +60,8 @@ DateTime? parse(String first, String second){
 
 String get today => DateTime.now().toIso8601String().substring(0, 10);
 
-String formatDate(DateTime dt){
-  return DateFormat.yMMMMd().format(dt);
-}
+String formatDate(DateTime dt) => DateFormat.yMMMMd().format(dt);
+String headerFormat(DateTime dt) => DateFormat('EEEE, MMMM d, y').format(DateTime.now());
 
 String durationSince(Duration time) {
   final days = time.inDays;
@@ -78,4 +85,52 @@ String durationTill(Duration difference) {
   } else {
     return '${difference.inDays}d';
   }
+}
+
+class OnlyLettersFormatter extends TextInputFormatter {
+  static final RegExp _allowed = RegExp(r"[a-zA-Z\s\-'.,]");
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final filtered = newValue.text.split('').where((c) => _allowed.hasMatch(c)).join();
+    if (filtered == newValue.text) return newValue;
+    return newValue.copyWith(
+      text: filtered,
+      selection: TextSelection.collapsed(offset: filtered.length),
+    );
+  }
+}
+
+class PartialCharactersFormatter extends TextInputFormatter {
+  static final RegExp _allowed = RegExp(r"[a-zA-Z0-9\s\-'.,;:]");
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final filtered = newValue.text.split('').where((c) => _allowed.hasMatch(c)).join();
+    if (filtered == newValue.text) return newValue;
+    return newValue.copyWith(
+      text: filtered,
+      selection: TextSelection.collapsed(offset: filtered.length),
+    );
+  }
+}
+
+String? lettersOnlyValidator(String? value) {
+  if (value == null || value.trim().isEmpty) return 'This field is required.';
+  final invalid = RegExp(r"[^a-zA-Z\s\-'.,]");
+  if (invalid.hasMatch(value)) return 'Only letters and basic punctuation allowed.';
+  return null;
+}
+
+String? instructionValidator(String? value) {
+  if (value == null || value.trim().isEmpty) return 'This field is required.';
+  final invalid = RegExp(r"[^a-zA-Z0-9\s\-'.,;:]");
+  if (invalid.hasMatch(value)) return 'No special characters allowed.';
+  return null;
 }

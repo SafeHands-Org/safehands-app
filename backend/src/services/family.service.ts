@@ -130,6 +130,18 @@ export type CreateInvitationInput = {
   createdBy: string;
 };
 
+export const getInvitation = async (userId: string) => {
+  const [invitation] = await db
+    .select()
+    .from(invitations)
+    .where(eq(invitations.createdBy, userId))
+    .limit(1);
+
+  if (!invitation) return null;
+
+  return invitation;
+};
+
 export const createInvitation = async (data: CreateInvitationInput) => {
   const code = generateCode(6);
 

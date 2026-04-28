@@ -17,10 +17,7 @@ class MemberView extends ConsumerWidget {
       body: switch (familyAsync) {
         AsyncLoading() => const Scaffold(body: LoadingCard()),
         AsyncError(:final error) => Scaffold(body: ErrorCard(message: error.toString())),
-        AsyncData(:final value) => MemberProfileSection(
-          member: value,
-          memberId: fmid,
-        ),
+        AsyncData(:final value) => MemberProfileSection(member: value),
       },
     );
   }

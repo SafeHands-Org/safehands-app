@@ -90,6 +90,10 @@ export const createInvitation = async (req: Request, res: Response) => {
     createdBy: req.user.id,
   };
 
+  const existing = await service.getInvitation(req.user.id)
+
+  if (existing != null) return res.status(201).json(existing);
+
   const result = await service.createInvitation(data);
   return res.status(201).json(result);
 };

@@ -415,3 +415,124 @@ class _FamilyMemberUpdateCopyWithImpl<$R, $Out>
   ) => _FamilyMemberUpdateCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
+class InvitationRequestMapper extends ClassMapperBase<InvitationRequest> {
+  InvitationRequestMapper._();
+
+  static InvitationRequestMapper? _instance;
+  static InvitationRequestMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = InvitationRequestMapper._());
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'InvitationRequest';
+
+  static String _$id(InvitationRequest v) => v.id;
+  static const Field<InvitationRequest, String> _f$id = Field('id', _$id);
+
+  @override
+  final MappableFields<InvitationRequest> fields = const {#id: _f$id};
+
+  static InvitationRequest _instantiate(DecodingData data) {
+    return InvitationRequest(id: data.dec(_f$id));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static InvitationRequest fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<InvitationRequest>(map);
+  }
+
+  static InvitationRequest fromJson(String json) {
+    return ensureInitialized().decodeJson<InvitationRequest>(json);
+  }
+}
+
+mixin InvitationRequestMappable {
+  String toJson() {
+    return InvitationRequestMapper.ensureInitialized()
+        .encodeJson<InvitationRequest>(this as InvitationRequest);
+  }
+
+  Map<String, dynamic> toMap() {
+    return InvitationRequestMapper.ensureInitialized()
+        .encodeMap<InvitationRequest>(this as InvitationRequest);
+  }
+
+  InvitationRequestCopyWith<
+    InvitationRequest,
+    InvitationRequest,
+    InvitationRequest
+  >
+  get copyWith =>
+      _InvitationRequestCopyWithImpl<InvitationRequest, InvitationRequest>(
+        this as InvitationRequest,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return InvitationRequestMapper.ensureInitialized().stringifyValue(
+      this as InvitationRequest,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return InvitationRequestMapper.ensureInitialized().equalsValue(
+      this as InvitationRequest,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return InvitationRequestMapper.ensureInitialized().hashValue(
+      this as InvitationRequest,
+    );
+  }
+}
+
+extension InvitationRequestValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, InvitationRequest, $Out> {
+  InvitationRequestCopyWith<$R, InvitationRequest, $Out>
+  get $asInvitationRequest => $base.as(
+    (v, t, t2) => _InvitationRequestCopyWithImpl<$R, $Out>(v, t, t2),
+  );
+}
+
+abstract class InvitationRequestCopyWith<
+  $R,
+  $In extends InvitationRequest,
+  $Out
+>
+    implements ClassCopyWith<$R, $In, $Out> {
+  $R call({String? id});
+  InvitationRequestCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  );
+}
+
+class _InvitationRequestCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, InvitationRequest, $Out>
+    implements InvitationRequestCopyWith<$R, InvitationRequest, $Out> {
+  _InvitationRequestCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<InvitationRequest> $mapper =
+      InvitationRequestMapper.ensureInitialized();
+  @override
+  $R call({String? id}) => $apply(FieldCopyWithData({if (id != null) #id: id}));
+  @override
+  InvitationRequest $make(CopyWithData data) =>
+      InvitationRequest(id: data.get(#id, or: $value.id));
+
+  @override
+  InvitationRequestCopyWith<$R2, InvitationRequest, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _InvitationRequestCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+

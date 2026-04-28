@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/providers/auth/auth_provider.dart';
 import 'package:frontend/features/ui/auth/widgets/form_buttons.dart';
 import 'package:frontend/features/ui/auth/widgets/form_field.dart';
+import 'package:frontend/utils/exceptions.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginView extends ConsumerStatefulWidget {
@@ -17,6 +18,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
 
+  bool hasError = false;
+
   @override
   void dispose() {
     _emailCtrl.dispose();
@@ -24,31 +27,42 @@ class _LoginViewState extends ConsumerState<LoginView> {
     super.dispose();
   }
 
+  @override
+  void initState(){
+    super.initState();
+    ref.listenManual(authProvider,
+    (previous, next) {next.whenOrNull(
+        data: (_) {
+          if (mounted) context.go('/');
+        },
+        error:(error, stackTrace) {
+          if (!mounted) return;
+          final message = switch (error) {
+            CredentialException() => 'Invalid email or password.',
+            NotFoundException() => 'Invalid email or password',
+            ServerException() => 'Request timed out. Try again.',
+            _ => 'Something went wrong. Please try again.',
+          };
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message), backgroundColor: Color(0xFFB62320)),
+          );
+        }
+      );
+    });
+  }
+
   void _submit() async {
     if (_formKey.currentState!.validate()){
-      try {
-        await ref.read(authProvider.notifier).login(
+      await ref.read(authProvider.notifier).login(
         email:  _emailCtrl.text,
         password: _passwordCtrl.text,
-        );
-        ('Going to dashboard..');
-        context.go('/');
-        ('Called dashboard..');
-      } on Exception catch (e, s) {
-        ({e, s});
-      }
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final provider = ref.watch(authProvider);
-
-    if (provider.hasError){
-      ('ERROR: ${provider.error}');
-      (provider.stackTrace);
-    }
 
     return Scaffold(
       backgroundColor: cs.surface,

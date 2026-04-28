@@ -91,6 +91,39 @@ final class UserRoleProvider
 
 String _$userRoleHash() => r'4751fa93aefae3e4c808d078c82582a302af9b95';
 
+@ProviderFor(isAdmin)
+final isAdminProvider = IsAdminProvider._();
+
+final class IsAdminProvider
+    extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
+    with $FutureModifier<bool>, $FutureProvider<bool> {
+  IsAdminProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'isAdminProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$isAdminHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<bool> create(Ref ref) {
+    return isAdmin(ref);
+  }
+}
+
+String _$isAdminHash() => r'2cc84300985555fb9e80648ab39a1aa0ed2c6e18';
+
 @ProviderFor(currentUser)
 final currentUserProvider = CurrentUserProvider._();
 
@@ -203,7 +236,7 @@ final class AuthProvider extends $NotifierProvider<Auth, AsyncValue<AuthUser>> {
   }
 }
 
-String _$authHash() => r'ec6d25cee4ffea7a180d85b7cea5a54953ddb5cd';
+String _$authHash() => r'7610b997e62d7b15b02a32e0a4dbf30e141cb36a';
 
 abstract class _$Auth extends $Notifier<AsyncValue<AuthUser>> {
   AsyncValue<AuthUser> build();

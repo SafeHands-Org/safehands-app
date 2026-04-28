@@ -57,4 +57,29 @@ class SharedPreferenceService {
     final sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.remove(_currentFamilyKey);
   }
+
+    Future<void> saveInviteToken(String fid, String token) async {
+    try {
+      final sharedPreferences = await SharedPreferences.getInstance();
+      if (sharedPreferences.getString(fid) != null) sharedPreferences.remove(fid);
+      sharedPreferences.setString(fid, token);
+    } on Exception {
+      throw Exception();
+    }
+  }
+
+  Future<String?> fetchInviteToken(String fid) async {
+    try {
+      final sharedPreferences = await SharedPreferences.getInstance();
+      final token = sharedPreferences.getString(fid);
+      return token;
+    } on Exception {
+      throw Exception();
+    }
+  }
+
+  Future<void> clearInviteToken(String fid) async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.remove(fid);
+  }
 }

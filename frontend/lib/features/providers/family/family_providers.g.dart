@@ -56,6 +56,54 @@ final class FamilyRepositoryProvider
 
 String _$familyRepositoryHash() => r'73e0ad8fc0e169b8fcfd7eaadd7a21102bcc5327';
 
+@ProviderFor(invitationRepository)
+final invitationRepositoryProvider = InvitationRepositoryProvider._();
+
+final class InvitationRepositoryProvider
+    extends
+        $FunctionalProvider<
+          InvitationRepositoryRemote,
+          InvitationRepositoryRemote,
+          InvitationRepositoryRemote
+        >
+    with $Provider<InvitationRepositoryRemote> {
+  InvitationRepositoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'invitationRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$invitationRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<InvitationRepositoryRemote> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  InvitationRepositoryRemote create(Ref ref) {
+    return invitationRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(InvitationRepositoryRemote value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<InvitationRepositoryRemote>(value),
+    );
+  }
+}
+
+String _$invitationRepositoryHash() =>
+    r'd8749f5008f604b4d36b8a9e4b1fef9dc3b775e5';
+
 @ProviderFor(familyChanges)
 final familyChangesProvider = FamilyChangesProvider._();
 
@@ -88,6 +136,39 @@ final class FamilyChangesProvider
 }
 
 String _$familyChangesHash() => r'2351183d1c69ce9e00f225ec9051f283bfb1195e';
+
+@ProviderFor(invitateChanges)
+final invitateChangesProvider = InvitateChangesProvider._();
+
+final class InvitateChangesProvider
+    extends $FunctionalProvider<AsyncValue<void>, void, Stream<void>>
+    with $FutureModifier<void>, $StreamProvider<void> {
+  InvitateChangesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'invitateChangesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$invitateChangesHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<void> $createElement($ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<void> create(Ref ref) {
+    return invitateChanges(ref);
+  }
+}
+
+String _$invitateChangesHash() => r'54da0ae63dadd9086e14170b05921550f4853314';
 
 @ProviderFor(getFamilyById)
 final getFamilyByIdProvider = GetFamilyByIdFamily._();
@@ -157,6 +238,40 @@ final class GetFamilyByIdFamily extends $Family
   @override
   String toString() => r'getFamilyByIdProvider';
 }
+
+@ProviderFor(currentFamilyObject)
+final currentFamilyObjectProvider = CurrentFamilyObjectProvider._();
+
+final class CurrentFamilyObjectProvider
+    extends $FunctionalProvider<AsyncValue<Family?>, Family?, FutureOr<Family?>>
+    with $FutureModifier<Family?>, $FutureProvider<Family?> {
+  CurrentFamilyObjectProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'currentFamilyObjectProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$currentFamilyObjectHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<Family?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Family?> create(Ref ref) {
+    return currentFamilyObject(ref);
+  }
+}
+
+String _$currentFamilyObjectHash() =>
+    r'64898389ab62e41083014919e49664bbfd4462f7';
 
 @ProviderFor(CurrentFamily)
 final currentFamilyProvider = CurrentFamilyProvider._();
@@ -239,6 +354,50 @@ abstract class _$Families extends $AsyncNotifier<UserFamilies> {
             as $ClassProviderElement<
               AnyNotifier<AsyncValue<UserFamilies>, UserFamilies>,
               AsyncValue<UserFamilies>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(Invitations)
+final invitationsProvider = InvitationsProvider._();
+
+final class InvitationsProvider
+    extends $AsyncNotifierProvider<Invitations, Invitation> {
+  InvitationsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'invitationsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$invitationsHash();
+
+  @$internal
+  @override
+  Invitations create() => Invitations();
+}
+
+String _$invitationsHash() => r'2d8719d7d0996d6b668d2dd09588c92960a88a33';
+
+abstract class _$Invitations extends $AsyncNotifier<Invitation> {
+  FutureOr<Invitation> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<Invitation>, Invitation>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<Invitation>, Invitation>,
+              AsyncValue<Invitation>,
               Object?,
               Object?
             >;

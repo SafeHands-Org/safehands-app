@@ -11,7 +11,7 @@ abstract final class AppSpacing {
 }
 
 abstract final class AppRadius {
-  static const sm = Radius.circular(6.0);
+  static const sm = Radius.circular(4.0);
   static const md = Radius.circular(8.0);
   static const lg = Radius.circular(10.0);
   static const xl = Radius.circular(14.0);

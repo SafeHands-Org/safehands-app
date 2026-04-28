@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/features/providers/api/api_providers.dart';
 import 'package:frontend/features/providers/app/app_providers.dart';
+import 'package:frontend/features/providers/family/family_providers.dart';
+import 'package:frontend/features/providers/family_members/family_member_providers.dart';
 import 'package:frontend/models/enums/enums.dart';
 import 'package:frontend/models/user/auth_user.dart';
 import 'package:frontend/repositories/auth/auth_repository.dart';
@@ -19,6 +21,20 @@ AuthRepository authRepository(Ref ref) => AuthRepositoryRemote(
 
 @Riverpod(keepAlive: true)
 UserRole userRole(Ref ref) => ref.watch(authProvider).value?.role ?? UserRole.familyMember;
+
+@Riverpod(keepAlive: true)
+Future<bool> isAdmin(Ref ref) async {
+  final memberships = await ref.watch(familyMembersProvider.future);
+  final family = await ref.watch(currentFamilyProvider.future);
+  final user = ref.watch(authProvider);
+  if (user.value == null) return false;
+
+  final member = memberships.values.firstWhere((e) => e.fid == family);
+
+  if (!member.isAdmin) return false;
+
+  return true;
+}
 
 @Riverpod(keepAlive: true)
 AuthUser? currentUser(Ref ref) => ref.watch(authProvider).value;
@@ -40,10 +56,16 @@ class Auth extends _$Auth {
   Future<void> login({required String email, required String password}) async {
     state = const AsyncLoading();
 
-    state = await AsyncValue.guard(() async {
+    final result = await AsyncValue.guard(() async {
       final AuthUser result = await ref.read(authRepositoryProvider).login(LoginRequest(email: email, password: password));
       return result;
     });
+
+    state = result;
+
+    if (result.hasError) {
+
+    }
   }
 
   Future<void> register({required String name, required String email, required String password, required String role}) async {

@@ -131,83 +131,44 @@ final class TodaysLogsProvider
 String _$todaysLogsHash() => r'79b8a5d256c0788b81c40104eb382cb342860866';
 
 @ProviderFor(upcomingFamilyDoses)
-final upcomingFamilyDosesProvider = UpcomingFamilyDosesFamily._();
+final upcomingFamilyDosesProvider = UpcomingFamilyDosesProvider._();
 
 final class UpcomingFamilyDosesProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<MedicationSchedule>>,
-          List<MedicationSchedule>,
-          FutureOr<List<MedicationSchedule>>
+          AsyncValue<List<Member>>,
+          List<Member>,
+          FutureOr<List<Member>>
         >
-    with
-        $FutureModifier<List<MedicationSchedule>>,
-        $FutureProvider<List<MedicationSchedule>> {
-  UpcomingFamilyDosesProvider._({
-    required UpcomingFamilyDosesFamily super.from,
-    required String? super.argument,
-  }) : super(
-         retry: null,
-         name: r'upcomingFamilyDosesProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         $allTransitiveDependencies: null,
-       );
+    with $FutureModifier<List<Member>>, $FutureProvider<List<Member>> {
+  UpcomingFamilyDosesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'upcomingFamilyDosesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$upcomingFamilyDosesHash();
 
-  @override
-  String toString() {
-    return r'upcomingFamilyDosesProvider'
-        ''
-        '($argument)';
-  }
-
   @$internal
   @override
-  $FutureProviderElement<List<MedicationSchedule>> $createElement(
+  $FutureProviderElement<List<Member>> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<List<MedicationSchedule>> create(Ref ref) {
-    final argument = this.argument as String?;
-    return upcomingFamilyDoses(ref, argument);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is UpcomingFamilyDosesProvider && other.argument == argument;
-  }
-
-  @override
-  int get hashCode {
-    return argument.hashCode;
+  FutureOr<List<Member>> create(Ref ref) {
+    return upcomingFamilyDoses(ref);
   }
 }
 
 String _$upcomingFamilyDosesHash() =>
-    r'8d09559131526f5c15a61496f5c8faa3c9eede18';
-
-final class UpcomingFamilyDosesFamily extends $Family
-    with
-        $FunctionalFamilyOverride<FutureOr<List<MedicationSchedule>>, String?> {
-  UpcomingFamilyDosesFamily._()
-    : super(
-        retry: null,
-        name: r'upcomingFamilyDosesProvider',
-        dependencies: null,
-        $allTransitiveDependencies: null,
-        isAutoDispose: true,
-      );
-
-  UpcomingFamilyDosesProvider call([String? fmid]) =>
-      UpcomingFamilyDosesProvider._(argument: fmid, from: this);
-
-  @override
-  String toString() => r'upcomingFamilyDosesProvider';
-}
+    r'd543f47eb11403eab31d9bb56af50aac881c6cde';
 
 @ProviderFor(upcomingMemberDoses)
 final upcomingMemberDosesProvider = UpcomingMemberDosesFamily._();

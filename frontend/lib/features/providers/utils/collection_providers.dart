@@ -77,15 +77,13 @@ Future<List<Member>> aggregateMemberships(Ref ref, String fid) async {
     if (memberAssignments == null) continue;
     for (final assignment in memberAssignments) {
       final med = meds[assignment.medicationId];
-
       final memberSchedules = schedules[member.id];
-
       final memberLogs = logs[member.id];
 
       if (med == null || memberSchedules == null || memberLogs == null) continue;
 
       final schedule = memberSchedules.firstWhereOrNull((s) => s.fmmid == assignment.id);
-
+      
       if (schedule == null) continue;
 
       assignmentList.add(
@@ -118,13 +116,9 @@ Future<List<Member>> aggregateMemberships(Ref ref, String fid) async {
 @riverpod
 Future<FamilyCollection> aggregateFamily(Ref ref) async {
   final familyId = await ref.watch(currentFamilyProvider.future);
-
   final familyCache = await ref.watch(familiesProvider.future);
-
   final collection = await ref.watch(aggregateMembershipsProvider(familyId).future);
-
   final family = familyCache.values.firstWhere((f) => f.id == familyId);
-
   final members = collection.where((m) => m.member.fid == familyId).toList();
 
   return FamilyCollection(

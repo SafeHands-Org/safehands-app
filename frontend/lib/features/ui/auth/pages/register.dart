@@ -4,6 +4,7 @@ import 'package:frontend/features/providers/auth/auth_provider.dart';
 import 'package:frontend/features/ui/auth/widgets/register_email.dart';
 import 'package:frontend/features/ui/auth/widgets/register_password.dart';
 import 'package:frontend/features/ui/auth/widgets/register_profile.dart';
+import 'package:frontend/utils/exceptions.dart';
 import 'package:go_router/go_router.dart';
 
 class RegistrationView extends ConsumerStatefulWidget {
@@ -50,20 +51,38 @@ class _RegistrationViewState extends ConsumerState<RegistrationView> {
     }
   }
 
+  @override
+  void initState(){
+    super.initState();
+    ref.listenManual(authProvider,
+    (previous, next) {next.whenOrNull(
+        data: (_) {
+          if (mounted) context.go('/');
+        },
+        error:(error, stackTrace) {
+          if (!mounted) return;
+          final message = switch (error) {
+            CredentialException() => 'Invalid email or password.',
+            NotFoundException() => 'Invalid email or password',
+            ServerException() => 'Request timed out. Try again.',
+            _ => 'Something went wrong. Please try again.',
+          };
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message), backgroundColor: Color(0xFFB62320)),
+          );
+        }
+      );
+    });
+  }
+
   void _createAccount() async {
-    try {
-      await ref.read(authProvider.notifier).register(
-        name: _name,
-        email: _email,
-        password: _password,
-        role: _role,
-      );
-      context.go('/dashboard');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration failed')),
-      );
-    }
+    await ref.read(authProvider.notifier).register(
+      name: _name,
+      email: _email,
+      password: _password,
+      role: _role,
+    );
+    context.go('/dashboard');
   }
 
   @override

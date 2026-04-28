@@ -6,7 +6,6 @@ import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/features/ui/dashboard/widgets/dashboard_header.dart';
 import 'package:frontend/features/ui/dashboard/widgets/family_member_card.dart';
 import 'package:frontend/features/ui/dashboard/widgets/medication_card.dart';
-import 'package:frontend/features/ui/dashboard/widgets/overview_section.dart';
 import 'package:frontend/features/ui/dashboard/widgets/quick_action.dart';
 import 'package:frontend/models/models.dart';
 import 'package:go_router/go_router.dart';
@@ -20,7 +19,7 @@ class DashboardView extends ConsumerWidget {
     if (role == UserRole.caregiver) {
       return CaregiverDashboardView();
     } else {
-      return UserDashboardView();
+      return MemberDashboardView();
     }
   }
 }
@@ -40,7 +39,7 @@ class CaregiverDashboardView extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  DashboardHeader(),
+                  CaregiverDashboardHeader(),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
                     child: Column(
@@ -48,21 +47,15 @@ class CaregiverDashboardView extends ConsumerWidget {
                       children: [
                         SectionHeader(
                           title: 'Family Overview',
-                          actionLabel: 'View All',
+                          actionLabel: Icons.chevron_right,
                           onAction: () => context.go('/family'),
                         ),
                         FamilyMemberList(),
-                        const SizedBox(),
-
-                        SectionHeader(title: 'Overview', actionLabel: 'Details', onAction: () => context.go('/family')),
-                        OverviewSection(),
                         const SizedBox(height: 24),
-                        const SectionHeader(title: 'Upcoming Doses', actionLabel: 'Schedule'),
-
+                        const SectionHeader(title: 'Upcoming Doses'),
                         MedicationCardList(),
                         const SizedBox(height: 12),
                         const SectionHeader(title: 'Quick Actions'),
-
                         QuickActionMenu(),
                       ],
                     ),
@@ -77,11 +70,8 @@ class CaregiverDashboardView extends ConsumerWidget {
   }
 }
 
-
-
-class UserDashboardView extends ConsumerWidget {
-  const UserDashboardView({super.key});
-
+class MemberDashboardView extends ConsumerWidget {
+  const MemberDashboardView({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref){
     return Scaffold(
@@ -94,30 +84,19 @@ class UserDashboardView extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  DashboardHeader(),
+                  MemberDashboardHeader(),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SectionHeader(
-                          title: 'Family Overview',
-                          actionLabel: 'View All',
-                          onAction: () => context.go('/family'),
-                        ),
+                        const SectionHeader(title: "Today's Progress"),
                         FamilyMemberList(),
-                        const SizedBox(),
-
-                        const SectionHeader(title: 'Overview', actionLabel: 'Details'),
-                        OverviewSection(),
+                        const SizedBox(height: 20),
                         const SizedBox(height: 24),
-                        const SectionHeader(title: 'Upcoming Doses', actionLabel: 'Schedule'),
-
+                        const SectionHeader(title: 'Upcoming Doses'),
                         MedicationCardList(),
-                        const SizedBox(height: 12),
-                        const SectionHeader(title: 'Quick Actions'),
-
-                        QuickActionMenu(),
+                        const SizedBox(height: 12)
                       ],
                     ),
                   ),
