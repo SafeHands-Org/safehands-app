@@ -78,6 +78,13 @@ export const removeFamilyMemberMedication = async (req: Request, res: Response) 
 export const getMedicationSchedules = async (req: Request, res: Response) => {
   const userId = req.user?.id;
   const userRole = req.user?.role;
+  const fmmId = req.query.fmmId as string | undefined;
+
+  if (fmmId) {
+    const result = await service.getScheduleByFmmId(fmmId);
+    if (!result) return res.status(200).json([]);
+    return res.status(200).json([{ schedules: result }]);
+  }
 
   if (userRole == 'caregiver' && userId != null) {
     const result = await service.getCaregiverMedicationSchedules(userId);

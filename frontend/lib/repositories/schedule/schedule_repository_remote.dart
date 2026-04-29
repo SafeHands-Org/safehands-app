@@ -5,7 +5,6 @@ import 'package:frontend/models/models.dart';
 import 'package:frontend/repositories/schedule/schedule_repository.dart';
 import 'package:frontend/services/api/api_service.dart';
 import 'package:frontend/services/api/models/medication/medication_requests.dart';
-import 'package:frontend/utils/exceptions.dart';
 import 'package:frontend/utils/types.dart';
 
 class ScheduleRepositoryRemote extends ScheduleRepository {
@@ -23,19 +22,36 @@ class ScheduleRepositoryRemote extends ScheduleRepository {
   @override
   Future<MemberSchedules> getMedicationSchedules() async {
     try {
-      if (_cachedSchedules.isEmpty) {
-        final result = await _api.get('$_baseUrl/schedules');
-        final data = jsonDecode(result.body) as List;
+      final result = await _api.get('$_baseUrl/schedules');
+      final data = jsonDecode(result.body) as List;
 
-        final schedules = data.map((element) => MedicationScheduleMapper.fromMap(element['schedules'])).toList();
-
-        _cachedSchedules.addAll({for (final schedule in schedules) schedule.fmid: schedules.where((s) => s.fmid == schedule.fmid).toList()});
+      _cachedSchedules.clear();
+      for (final element in data) {
+        final raw = element['schedules'] as Map<String, dynamic>?;
+        if (raw == null) continue;
+        final schedule = MedicationScheduleMapper.fromMap(raw);
+        _cachedSchedules
+            .putIfAbsent(schedule.fmid, () => [])
+            .add(schedule);
       }
     } on Exception {
       rethrow;
     }
-
     return Map.unmodifiable(_cachedSchedules);
+  }
+
+  Future<MedicationSchedule?> getScheduleForAssignment(String fmmId) async {
+    try {
+      final result = await _api.get('$_baseUrl/schedules?fmmId=$fmmId');
+      final data = jsonDecode(result.body);
+      final list = data is List ? data : [data];
+      if (list.isEmpty) return null;
+      final element = list[0];
+      final raw = (element['schedules'] ?? element) as Map<String, dynamic>;
+      return MedicationScheduleMapper.fromMap(raw);
+    } on Exception {
+      return null;
+    }
   }
 
   @override
@@ -43,9 +59,12 @@ class ScheduleRepositoryRemote extends ScheduleRepository {
     try {
       final result = await _api.post('$_baseUrl/schedules', data.toMap());
       final json = jsonDecode(result.body);
-      MedicationSchedule newSchedule = MedicationScheduleMapper.fromMap(json);
-      _cachedSchedules.putIfAbsent(newSchedule.fmid, () => []);
-      _cachedSchedules[newSchedule.fmid]!.add(newSchedule);
+      final raw = json is List ? json[0] : json;
+      final MedicationSchedule newSchedule =
+          MedicationScheduleMapper.fromMap(raw as Map<String, dynamic>);
+      _cachedSchedules
+          .putIfAbsent(newSchedule.fmid, () => [])
+          .add(newSchedule);
       _notifyChange();
     } on Exception {
       rethrow;
@@ -54,15 +73,16 @@ class ScheduleRepositoryRemote extends ScheduleRepository {
 
   @override
   Future<void> updateSchedule(String schedId, ScheduleUpdate data) async {
-    if (!_cachedSchedules.containsKey(schedId)) throw NotFoundException();
-
     try {
-      final result = await _api.put('$_baseUrl/schedules/$schedId', data.toMap());
+      final result =
+          await _api.put('$_baseUrl/schedules/$schedId', data.toMap());
       final json = jsonDecode(result.body);
-      MedicationSchedule updatedSchedule = MedicationScheduleMapper.fromMap(json);
-      final list = _cachedSchedules.putIfAbsent(updatedSchedule.fmid, () => []);
+      final raw = json is List ? json[0] : json;
+      final MedicationSchedule updatedSchedule =
+          MedicationScheduleMapper.fromMap(raw as Map<String, dynamic>);
+      final list =
+          _cachedSchedules.putIfAbsent(updatedSchedule.fmid, () => []);
       final index = list.indexWhere((m) => m.id == updatedSchedule.id);
-
       if (index != -1) {
         list[index] = updatedSchedule;
       } else {
@@ -76,13 +96,10 @@ class ScheduleRepositoryRemote extends ScheduleRepository {
 
   @override
   Future<void> deleteSchedule(String schedId, String fmId) async {
-    if (!_cachedSchedules.containsKey(schedId)) throw NotFoundException();
-
     try {
       await _api.delete('$_baseUrl/schedules/$schedId');
-      final list = _cachedSchedules[fmId];
-      list!.removeWhere((m) => m.id == schedId && m.fmid == fmId);
-       _notifyChange();
+      _cachedSchedules[fmId]?.removeWhere((m) => m.id == schedId);
+      _notifyChange();
     } on Exception {
       rethrow;
     }

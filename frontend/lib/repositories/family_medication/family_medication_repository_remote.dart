@@ -46,15 +46,23 @@ class FamilyMedicationRepositoryRemote extends FamilyMedicationRepository {
 
   @override
   Future<void> createFamilyMedication(MemberMedicationRequest data) async {
+    await createFamilyMedicationAndReturn(data);
+  }
+
+  Future<FamilyMemberMedication> createFamilyMedicationAndReturn(
+      MemberMedicationRequest data) async {
     try {
-      final Response result = await _api.post('$_baseUrl/members', data.toMap());
+      final Response result =
+          await _api.post('$_baseUrl/members', data.toMap());
       final json = jsonDecode(result.body);
       final raw = json is List ? json[0] : json;
-      FamilyMemberMedication newMed = FamilyMemberMedicationMapper.fromMap(raw);
+      FamilyMemberMedication newMed =
+          FamilyMemberMedicationMapper.fromMap(raw);
       _cachedFamilyMedications
           .putIfAbsent(newMed.familyMemberId, () => [])
           .add(newMed);
       _notifyChange();
+      return newMed;
     } on Exception {
       rethrow;
     }
