@@ -141,7 +141,6 @@ class FormSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: AppRadius.borderRadiusCard,
-        border: Border.all(color: cs.outlineVariant),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -171,6 +170,7 @@ InputDecoration formFieldDecoration({
   String? hintText,
   Widget? prefixIcon,
   Widget? suffixIcon,
+  EdgeInsets? contentPadding,
   required BuildContext context,
 }) {
   final cs = Theme.of(context).colorScheme;
@@ -191,13 +191,14 @@ InputDecoration formFieldDecoration({
   );
 
   return InputDecoration(
+    isDense: true,
     hintText: hintText,
     hintStyle: TextStyle(color: cs.onSurface, fontSize: 14),
     prefixIcon: prefixIcon,
     suffixIcon: suffixIcon,
     filled: true,
     fillColor: cs.surface,
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    contentPadding: contentPadding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     border: border,
     enabledBorder: border,
     focusedBorder: focusedBorder,

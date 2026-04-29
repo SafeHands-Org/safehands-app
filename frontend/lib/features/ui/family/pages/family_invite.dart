@@ -33,16 +33,11 @@ class FamilyInviteView extends ConsumerWidget {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
 
-    final String code = invite.code;
+    final String code = invite.token;
 
     return DecoratedBox(
       decoration: ShapeDecoration(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: AppRadius.card,
-            topRight: AppRadius.card,
-          ),
-        ),
+        shape: RoundedRectangleBorder(),
         gradient: context.palette.header,
       ),
       child: SingleChildScrollView(

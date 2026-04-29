@@ -40,17 +40,10 @@ class FamilyMedicationRepositoryRemote extends FamilyMedicationRepository {
 
   @override
   Future<void> createFamilyMedication(MemberMedicationRequest data) async {
-    final list = _cachedFamilyMedications[data.familyMemberId];
-    if (list != null && list.isNotEmpty) {
-      final index = list.indexWhere((m) => m.medicationId == data.medicationId);
-      if (index != -1){
-        throw DuplicateException("Medication already assigned to this member.");
-      }
-    }
-
     try {
       final Response result = await _api.post('$_baseUrl/members', data.toMap());
-      FamilyMemberMedication newMed = FamilyMemberMedicationMapper.fromMap(jsonDecode(result.body));
+      final json = jsonDecode(result.body);
+      FamilyMemberMedication newMed = FamilyMemberMedicationMapper.fromMap(json[0]);
       _cachedFamilyMedications.putIfAbsent(newMed.familyMemberId, () => []);
       _cachedFamilyMedications[newMed.familyMemberId]!.add(newMed);
       _notifyChange();
@@ -86,7 +79,8 @@ class FamilyMedicationRepositoryRemote extends FamilyMedicationRepository {
 
     try {
       final Response result = await _api.put('$_baseUrl/members/$fmmId', data.toMap());
-      FamilyMemberMedication updatedMed = FamilyMemberMedicationMapper.fromMap(jsonDecode(result.body));
+      final json = jsonDecode(result.body);
+      FamilyMemberMedication updatedMed = FamilyMemberMedicationMapper.fromMap(json);
 
       final list = _cachedFamilyMedications.putIfAbsent(updatedMed.familyMemberId, () => []);
       final index = list.indexWhere((m) => m.id == updatedMed.id);

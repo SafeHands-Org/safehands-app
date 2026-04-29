@@ -52,6 +52,7 @@ export const getMemberMedicationSchedules = async (userId: string) => {
       schedules: {
         id: medicationSchedules.id,
         fmmid: medicationSchedules.familyMemberMedicationId,
+        fmid: familyMemberships.id,
         timesOfDay: medicationSchedules.timesOfDay,
         daysOfWeek: medicationSchedules.daysOfWeek,
         frequency: medicationSchedules.frequency,
@@ -81,8 +82,23 @@ export const getCaregiverMedicationSchedules = async (userId: string) => {
   return medications
 }
 
-export const createMedicationSchedule = async (data: MedicationSchedule) =>
-  await db.insert(medicationSchedules).values(data).returning();
+export const createMedicationSchedule = async (data: MedicationSchedule) => {
+  const [inserted] = await db.insert(medicationSchedules).values(data).returning();
+  const [result] = await db
+    .select({
+      id: medicationSchedules.id,
+      fmmid: medicationSchedules.familyMemberMedicationId,
+      fmid: familyMemberships.id,
+      timesOfDay: medicationSchedules.timesOfDay,
+      daysOfWeek: medicationSchedules.daysOfWeek,
+      frequency: medicationSchedules.frequency,
+    })
+    .from(medicationSchedules)
+    .innerJoin(familyMemberMedications, eq(medicationSchedules.familyMemberMedicationId, familyMemberMedications.id))
+    .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
+    .where(eq(medicationSchedules.id, inserted.id));
+  return result;
+};
 
 export const updateMedicationSchedule = async (id: string, data: Partial<MedicationSchedule>) =>
   await db.update(medicationSchedules).set(data).where(eq(medicationSchedules.id, id)).returning();
@@ -95,6 +111,7 @@ export const getMemberAdherenceLogs = async (userId: string) => {
     .select({
       logs: {
         id: medicationAdherenceLogs.id,
+        fmid: familyMemberships.id,
         fmmid: medicationAdherenceLogs.familyMemberMedicationId,
         scheduledTime: medicationAdherenceLogs.scheduledTime,
         takenAt: medicationAdherenceLogs.takenAt,

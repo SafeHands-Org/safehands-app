@@ -26,7 +26,7 @@ final class AdherenceRepositoryProvider
         argument: null,
         retry: null,
         name: r'adherenceRepositoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -57,7 +57,7 @@ final class AdherenceRepositoryProvider
 }
 
 String _$adherenceRepositoryHash() =>
-    r'33f989c22762c966a57c7ba8aa8f5e44b5b7251b';
+    r'b41a4607d75b3bfeddbb53640f80cf5af3aa2179';
 
 @ProviderFor(adherenceChanges)
 final adherenceChangesProvider = AdherenceChangesProvider._();

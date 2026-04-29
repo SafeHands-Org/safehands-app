@@ -297,7 +297,7 @@ final class AggregateMembershipsProvider
 }
 
 String _$aggregateMembershipsHash() =>
-    r'eee5a3876d4e16966e853a23e9ae054b338fe8e5';
+    r'3cb3bbfb04b90a4072174fbdac860ea670c9c698';
 
 final class AggregateMembershipsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Member>>, String> {

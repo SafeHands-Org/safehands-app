@@ -13,8 +13,8 @@ class ApiService {
   set tokenProvider(TokenProvider token) => _tokenProvider = token;
 
   Future<Map<String, String>> _header() async {
-    final headers = {'Content-Type': 'application/json'};
-    final authHeader = _tokenProvider?.call();
+    var headers = {'Content-Type': 'application/json'};
+    var authHeader = _tokenProvider?.call();
     if (authHeader != null) headers.addAll({'Authorization': authHeader});
     return headers;
   }
@@ -56,7 +56,7 @@ class ApiService {
   Future<dynamic> delete(
     String path
   ) async {
-    final response = await _client.post(
+    final response = await _client.delete(
       Uri.parse(path),
       headers: await _header(),
     );
@@ -65,9 +65,7 @@ class ApiService {
 
   Future<dynamic> _handleRequest(Response res) async {
     final status = res.statusCode;
-
-    if (res.body.isEmpty) return NotFoundException();
-
+    print(status);
     switch (status) {
       case 200: return res;
       case 201: return res;

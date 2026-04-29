@@ -26,7 +26,7 @@ final class AssignmentRepositoryProvider
         argument: null,
         retry: null,
         name: r'assignmentRepositoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -57,7 +57,7 @@ final class AssignmentRepositoryProvider
 }
 
 String _$assignmentRepositoryHash() =>
-    r'51e388e4069205848a7a3bb7e08eddc62edf2eb4';
+    r'95aae3fcb2349d23dad10ce8dad5c14cdfb9cf71';
 
 @ProviderFor(assignmentChanged)
 final assignmentChangedProvider = AssignmentChangedProvider._();

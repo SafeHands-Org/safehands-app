@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 class UserAvatar extends StatelessWidget {
   const UserAvatar({
     super.key,
-    required this.name,
+    this.name,
     this.radius = 28,
   });
 
-  final String name;
+  final String? name;
   final double radius;
 
   @override
@@ -16,14 +16,18 @@ class UserAvatar extends StatelessWidget {
     return CircleAvatar(
       radius: radius,
       backgroundColor: cs.secondaryContainer,
-      child: Text(
-        UserAvatar._initials(name),
+      child: name != null ? Text(
+        UserAvatar._initials(name!),
         style: TextStyle(
           fontSize: radius * 0.45,
           fontWeight: FontWeight.w600,
           color: Colors.grey[600],
         ),
-      ),
+      ) : Icon(
+        Icons.person,
+        size: radius,
+        color: Colors.grey[600],
+      )
     );
   }
 

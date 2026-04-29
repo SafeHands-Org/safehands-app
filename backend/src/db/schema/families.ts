@@ -61,9 +61,7 @@ export const invitations = pgTable(
       .notNull()
       .references(() => families.id, { onDelete: "cascade" }),
 
-    code: text("code").notNull().unique(),
-
-    used: boolean("used").default(false).notNull(),
+    token: text("token").notNull().unique(),
 
     expiration: timestamp("expiration").notNull(),
 
@@ -75,7 +73,7 @@ export const invitations = pgTable(
   },
   (table) => [
     index("invitations_family_idx").on(table.familyId),
-    index("invitations_code_idx").on(table.code),
+    index("invitations_code_idx").on(table.token),
   ]
 );
 

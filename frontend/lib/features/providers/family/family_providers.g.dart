@@ -26,7 +26,7 @@ final class FamilyRepositoryProvider
         argument: null,
         retry: null,
         name: r'familyRepositoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -54,7 +54,7 @@ final class FamilyRepositoryProvider
   }
 }
 
-String _$familyRepositoryHash() => r'73e0ad8fc0e169b8fcfd7eaadd7a21102bcc5327';
+String _$familyRepositoryHash() => r'c417b1f7e573a172737a38f7da5ada0364276974';
 
 @ProviderFor(invitationRepository)
 final invitationRepositoryProvider = InvitationRepositoryProvider._();
@@ -73,7 +73,7 @@ final class InvitationRepositoryProvider
         argument: null,
         retry: null,
         name: r'invitationRepositoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -102,7 +102,7 @@ final class InvitationRepositoryProvider
 }
 
 String _$invitationRepositoryHash() =>
-    r'd8749f5008f604b4d36b8a9e4b1fef9dc3b775e5';
+    r'd3835817b2f0008c71cfd46f0b93b4e894a43c67';
 
 @ProviderFor(familyChanges)
 final familyChangesProvider = FamilyChangesProvider._();
@@ -271,7 +271,7 @@ final class CurrentFamilyObjectProvider
 }
 
 String _$currentFamilyObjectHash() =>
-    r'64898389ab62e41083014919e49664bbfd4462f7';
+    r'786ac903f54585d8f6e727c15d074b8fa06e5c0b';
 
 @ProviderFor(CurrentFamily)
 final currentFamilyProvider = CurrentFamilyProvider._();
@@ -297,7 +297,7 @@ final class CurrentFamilyProvider
   CurrentFamily create() => CurrentFamily();
 }
 
-String _$currentFamilyHash() => r'5a45c38c014f55c133111b5eefd46b0f409a155a';
+String _$currentFamilyHash() => r'1159e8a53d1e1772850acd63af217b54a332cd28';
 
 abstract class _$CurrentFamily extends $AsyncNotifier<String> {
   FutureOr<String> build();
@@ -385,7 +385,7 @@ final class InvitationsProvider
   Invitations create() => Invitations();
 }
 
-String _$invitationsHash() => r'2d8719d7d0996d6b668d2dd09588c92960a88a33';
+String _$invitationsHash() => r'a5a37089425601ecacc27121ae6acfa83d2636bf';
 
 abstract class _$Invitations extends $AsyncNotifier<Invitation> {
   FutureOr<Invitation> build();

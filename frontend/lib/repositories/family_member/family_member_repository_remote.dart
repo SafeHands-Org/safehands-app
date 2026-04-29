@@ -45,7 +45,8 @@ class FamilyMemberRepositoryRemote extends FamilyMemberRepository {
 
     try {
       final result = await _api.post('$_baseUrl/members', data.toMap());
-      FamilyMember newFamilyMember = FamilyMemberMapper.fromMap(result.value);
+      final json = jsonDecode(result.body);
+      FamilyMember newFamilyMember = FamilyMemberMapper.fromMap(json);
       _cachedMembers[newFamilyMember.id] = newFamilyMember;
       _notifyChange();
     } on Exception {
@@ -54,10 +55,10 @@ class FamilyMemberRepositoryRemote extends FamilyMemberRepository {
   }
 
   @override
-  Future<FamilyMember> getFamilyMember(String id, String mid) async {
+  Future<FamilyMember> getFamilyMember(String id) async {
     try {
       if (!_cachedMembers.containsKey(id)) {
-        final result = await _api.get('$_baseUrl/$id/members/$mid');
+        final result = await _api.get('$_baseUrl/members/$id');
         FamilyMember member = FamilyMemberMapper.fromMap(result.value);
         _cachedMembers[member.id] = member;
         _notifyChange();
@@ -71,26 +72,27 @@ class FamilyMemberRepositoryRemote extends FamilyMemberRepository {
   }
 
   @override
-  Future<void> updateFamilyMember(String id, String mid, FamilyMemberUpdate data) async {
+  Future<void> updateFamilyMember(String id, FamilyMemberUpdate data) async {
     if (!_cachedMembers.containsKey(id)) throw NotFoundException();
-
     try {
-      final result = await _api.put('$_baseUrl/$id/members/$mid', data.toMap());
-      FamilyMember updatedFamilyMember = FamilyMemberMapper.fromMap(result.value);
-      _cachedMembers.update(mid, (member) => updatedFamilyMember);
+      final result = await _api.put('$_baseUrl/members/$id', {'riskLevel': data.riskLevel?.toLowerCase()});
+      final json = jsonDecode(result.body);
+      FamilyMember updatedFamilyMember = FamilyMemberMapper.fromMap(json);
+      _cachedMembers.update(id, (member) => updatedFamilyMember);
       _notifyChange();
     } on Exception {
+      print('EXCEPTION: $Exception');
       rethrow;
     }
   }
 
   @override
-  Future<void> removeFamilyMember(String id, String mid) async {
+  Future<void> removeFamilyMember(String id) async {
     if (!_cachedMembers.containsKey(id)) throw NotFoundException();
 
     try {
-      await _api.delete('$_baseUrl/$id/members/$mid');
-       _cachedMembers.remove(mid);
+      await _api.delete('$_baseUrl/members/$id');
+       _cachedMembers.remove(id);
        _notifyChange();
     } on Exception {
       rethrow;

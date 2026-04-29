@@ -10,8 +10,12 @@ export const getUserMemberships = async (fid: string) => {
     .select({
       member: {
         id: familyMemberships.id,
+        uid: familyMemberships.userId,
+        fid: familyMemberships.familyId,
         name: users.name,
+        risklevel: familyMemberships.riskLevel,
         isAdmin: familyMemberships.isAdmin,
+        createdAt: familyMemberships.createdAt
       }
     })
     .from(familyMemberships)
@@ -118,7 +122,22 @@ export const updateFamilyMember = async (
     .where(eq(familyMemberships.id, id))
     .returning();
 
-  return updated;
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, updated.userId))
+
+  const member = {
+    id: updated.id,
+    uid: updated.userId,
+    fid: updated.familyId,
+    name: user.name,
+    risklevel: updated.riskLevel,
+    isAdmin: updated.isAdmin,
+    createdAt: updated.createdAt
+  }
+
+  return member;
 };
 
 export const removeFamilyMember = async (id: string) => {
@@ -131,10 +150,12 @@ export type CreateInvitationInput = {
 };
 
 export const getInvitation = async (userId: string) => {
+  const family = await getAdminFamilies(userId)
+
   const [invitation] = await db
     .select()
     .from(invitations)
-    .where(eq(invitations.createdBy, userId))
+    .where(eq(invitations.createdBy, family[0]?.family.createdBy))
     .limit(1);
 
   if (!invitation) return null;
@@ -142,8 +163,9 @@ export const getInvitation = async (userId: string) => {
   return invitation;
 };
 
-export const createInvitation = async (data: CreateInvitationInput) => {
+export const createInvitation = async (userId: string) => {
   const code = generateCode(6);
+  const family = await getAdminFamilies(userId)
 
   const expiration = new Date();
   expiration.setHours(expiration.getHours() + 24);
@@ -151,29 +173,12 @@ export const createInvitation = async (data: CreateInvitationInput) => {
   const [invitation] = await db
     .insert(invitations)
     .values({
-      familyId: data.familyId,
-      code,
-      expiration,
-      createdBy: data.createdBy,
-      used: false,
+      familyId: family[0]?.family.id,
+      token: code,
+      expiration: expiration,
+      createdBy: family[0]?.family.createdBy,
     })
     .returning();
-
-  return invitation;
-};
-
-export const checkInvitation = async (code: string) => {
-  const [invitation] = await db
-    .select()
-    .from(invitations)
-    .where(eq(invitations.code, code))
-    .limit(1);
-
-  if (!invitation) return null;
-
-  if (new Date() > invitation.expiration) return null;
-
-  if (invitation.used) return null;
 
   return invitation;
 };
@@ -182,11 +187,10 @@ export const joinFamily = async (code: string, userId: string) => {
   const [invitation] = await db
     .select()
     .from(invitations)
-    .where(eq(invitations.code, code))
+    .where(eq(invitations.token, code))
     .limit(1);
 
   if (!invitation) return null;
-  if (invitation.used) return null;
   if (new Date() > invitation.expiration) return null;
 
   const existing = await db
@@ -211,11 +215,6 @@ export const joinFamily = async (code: string, userId: string) => {
       isAdmin: false,
     })
     .returning();
-
-  await db
-    .update(invitations)
-    .set({ used: true })
-    .where(eq(invitations.code, code));
 
   return membership;
 };

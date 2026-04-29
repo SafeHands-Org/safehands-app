@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'family_member_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 FamilyMemberRepositoryRemote familyMemberRepository(Ref ref) => FamilyMemberRepositoryRemote(
   ref.watch(apiServiceProvider),
   ref.watch(familyUrlProvider),
@@ -44,19 +44,19 @@ class FamilyMembers extends _$FamilyMembers {
     }
   }
 
-  Future<void> updateFamilyMember(String id, String mid, FamilyMemberUpdate data) async {
+  Future<void> updateFamilyMember(String id, FamilyMemberUpdate data) async {
     state = const AsyncLoading();
     try {
-      await ref.read(familyMemberRepositoryProvider).updateFamilyMember(id, mid, data);
+      await ref.read(familyMemberRepositoryProvider).updateFamilyMember(id, data);
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
     }
   }
 
-  Future<void> removeFamilyMember(String id, String mid) async {
+  Future<void> removeFamilyMember(String id) async {
     state = const AsyncLoading();
     try {
-      await ref.read(familyMemberRepositoryProvider).removeFamilyMember(id, mid);
+      await ref.read(familyMemberRepositoryProvider).removeFamilyMember(id);
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
     }

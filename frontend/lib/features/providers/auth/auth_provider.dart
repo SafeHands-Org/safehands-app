@@ -3,6 +3,7 @@ import 'package:frontend/features/providers/api/api_providers.dart';
 import 'package:frontend/features/providers/app/app_providers.dart';
 import 'package:frontend/features/providers/family/family_providers.dart';
 import 'package:frontend/features/providers/family_members/family_member_providers.dart';
+import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/models/enums/enums.dart';
 import 'package:frontend/models/user/auth_user.dart';
 import 'package:frontend/repositories/auth/auth_repository.dart';
@@ -56,16 +57,10 @@ class Auth extends _$Auth {
   Future<void> login({required String email, required String password}) async {
     state = const AsyncLoading();
 
-    final result = await AsyncValue.guard(() async {
+    state = await AsyncValue.guard(() async {
       final AuthUser result = await ref.read(authRepositoryProvider).login(LoginRequest(email: email, password: password));
       return result;
     });
-
-    state = result;
-
-    if (result.hasError) {
-
-    }
   }
 
   Future<void> register({required String name, required String email, required String password, required String role}) async {
@@ -81,7 +76,6 @@ class Auth extends _$Auth {
 
   Future<void> logout() async {
     state = const AsyncLoading();
-
     await ref.read(authRepositoryProvider).logout();
     state = AsyncData(AuthUser());
   }

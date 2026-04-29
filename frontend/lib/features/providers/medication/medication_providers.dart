@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'medication_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 MedicationRepositoryRemote medicationRepository(Ref ref) => MedicationRepositoryRemote(
   ref.watch(apiServiceProvider),
   ref.read(medicationUrlProvider)

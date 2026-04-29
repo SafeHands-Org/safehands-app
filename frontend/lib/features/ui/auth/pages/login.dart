@@ -32,8 +32,10 @@ class _LoginViewState extends ConsumerState<LoginView> {
     super.initState();
     ref.listenManual(authProvider,
     (previous, next) {next.whenOrNull(
-        data: (_) {
-          if (mounted) context.go('/');
+        data: (user) {
+          if (mounted && user.isLoggedIn) {
+            context.go('/dashboard');
+          }
         },
         error:(error, stackTrace) {
           if (!mounted) return;

@@ -29,15 +29,8 @@ class InvitationMapper extends ClassMapperBase<Invitation> {
     'familyId',
     _$familyId,
   );
-  static String _$code(Invitation v) => v.code;
-  static const Field<Invitation, String> _f$code = Field('code', _$code);
-  static bool _$used(Invitation v) => v.used;
-  static const Field<Invitation, bool> _f$used = Field('used', _$used);
-  static DateTime _$expiration(Invitation v) => v.expiration;
-  static const Field<Invitation, DateTime> _f$expiration = Field(
-    'expiration',
-    _$expiration,
-  );
+  static String _$token(Invitation v) => v.token;
+  static const Field<Invitation, String> _f$token = Field('token', _$token);
   static String _$createdBy(Invitation v) => v.createdBy;
   static const Field<Invitation, String> _f$createdBy = Field(
     'createdBy',
@@ -53,9 +46,7 @@ class InvitationMapper extends ClassMapperBase<Invitation> {
   final MappableFields<Invitation> fields = const {
     #id: _f$id,
     #familyId: _f$familyId,
-    #code: _f$code,
-    #used: _f$used,
-    #expiration: _f$expiration,
+    #token: _f$token,
     #createdBy: _f$createdBy,
     #createdAt: _f$createdAt,
   };
@@ -64,9 +55,7 @@ class InvitationMapper extends ClassMapperBase<Invitation> {
     return Invitation(
       id: data.dec(_f$id),
       familyId: data.dec(_f$familyId),
-      code: data.dec(_f$code),
-      used: data.dec(_f$used),
-      expiration: data.dec(_f$expiration),
+      token: data.dec(_f$token),
       createdBy: data.dec(_f$createdBy),
       createdAt: data.dec(_f$createdAt),
     );
@@ -135,9 +124,7 @@ abstract class InvitationCopyWith<$R, $In extends Invitation, $Out>
   $R call({
     String? id,
     String? familyId,
-    String? code,
-    bool? used,
-    DateTime? expiration,
+    String? token,
     String? createdBy,
     DateTime? createdAt,
   });
@@ -156,18 +143,14 @@ class _InvitationCopyWithImpl<$R, $Out>
   $R call({
     String? id,
     String? familyId,
-    String? code,
-    bool? used,
-    DateTime? expiration,
+    String? token,
     String? createdBy,
     DateTime? createdAt,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
       if (familyId != null) #familyId: familyId,
-      if (code != null) #code: code,
-      if (used != null) #used: used,
-      if (expiration != null) #expiration: expiration,
+      if (token != null) #token: token,
       if (createdBy != null) #createdBy: createdBy,
       if (createdAt != null) #createdAt: createdAt,
     }),
@@ -176,9 +159,7 @@ class _InvitationCopyWithImpl<$R, $Out>
   Invitation $make(CopyWithData data) => Invitation(
     id: data.get(#id, or: $value.id),
     familyId: data.get(#familyId, or: $value.familyId),
-    code: data.get(#code, or: $value.code),
-    used: data.get(#used, or: $value.used),
-    expiration: data.get(#expiration, or: $value.expiration),
+    token: data.get(#token, or: $value.token),
     createdBy: data.get(#createdBy, or: $value.createdBy),
     createdAt: data.get(#createdAt, or: $value.createdAt),
   );

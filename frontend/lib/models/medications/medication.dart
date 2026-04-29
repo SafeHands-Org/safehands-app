@@ -18,6 +18,7 @@ part 'medication.mapper.dart';
 }
 
 */
+
 @MappableClass()
 class Medication with MedicationMappable{
   final String id;

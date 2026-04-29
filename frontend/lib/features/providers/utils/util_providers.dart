@@ -48,7 +48,6 @@ Future<List<MedicationAdherenceLog>> todaysLogs(Ref ref) async {
     .toList();
 }
 
-
 @riverpod
 Future<List<Member>> upcomingFamilyDoses(Ref ref) async {
   final reference = await ref.watch(currentFamilyProvider.future);

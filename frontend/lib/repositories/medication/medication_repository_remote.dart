@@ -49,7 +49,10 @@ class MedicationRepositoryRemote extends MedicationRepository{
     try {
       final url = '$_baseUrl/';
       final result = await _api.post(url, data.toMap());
-      Medication newMedication = MedicationMapper.fromMap(result.value);
+      final json = jsonDecode(result.body);
+      print(json);
+      Medication newMedication = MedicationMapper.fromMap(json);
+      print(newMedication);
       _cachedMedications[newMedication.id] = newMedication;
       _notifyChange();
     } on Exception {
@@ -83,7 +86,8 @@ class MedicationRepositoryRemote extends MedicationRepository{
     try {
       final url = '$_baseUrl/$medId';
       final result = await _api.put(url, data.toMap());
-      Medication updatedMedication = MedicationMapper.fromMap(result.value);
+      final json = jsonDecode(result.body);
+      Medication updatedMedication = MedicationMapper.fromMap(json);
       _cachedMedications.update(medId, (value) => updatedMedication);
       _notifyChange();
     } on Exception {

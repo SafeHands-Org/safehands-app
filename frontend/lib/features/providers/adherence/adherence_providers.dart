@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'adherence_providers.g.dart';
 
 
-@riverpod
+@Riverpod(keepAlive: true)
 MedicationAdherenceRepositoryRemote adherenceRepository(Ref ref) => MedicationAdherenceRepositoryRemote(
   ref.watch(apiServiceProvider),
   ref.read(medicationUrlProvider)
@@ -25,7 +25,7 @@ class Adherences extends _$Adherences {
   Future<MemberLogs> build() async {
     final repo = ref.read(adherenceRepositoryProvider);
     ref.watch(adherenceChangesProvider);
-    
+
     return repo.getMedicationLogs();
   }
 

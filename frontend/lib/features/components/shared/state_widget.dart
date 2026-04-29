@@ -33,6 +33,34 @@ class ErrorCard extends StatelessWidget {
   }
 }
 
+class ErrorBody extends StatelessWidget {
+  const ErrorBody({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Center(
+      child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+          Icon(
+            Icons.error_outline,
+            color: cs.error,
+            size: 32,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Something went wrong. Please try again later.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: cs.error),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class EmptyCard extends StatelessWidget {
   const EmptyCard({super.key, required this.message, this.icon});
 
@@ -69,6 +97,34 @@ class EmptyCard extends StatelessWidget {
   }
 }
 
+class EmptyBody extends StatelessWidget {
+  const EmptyBody({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.sync,
+            color: cs.outline,
+            size: 32,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Nothing here yet.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: cs.outline),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class LoadingCard extends StatelessWidget {
   const LoadingCard({super.key});
 
@@ -79,6 +135,17 @@ class LoadingCard extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 24),
         child: CircularProgressIndicator(),
       ),
+    );
+  }
+}
+
+class LoadingBody extends StatelessWidget {
+  const LoadingBody({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: CircularProgressIndicator(),
     );
   }
 }

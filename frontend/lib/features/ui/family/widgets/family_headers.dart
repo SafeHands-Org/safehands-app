@@ -82,7 +82,7 @@ class FamilyOverviewHeader extends ConsumerWidget {
                 padding: EdgeInsets.zero,
                 constraints: BoxConstraints(),
                 icon: Icon(Icons.edit_square, color: cs.onInverseSurface),
-                onPressed: () => context.go('/family/edit/$fid/$familyName'),
+                onPressed: () => context.push('/family/edit/$fid/$familyName'),
               ),
               title: familyName,
             ),
@@ -129,34 +129,79 @@ class EditFamilyHeader extends ConsumerWidget {
 }
 
 class MemberOverviewHeader extends ConsumerWidget {
-  const MemberOverviewHeader({super.key, required this.name});
-
-  final String name;
+  const MemberOverviewHeader({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final familyAsync = ref.watch(aggregateFamilyProvider);
     final cs = Theme.of(context).colorScheme;
+    final familyName = familyAsync.maybeWhen(
+      data: (fc) => fc.family.name,
+      orElse: () => 'Your Family',
+    );
+
+    final memberCount = familyAsync.maybeWhen(
+      data: (fc) => '${fc.totalMembers}',
+      orElse: () => '--',
+    );
+
+    List<String> memberNames = <String>[];
+
+    familyAsync.maybeWhen(
+      data: (fc) => memberNames = fc.members.map((v) => v.name).toList(),
+      orElse: () => memberNames = <String>[],
+    );
+
+    final activeMeds = familyAsync.maybeWhen(
+      data: (fc) => '${fc.activeMeds}',
+      orElse: () => '--',
+    );
+
+    final fid = familyAsync.maybeWhen(
+      data: (fc) => fc.family.id,
+      orElse: () => '--',
+    );
+    //final adherencePct = familyAsync.maybeWhen(
+    //  data: (fc) => '${fc.adherencePercentage}%',
+    //  orElse: () => '--',
+    //);
 
     return Container(
       decoration: BoxDecoration(gradient: context.palette.header),
-      height: 90,
+      height: 215,
       child: SafeArea(
         bottom: false,
         child: Column(
           children: [
             _ToolBar(
-              ctxHeight: 38.0,
+              ctxHeight: 48.0,
+              headerBody: Row(
+                children: [
+                  FamilyAvatar(radius: 40),
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(familyName,
+                        style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.w700),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                        AvatarStack(names: memberNames),
+                        Text("$memberCount members",
+                        style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w500),)
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
               leading: BackButton(
                 color: cs.onInverseSurface,
-                onPressed: () => context.canPop() ? context.pop() : context.go('/family')
+                onPressed: () => context.canPop() ? context.pop() : context.go('/')
               ),
-              trailing: IconButton(
-                padding: EdgeInsets.zero,
-                constraints: BoxConstraints(),
-                icon: Icon(Icons.edit_outlined, color: cs.onInverseSurface),
-                onPressed: () {},
-              ),
-              title: name,
+              title: familyName,
             ),
           ],
         ),

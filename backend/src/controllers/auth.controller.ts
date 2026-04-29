@@ -27,7 +27,6 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 
   await storeSession({userId: registerUser.id, sessionToken, expiresAt});
 
-  res.setHeader("Authorization", `Bearer ${sessionToken}`);
   res.status(201).json({
     success: true,
     message: "Account Creation Successful",
@@ -43,13 +42,10 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
-
   const user = await getUserByEmail(email);
   if (!user) return throwErr.notFound("Invalid email or password");
-
   const validPassword = await bcrypt.compare(password, user.passwordHash);
   if (!validPassword) return throwErr.unauthorized("Invalid email or password");
-
   const payload = {
     id: user.id,
     name: user.name,
@@ -62,7 +58,6 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
   await storeSession({userId: user.id, sessionToken, expiresAt});
 
-  res.setHeader("Authorization", `Bearer ${sessionToken}`);
   res.status(200).json({
     success: true,
     message: "Authentication Successful",

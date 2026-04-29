@@ -1,36 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:frontend/features/components/shared/state_widget.dart';
 import 'package:frontend/features/components/styles/styles.dart';
-import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/models/medications/medication.dart';
-
+import 'package:go_router/go_router.dart';
 
 class MedicationList extends ConsumerWidget {
-  const MedicationList({super.key});
+  const MedicationList({super.key, required this.medications} );
 
+  final Map<String, Medication> medications;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final medicationsAsync = ref.watch(medicationsProvider);
 
-    switch (medicationsAsync) {
-      case AsyncLoading(): return const LoadingCard();
-      case AsyncError(:final error): return ErrorCard(message: error.toString());
-      case AsyncData(:final value) when value.isEmpty: return const EmptyCard(
-        message: 'No family members found.', icon: Icons.people_outline);
-      case AsyncData(:final value):
-        final medicationList = value.values.toList();
-        return ListView.separated(
-          padding: EdgeInsets.only(top: 16),
-          itemCount: value.values.length,
-          separatorBuilder: (BuildContext context, int index) => const Divider(),
-          itemBuilder: (context, index) {
-
-          return MedicationCard(med: medicationList[index]);
-        }
-      );
-    }
+    final medicationList = medications.values.toList();
+    return Column(
+      children: [
+        for (final med in medicationList)...[
+          MedicationCard(med: med),
+          const Divider(),
+        ]
+      ]
+    );
   }
 }
 
@@ -58,81 +48,10 @@ class MedicationCard extends StatelessWidget {
         style: tt.labelMedium
       ),
       trailing: IconButton(
-        onPressed: () {},
-        icon: Icon(Icons.chevron_right, size: 20),
+        onPressed: () => context.push('/medications/edit', extra: med),
+        icon: Icon(Icons.more_vert_outlined, size: 20),
       ),
     );
-
-
-
-    //Container(
-    //  decoration: BoxDecoration(
-    //    color: cs.surface,
-    //    borderRadius: AppRadius.borderRadiusCard,
-    //    border: Border.all(color: cs.outlineVariant),
-    //  ),
-    //  child: Stack(
-    //    children: [
-    //      Padding(
-    //        padding: const EdgeInsets.all(16),
-    //        child: Column(
-    //          crossAxisAlignment: CrossAxisAlignment.start,
-    //          children: [
-    //            Row(
-    //              children: [
-    //                _MedicationAvatar(
-    //                  name: med.doseForm,
-    //                  radius: 23,
-    //                  color: cs.secondary,
-    //                ),
-    //                const SizedBox(width: 12),
-    //                Expanded(
-    //                  child: Column(
-    //                    crossAxisAlignment: CrossAxisAlignment.start,
-    //                    children: [
-    //                      Text(
-    //                        '${med.names.first} ${med.dosage} ${med.doseForm} ',
-    //                        style: TextStyle(
-    //                          fontSize: 15, fontWeight: FontWeight.w600,
-    //                          color: cs.onSurface,
-    //                        ),
-    //                      ),
-    //                      Text(
-    //                        'Generic name: ${med.names.last}',
-    //                        style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
-    //                      ),
-    //                    ],
-    //                  ),
-    //                ),
-    //              ],
-    //            ),
-    //            const SizedBox(height: 10),
-    //            Text(med.instructions),
-    //            const SizedBox(height: 10,)
-    //          ],
-    //        ),
-    //      ),
-    //      Positioned(
-    //        top: 8,
-    //        right: 8,
-    //        child: Container(
-    //          width: 35,
-    //          height: 35,
-    //          decoration: BoxDecoration(
-    //            color: cs.surface,
-    //            borderRadius: BorderRadius.circular(8),
-    //          ),
-    //          child: IconButton(
-    //            onPressed: () {},
-    //            icon: Icon(Icons.chevron_right, size: 20),
-    //          ),
-    //        ),
-    //      ),
-    //    ],
-    //  ),
-    //);
-
-
   }
 
   Widget medicationAvatar(ColorScheme scheme, String name) {

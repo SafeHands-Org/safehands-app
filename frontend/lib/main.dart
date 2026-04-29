@@ -8,7 +8,8 @@ import 'package:frontend/services/notification_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.init();
-  runApp(ProviderScope(child: SafeHandsApp()));
+
+  runApp(ProviderScope(child: const SafeHandsApp()));
 }
 
 class SafeHandsApp extends ConsumerWidget {
@@ -17,9 +18,9 @@ class SafeHandsApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
+
     return _AppStartup(
       child: MaterialApp.router(
-        key: navigatorKey,
         title: 'SafeHands',
         theme: AppTheme.light(),
         routerConfig: router,

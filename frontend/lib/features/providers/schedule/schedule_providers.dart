@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'schedule_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 ScheduleRepositoryRemote scheduleRepository(Ref ref) => ScheduleRepositoryRemote(
   ref.watch(apiServiceProvider),
   ref.read(medicationUrlProvider)

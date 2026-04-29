@@ -40,17 +40,10 @@ class ScheduleRepositoryRemote extends ScheduleRepository {
 
   @override
   Future<void> createSchedule(ScheduleRequest data, String fmId) async {
-    final list = _cachedSchedules[fmId];
-    if (list != null && list.isNotEmpty) {
-      final index = list.indexWhere((m) => m.fmmid == data.familyMemberMedicationId);
-      if (index != -1 ){
-        throw DuplicateException("Medication already assigned to this member.");
-      }
-    }
-
     try {
       final result = await _api.post('$_baseUrl/schedules', data.toMap());
-      MedicationSchedule newSchedule = MedicationScheduleMapper.fromMap(result.value);
+      final json = jsonDecode(result.body);
+      MedicationSchedule newSchedule = MedicationScheduleMapper.fromMap(json);
       _cachedSchedules.putIfAbsent(newSchedule.fmid, () => []);
       _cachedSchedules[newSchedule.fmid]!.add(newSchedule);
       _notifyChange();
@@ -65,7 +58,8 @@ class ScheduleRepositoryRemote extends ScheduleRepository {
 
     try {
       final result = await _api.put('$_baseUrl/schedules/$schedId', data.toMap());
-      MedicationSchedule updatedSchedule = MedicationScheduleMapper.fromMap(result.value);
+      final json = jsonDecode(result.body);
+      MedicationSchedule updatedSchedule = MedicationScheduleMapper.fromMap(json);
       final list = _cachedSchedules.putIfAbsent(updatedSchedule.fmid, () => []);
       final index = list.indexWhere((m) => m.id == updatedSchedule.id);
 

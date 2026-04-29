@@ -9,7 +9,7 @@ part 'assignment_providers.g.dart';
 
 typedef DailyMedProgress = ({int? taken, int? total});
 
-@riverpod
+@Riverpod(keepAlive: true)
 FamilyMedicationRepositoryRemote assignmentRepository(Ref ref) => FamilyMedicationRepositoryRemote(
   ref.watch(apiServiceProvider),
   ref.read(medicationUrlProvider),

@@ -26,7 +26,7 @@ final class MedicationRepositoryProvider
         argument: null,
         retry: null,
         name: r'medicationRepositoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -55,7 +55,7 @@ final class MedicationRepositoryProvider
 }
 
 String _$medicationRepositoryHash() =>
-    r'bcd83708ef65e864cba33dd2071c21d1b97c894f';
+    r'496f8631e6f1fafbf82ab73e6690b22ae5d25de4';
 
 @ProviderFor(medicationChanged)
 final medicationChangedProvider = MedicationChangedProvider._();

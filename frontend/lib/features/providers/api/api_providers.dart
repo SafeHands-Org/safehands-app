@@ -1,23 +1,20 @@
 import 'dart:io';
 
-import 'package:frontend/config/api_client.dart';
-import 'package:frontend/services/shared_preferences.dart';
-import 'package:http/io_client.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'api_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-AuthenticatedClient authenticatedClient(Ref ref) {
-  final token = SharedPreferenceService().fetchToken() as String;
-  final client = AuthenticatedClient(IOClient(HttpClient()), token);
-  ref.onDispose(client.close);
-  return client;
-}
-
-@Riverpod(keepAlive: true)
 String baseUrl(Ref ref) {
-  return 'http://10.0.2.2:8000';
+  if (Platform.isAndroid) {
+    return 'http://10.0.2.2:8000';
+  }
+
+  if (Platform.isIOS) {
+    return 'http://127.0.0.1:8000';
+  }
+
+  return 'http://localhost:8000';
 }
 
 @riverpod

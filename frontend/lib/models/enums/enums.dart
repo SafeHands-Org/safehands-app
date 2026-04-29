@@ -1,8 +1,10 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'enums.mapper.dart';
 
-@MappableEnum(mode: ValuesMode.named)
+@MappableEnum(mode: ValuesMode.named, caseStyle: CaseStyle.snakeCase)
 enum UserRole { caregiver, familyMember, viewer }
 
 @MappableEnum(mode: ValuesMode.named)

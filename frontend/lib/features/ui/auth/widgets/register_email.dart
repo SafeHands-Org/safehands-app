@@ -39,7 +39,7 @@ class _RegisterStepEmailState extends ConsumerState<RegisterStepEmail> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 48, bottom: 32),
-            child: FormBackButton(onPressed: () => context.go('/auth/startup')),
+            child: FormBackButton(onPressed: () => context.go('/auth')),
           ),
           Text('Create Account', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: cs.onSurface)),
           const SizedBox(height: 8),

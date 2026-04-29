@@ -73,13 +73,14 @@ class FamilyRepositoryRemote extends FamilyRepository {
   @override
   Future<void> updateFamily(String id, String name) async {
     if (!_cachedFamilies.containsKey(id)) throw NotFoundException();
-
     try {
       final result = await _api.put('$_baseUrl/$id', {'name': name});
-      Family updatedFamily = FamilyMapper.fromMap(result.value);
+      final data = jsonDecode(result.body);
+      Family updatedFamily = FamilyMapper.fromMap(data);
       _cachedFamilies.update(id, (family) => updatedFamily);
       _notifyChange();
     } on Exception {
+      print('EXCEPTION: $Exception');
       rethrow;
     }
   }
@@ -97,7 +98,7 @@ class FamilyRepositoryRemote extends FamilyRepository {
     }
   }
 
-  Future<void> saveCurrentFamily(String fid) async => await _storage.saveFid(fid);
+  Future<void> saveCurrentFamily(String fid) async => await _storage.setFid(fid);
   Future<void> clearCurrentFamily() async => await _storage.clearFid();
-  Future<String> fetchCurrentFamily() async => await _storage.fetchFid() ?? '';
+  String? fetchCurrentFamily() => _storage.fetchFid();
 }

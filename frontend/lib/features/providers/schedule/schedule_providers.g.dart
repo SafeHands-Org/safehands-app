@@ -26,7 +26,7 @@ final class ScheduleRepositoryProvider
         argument: null,
         retry: null,
         name: r'scheduleRepositoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -55,7 +55,7 @@ final class ScheduleRepositoryProvider
 }
 
 String _$scheduleRepositoryHash() =>
-    r'933183e57f13e5d4b952aefcb0ab73fd4962833d';
+    r'a3b3b983caf2eb3d74ac1c86e9f56b6b60b77d35';
 
 @ProviderFor(scheduleChanged)
 final scheduleChangedProvider = ScheduleChangedProvider._();

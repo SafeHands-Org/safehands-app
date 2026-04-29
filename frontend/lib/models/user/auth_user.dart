@@ -19,5 +19,11 @@ class AuthUser with AuthUserMappable {
     this.token,
   });
 
+  String get namedRole => switch(role){
+    null => '',
+    UserRole.caregiver => 'Caregiver',
+    UserRole.familyMember => 'Family Member',
+    UserRole.viewer => 'Viewer',
+  };
   bool get isLoggedIn => token != null;
 }

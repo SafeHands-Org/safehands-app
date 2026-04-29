@@ -2,6 +2,6 @@
   "watch": ["src", "drizzle"],
   "ext": "ts,json,sql",
   "ignore": ["dist/*"],
-  "delay": 600000,
+  "delay": 10000,
   "exec": "ts-node ./src/server.ts"
 }

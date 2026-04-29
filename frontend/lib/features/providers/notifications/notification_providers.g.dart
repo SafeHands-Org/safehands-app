@@ -21,7 +21,7 @@ final class MedicationAlertAllProvider
         argument: null,
         retry: null,
         name: r'medicationAlertAllProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -49,7 +49,7 @@ final class MedicationAlertAllProvider
 }
 
 String _$medicationAlertAllHash() =>
-    r'5e760de2b720a652a648f10b2712a2f23a9f592d';
+    r'13532b658ea138c2497b4bd0f526966e57c26959';
 
 @ProviderFor(medicationAlertByFm)
 final medicationAlertByFmProvider = MedicationAlertByFmFamily._();

@@ -5,12 +5,14 @@ class StatChip extends StatelessWidget {
     super.key,
     this.value,
     this.label,
-    this.icon
+    this.icon,
+    this.color
   });
 
   final String? value;
   final String? label;
   final IconData? icon;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,7 @@ class StatChip extends StatelessWidget {
       width: 108,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
+        color: color == null ? Colors.white.withValues(alpha: 0.1) : color!.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       ),

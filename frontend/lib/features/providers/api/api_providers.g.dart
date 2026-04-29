@@ -9,54 +9,6 @@ part of 'api_providers.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(authenticatedClient)
-final authenticatedClientProvider = AuthenticatedClientProvider._();
-
-final class AuthenticatedClientProvider
-    extends
-        $FunctionalProvider<
-          AuthenticatedClient,
-          AuthenticatedClient,
-          AuthenticatedClient
-        >
-    with $Provider<AuthenticatedClient> {
-  AuthenticatedClientProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'authenticatedClientProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$authenticatedClientHash();
-
-  @$internal
-  @override
-  $ProviderElement<AuthenticatedClient> $createElement(
-    $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
-
-  @override
-  AuthenticatedClient create(Ref ref) {
-    return authenticatedClient(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(AuthenticatedClient value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<AuthenticatedClient>(value),
-    );
-  }
-}
-
-String _$authenticatedClientHash() =>
-    r'2ecbe5be053ddfed2705c1aabb6b0587833abc3e';
-
 @ProviderFor(baseUrl)
 final baseUrlProvider = BaseUrlProvider._();
 
@@ -95,7 +47,7 @@ final class BaseUrlProvider extends $FunctionalProvider<String, String, String>
   }
 }
 
-String _$baseUrlHash() => r'e9794e6ba8685e88bbf089de5c08807846a2027b';
+String _$baseUrlHash() => r'6303754623b968320ceb55763e909a758b74be02';
 
 @ProviderFor(familyUrl)
 final familyUrlProvider = FamilyUrlProvider._();

@@ -13,6 +13,8 @@ class AuthRepositoryRemote extends AuthRepository {
 
   AuthRepositoryRemote(this._api, this._storage, this._baseUrl);
 
+  String? get token => _storage.getToken();
+
   @override
   Future<AuthUser> login(LoginRequest request) async {
     try {
@@ -22,7 +24,7 @@ class AuthRepositoryRemote extends AuthRepository {
 
       final user = AuthUserMapper.fromMap(data['user']);
 
-      if (user.token != null) await _storage.saveToken(user.token!);
+      if (user.token != null) await _storage.setToken(user.token!);
 
       return user;
     } on Exception {
@@ -33,10 +35,13 @@ class AuthRepositoryRemote extends AuthRepository {
   @override
   Future<AuthUser> register(RegisterRequest request) async {
     try {
-      final result = await _api.post('$_baseUrl/login', request.toMap());
-      final user = AuthUserMapper.fromMap(result);
-
-      await _storage.saveToken(user.token!);
+      final result = await _api.post('$_baseUrl/register', request.toMap());
+      print('Success');
+      final data = jsonDecode(result.body);
+      print(data);
+      final user = AuthUserMapper.fromMap(data['user']);
+      print(user.token);
+      if (user.token != null) await _storage.setToken(user.token!);
 
       return user;
     } on Exception {
@@ -45,11 +50,10 @@ class AuthRepositoryRemote extends AuthRepository {
   }
 
   @override
-  Future<void> logout() async => {
-    await _storage.clearToken()
-  };
-
-  @override
-  Future<bool> isLoggedIn() async => await _storage.fetchToken() == null ? false : true;
-
+  Future<void> logout() async {
+    await _storage.clearFid();
+    await _storage.clearInvite();
+    await _storage.clearToken();
+  }
+  bool isLoggedIn() => _storage.getToken() == null ? false : true;
 }

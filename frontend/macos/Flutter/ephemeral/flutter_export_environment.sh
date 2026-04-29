@@ -1,7 +1,8 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=C:\Users\marin\OneDrive\Desktop\Project\flutter"
-export "FLUTTER_APPLICATION_PATH=C:\Users\marin\OneDrive\Desktop\Project\SafeHands-V2\safehands-app\frontend"
+export "FLUTTER_ROOT=/Users/alexgr/flutter"
+export "FLUTTER_APPLICATION_PATH=/Users/alexgr/dev/cs4360-senior-experience/safehands-app/frontend"
+export "FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/Users/alexgr/dev/cs4360-senior-experience/safehands-app/frontend/macos/Flutter/ephemeral/Packages/.packages/FlutterFramework"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"

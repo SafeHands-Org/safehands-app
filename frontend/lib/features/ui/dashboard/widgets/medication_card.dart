@@ -1,67 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/components/shared/avatar_profile.dart';
-import 'package:frontend/features/components/shared/state_widget.dart';
+import 'package:frontend/features/components/shared/section_header.dart';
 import 'package:frontend/features/components/styles/styles.dart';
-import 'package:frontend/features/providers/providers.dart';
-import 'package:frontend/features/ui/dashboard/pages/dashboard.dart';
 import 'package:frontend/models/models.dart';
 import 'package:frontend/utils/utils.dart';
 
 enum DoseStatus { upcoming, taken, missed }
 
-class MedicationDetails extends ConsumerWidget {
-  const MedicationDetails({super.key});
+class MemberMedicationCardList extends ConsumerWidget {
+  const MemberMedicationCardList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    UserRole user = ref.watch(userRoleProvider);
-    if(user == UserRole.caregiver) {
-      return CaregiverDashboardView();
-    } else {
-      return MemberDashboardView();
-    }
+    return Scaffold();
   }
 }
 
+class CaregiverMedicationCardList extends ConsumerWidget {
+  const CaregiverMedicationCardList({super.key, required this.members});
 
-class MedicationCardList extends ConsumerWidget {
-  const MedicationCardList({super.key});
+  final List<Member> members;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dosesAsync = ref.watch(upcomingFamilyDosesProvider);
+    final assignments = members.expand((v) => v.assignments);
+    final now = DateTime.now();
+    final doses = assignments
+        .where((a) {
+          final next = a.schedule.nextDoseTime;
+          return next.isAfter(now) && next.day == now.day;
+        })
+        .toList()
+      ..sort((a, b) => a.schedule.nextDoseTime.compareTo(b.schedule.nextDoseTime));
 
-    switch (dosesAsync) {
-      case AsyncLoading(): return const LoadingCard();
-      case AsyncError(:final error): return ErrorCard(message: error.toString());
-      case AsyncData(:final value) when value.isEmpty: return const EmptyCard(message: 'No upcoming doses for today');
-      case AsyncData(:final value):
-
-      final doses = value.expand((v) => v.assignments).toList();
-
-      if (doses.isEmpty) {
-        return const EmptyCard(message: 'No upcoming doses for today.');
-      }
 
       return Column(
-        children: doses.map((item) {
-          final med = item.reference;
-          final member = item.member;
-          final schedule = item.schedule;
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: _MedicationCard(
-              name: med.names.firstOrNull ?? '--',
-              dosage: med.dosage,
-              time: schedule.timesOfDay.firstOrNull ?? '--',
-              member: member.name,
-              status: DoseStatus.upcoming,
-            ),
-          );
-        }).toList(),
+        children: [
+          const SectionHeader(title: 'Upcoming Doses'),
+          _buildList(doses)
+        ]
       );
     }
+  Widget _buildList(List<Assignment> items){
+    return Column(
+      children: items.map((item) {
+        final med = item.reference;
+        final member = item.member;
+        final schedule = item.schedule;
+        print(schedule.nextDoseTime);
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: _MedicationCard(
+            name: med.names.firstOrNull ?? '--',
+            dosage: med.dosage,
+            time: '${schedule.nextDoseTime}',
+            member: member.name,
+            status: DoseStatus.upcoming,
+          ),
+        );
+      }).toList(),
+    );
   }
 }
 

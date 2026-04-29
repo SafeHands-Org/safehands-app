@@ -57,13 +57,11 @@ class _RegistrationViewState extends ConsumerState<RegistrationView> {
     ref.listenManual(authProvider,
     (previous, next) {next.whenOrNull(
         data: (_) {
-          if (mounted) context.go('/');
+          if (mounted) context.go('/dashboard');
         },
         error:(error, stackTrace) {
           if (!mounted) return;
           final message = switch (error) {
-            CredentialException() => 'Invalid email or password.',
-            NotFoundException() => 'Invalid email or password',
             ServerException() => 'Request timed out. Try again.',
             _ => 'Something went wrong. Please try again.',
           };
@@ -82,7 +80,6 @@ class _RegistrationViewState extends ConsumerState<RegistrationView> {
       password: _password,
       role: _role,
     );
-    context.go('/dashboard');
   }
 
   @override

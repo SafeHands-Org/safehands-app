@@ -83,13 +83,13 @@ class _RegisterStepProfileState extends State<RegisterStepProfile> {
           ),
           const SizedBox(height: 12),
           _RoleCard(
-            selected: _role == 'member',
+            selected: _role == 'family_member',
             icon: Icons.group_outlined,
             title: 'Family Member',
             description:
               'Join an existing family group to track your own medications '
               'and share with your caregiver',
-            onTap: () => setState(() => _role = 'member'),
+            onTap: () => setState(() => _role = 'family_member'),
           ),
           const SizedBox(height: 32),
           FormButton(

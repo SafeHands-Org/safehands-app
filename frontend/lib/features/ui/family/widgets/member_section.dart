@@ -1,125 +1,123 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/components/shared/section_header.dart';
-import 'package:frontend/features/components/shared/settings_tile.dart';
 import 'package:frontend/features/components/styles/styles.dart';
-import 'package:frontend/features/ui/family/pages/edit_member.dart';
-import 'package:frontend/features/ui/family/widgets/family_headers.dart';
+import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/models/models.dart';
 import 'package:frontend/utils/utils.dart';
+import 'package:go_router/go_router.dart';
 
-class MemberProfileSection extends StatelessWidget {
+class MemberProfileSection extends ConsumerWidget {
   const MemberProfileSection({super.key, required this.member});
 
   final Member member;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final activeAssignments = member.assignments.where((a) => a.assignment.isActive);
     final inactiveAssignments = member.assignments.where((a) => !a.assignment.isActive);
-
+    final currentUser = ref.watch(currentUserProvider);
     final cs = Theme.of(context).colorScheme;
-    final palette = context.palette;
+    final tt = Theme.of(context).textTheme;
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          MemberOverviewHeader(name: member.name),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SectionHeader(title: 'Member Information'),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        _ContactRow(
-                          icon: Icons.calendar_today_outlined,
-                          iconBg: cs.primaryContainer,
-                          iconColor: cs.primary,
-                          label: 'Member since',
-                          value: member.joinDate,
-                        ),
-                        const SizedBox(height: 12),
-                        _ContactRow(
-                          icon: Icons.warning_amber_outlined,
-                          iconBg: palette.categoryOrangeContainer,
-                          iconColor: palette.categoryOrange,
-                          label: 'Risk level',
-                          value: member.riskLevel,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                if (activeAssignments.isNotEmpty)...[
-                  SectionHeader(title: 'Active Medications (${activeAssignments.length})'),
-                  ...activeAssignments.map(
-                    (med) => Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _MedicationDetailCard(
-                        medication: med.reference,
-                        schedule: med.schedule
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-
-                if (inactiveAssignments.isNotEmpty)...[
-                  SectionHeader(title: 'Inactive Medications (${activeAssignments.length})'),
-                  ...inactiveAssignments.map(
-                    (med) => Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _MedicationDetailCard(
-                        medication: med.reference,
-                        schedule: med.schedule
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-
-                if (member.isAdmin)...[
-                  const SectionHeader(title: 'Admin Actions'),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 8),
-                    child: SettingsTile(
-                      icon: Icons.calendar_today_outlined,
-                      title: "Configure Member's Information",
-                      subtitle: "Change ${member.name}'s risk level or remove them",
-                      iconBg: cs.primaryContainer,
-                      iconColor: cs.primary,
-                      onTap: () => _showEditSheet(context, member)
-                    ),
-                  ),
-                ]
-              ],
+    return Scaffold(
+      appBar: AppBar(
+        leading: BackButton(
+          color: cs.onInverseSurface,
+          onPressed: () => context.go('/family')
+        ),
+        flexibleSpace: Container(decoration: BoxDecoration(gradient: context.palette.header)),
+        title: Text(
+          "${member.name}'s Profile",
+          style: tt.titleMedium?.copyWith(color: cs.onInverseSurface),
+          textAlign: TextAlign.center
+        ),
+        actions: [
+          if (currentUser?.role == UserRole.caregiver)...[
+            IconButton(
+              padding: EdgeInsets.zero,
+              constraints: BoxConstraints(),
+              icon: Icon(Icons.edit_square, color: cs.onInverseSurface),
+              onPressed: () => context.push('/family/members/${member.id}/${member.family.id}',)
             ),
-          ),
-        ],
+          ],
+        ]
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SectionHeader(title: 'Member Information'),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          _ContactRow(
+                            icon: Icons.calendar_today_outlined,
+                            iconBg: cs.primaryContainer,
+                            iconColor: cs.primary,
+                            label: 'Member since',
+                            value: member.joinDate,
+                          ),
+                          const SizedBox(height: 12),
+                          _ContactRow(
+                            icon: Icons.warning_amber_outlined,
+                            iconBg: cs.errorContainer,
+                            iconColor: cs.error,
+                            label: 'Risk level',
+                            value: member.riskLevel,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  if (activeAssignments.isNotEmpty)...[
+                    SectionHeader(title: 'Active Medications (${activeAssignments.length})'),
+                    ...activeAssignments.map(
+                      (med) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: _MedicationDetailCard(
+                          fmId: member.id,
+                          fmmId: med.assignment.id,
+                          medication: med.reference,
+                          schedule: med.schedule
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+
+                  if (inactiveAssignments.isNotEmpty)...[
+                    SectionHeader(title: 'Inactive Medications (${inactiveAssignments.length})'),
+                    ...inactiveAssignments.map(
+                      (med) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: _MedicationDetailCard(
+                          fmId: member.id,
+                          fmmId: med.assignment.id,
+                          medication: med.reference,
+                          schedule: med.schedule
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
-
-void _showEditSheet(BuildContext context, Member member) {
-  showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    builder: (_) => DraggableScrollableSheet(
-      initialChildSize: 0.5,
-      minChildSize: 0.45,
-      maxChildSize: 0.55,
-      expand: false,
-      builder: (_, scrollController) => EditMemberView(member: member)
-    ),
-  );
 }
 
 class _ContactRow extends StatelessWidget {
@@ -166,10 +164,14 @@ class _MedicationDetailCard extends StatelessWidget {
   const _MedicationDetailCard({
     required this.medication,
     required this.schedule,
+    required this.fmId,
+    required this.fmmId
   });
 
   final Medication medication;
   final MedicationSchedule schedule;
+  final String fmId;
+  final String fmmId;
 
   @override
   Widget build(BuildContext context) {
@@ -207,14 +209,6 @@ class _MedicationDetailCard extends StatelessWidget {
                         style: tt.bodyMedium!.copyWith(color: cs.outline),
                       ),
                     ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.edit_outlined, color: cs.outline , size: 18),
-                  style: IconButton.styleFrom(
-                    backgroundColor: cs.surface,
-                    shape: RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusMd),
                   ),
                 ),
               ],
@@ -285,9 +279,9 @@ class _MedicationDetailCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () => context.push('/assignment/$fmId/logs/$fmmId'),
                   style: TextButton.styleFrom(
-                    backgroundColor: palette.categoryBlueContainer,
+                    backgroundColor: palette.categoryBlueContainer.withValues(alpha: 0.3),
                     foregroundColor: palette.categoryBlue,
                     shape: RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusMd, side: BorderSide(color: palette.categoryBlue)),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -295,15 +289,6 @@ class _MedicationDetailCard extends StatelessWidget {
                   child: Text(
                     'View Details',
                     style: tt.bodyMedium!.copyWith(fontWeight: FontWeight.w500, color: palette.categoryBlue),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.delete_outline, color: cs.outline, size: 18),
-                  style: IconButton.styleFrom(
-                    backgroundColor: cs.errorContainer,
-                    shape: RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusMd, side: BorderSide(color: cs.error)),
                   ),
                 ),
               ],

@@ -3,20 +3,19 @@ import 'package:frontend/features/providers/app/app_providers.dart';
 import 'package:frontend/models/models.dart';
 import 'package:frontend/repositories/family/family_repository_remote.dart';
 import 'package:frontend/repositories/invitation/invitation_repository_remote.dart';
-import 'package:frontend/services/api/models/family/family_api_requests.dart';
 import 'package:frontend/utils/types.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'family_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 FamilyRepositoryRemote familyRepository(Ref ref) => FamilyRepositoryRemote(
   ref.watch(apiServiceProvider),
   ref.watch(sharedPreferenceServiceProvider),
   ref.watch(familyUrlProvider),
 );
 
-@riverpod
+@Riverpod(keepAlive: true)
 InvitationRepositoryRemote invitationRepository(Ref ref) => InvitationRepositoryRemote(
   ref.watch(apiServiceProvider),
   ref.watch(sharedPreferenceServiceProvider),
@@ -52,8 +51,9 @@ Future<Family?> getFamilyById(Ref ref, String fid) async {
 Future<Family?> currentFamilyObject(Ref ref) async {
   final provider = await ref.watch(familiesProvider.future);
   final reference = await ref.watch(currentFamilyProvider.future);
+  if (provider.isEmpty || reference.isEmpty) return Family.empty();
 
-  Family? family = provider[reference];
+  Family family = provider[reference]!;
 
   return family;
 }
@@ -66,19 +66,18 @@ class CurrentFamily extends _$CurrentFamily {
 
   Future<String> _getCurrentFamily() async {
     state = const AsyncLoading();
-
-    final fid = await AsyncValue.guard(() async {
-      final id = await ref.read(familyRepositoryProvider).fetchCurrentFamily();
-
-      if (id.isEmpty) {
-        final families = await ref.read(familyRepositoryProvider).getFamilies();
-        if (families.values.isNotEmpty) setFamily(families.values.first.id);
+    final id = ref.read(familyRepositoryProvider).fetchCurrentFamily();
+    if (id == null) {
+      final families = await ref.read(familyRepositoryProvider).getFamilies();
+      if (families.values.isNotEmpty) {
+        final firstId = families.values.first.id;
+        print(firstId);
+        await setFamily(firstId);
+        return firstId;
       }
-
-      return id;
-    });
-
-    return fid.value ?? '';
+      return '';
+    }
+    return id;
   }
 
   Future<void> setFamily(String fid) async {
@@ -145,14 +144,5 @@ class Invitations extends _$Invitations {
     ref.watch(invitateChangesProvider);
 
     return repo.getInvitation(currentFamily);
-  }
-
-  Future<void> createInvitation({required String fid, required InvitationRequest data}) async {
-    state = const AsyncLoading();
-    try {
-      await ref.read(invitationRepositoryProvider).createInvitation(fid, data);
-    } catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
-    }
   }
 }

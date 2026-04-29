@@ -2,37 +2,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/components/shared/avatar_profile.dart';
-import 'package:frontend/features/components/shared/state_widget.dart';
+import 'package:frontend/features/components/shared/section_header.dart';
 import 'package:frontend/features/components/styles/styles.dart';
-import 'package:frontend/features/providers/family/family_providers.dart';
-import 'package:frontend/features/providers/utils/collection_providers.dart';
 import 'package:frontend/models/models.dart';
 import 'package:go_router/go_router.dart';
 
 class FamilyMemberList extends ConsumerWidget {
-  const FamilyMemberList({super.key});
+  const FamilyMemberList({super.key, required this.members});
+
+  final List<Member> members;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final fid = ref.watch(currentFamilyProvider).value ?? '';
-    final membersAsync = ref.watch(aggregateMembershipsProvider(fid));
-
-    return switch (membersAsync) {
-      AsyncLoading() => const LoadingCard(),
-      AsyncError(:final error) => ErrorCard(message: error.toString()),
-      AsyncData(:final value) when value.isEmpty => const EmptyCard(message: 'No family members found.'),
-      AsyncData(:final value) => Column(
-        children: value.map(
-          (member) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: GestureDetector(
-              onTap: () => context.go('/profile'),
-              child: _FamilyMemberCard(member: member),
-            ),
-          ),
-        ).toList(),
-      ),
-    };
+    return Column(
+      children: [
+        SectionHeader(
+          title: 'Family Overview',
+          actionLabel: Icons.chevron_right,
+          onAction: () => context.go('/family'),
+        ),
+         _buildList(members)
+      ]
+    );
+  }
+  Widget _buildList(List<Member> members) {
+    return Column(
+      children: members.map((member) => _FamilyMemberCard(member: member)).toList(),
+    );
   }
 }
 
@@ -62,6 +58,7 @@ class _FamilyMemberCard extends ConsumerWidget {
       },
       child: Card(
         elevation: 5,
+        margin: EdgeInsets.only(top: 10, bottom: 10),
         shadowColor: cs.shadow,
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -118,108 +115,6 @@ class _FamilyMemberCard extends ConsumerWidget {
               )
             ],
           ),
-        ),
-      )
-    );
-  }
-}
-
-class LoadingMemberCard extends StatelessWidget {
-  const LoadingMemberCard({super.key, required this.loadingWidget});
-
-  final Widget loadingWidget;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final Color secondary = cs.surface.withValues(red: 0.96, green: 0.96, blue: 0.96);
-
-    return SizedBox(
-      height: 167,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Stack(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          CircleAvatar(
-                            radius: 28,
-                            backgroundColor: secondary,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          textDirection: TextDirection.ltr,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: 23.0,
-                              width: 150.0,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: secondary,
-                                  borderRadius: const BorderRadius.only(topLeft: AppRadius.sm, topRight: AppRadius.sm, bottomRight: AppRadius.sm)
-                                )
-                              )
-                            ),
-                            SizedBox(
-                              height: 17.0,
-                              width: 60.0,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: secondary,
-                                  borderRadius: const BorderRadius.only(bottomLeft: AppRadius.sm, bottomRight: AppRadius.sm)
-                                )
-                              )
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 67.0,
-                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-                          decoration: BoxDecoration(color: secondary, borderRadius: BorderRadius.circular(8)),
-                        )
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Container(
-                          height: 67.0,
-                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-                          decoration: BoxDecoration(color: secondary, borderRadius: BorderRadius.circular(8)),
-                        )
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Container(
-                          height: 67.0,
-                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-                          decoration: BoxDecoration(color: secondary, borderRadius: BorderRadius.circular(8)),
-                        )
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              loadingWidget
-            ],
-          )
         ),
       )
     );

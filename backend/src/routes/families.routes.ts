@@ -8,9 +8,8 @@ import {
   addFamilyMember,
   updateFamilyMember,
   removeFamilyMember,
-  createInvitation,
-  checkInvitation,
-  getFamilyMembers
+  getFamilyMembers,
+  getInvitation
 } from "../controllers/families.controller";
 
 const router = Router();
@@ -27,11 +26,8 @@ router.route("/members")
   .get(getFamilyMembers)
   .post(addFamilyMember);
 
-router.route("/invitations/:token")
-  .get(checkInvitation)
-
 router.route("/invitations")
-  .put(createInvitation);
+  .get(getInvitation);
 
 router.route("/:id")
   .get(getFamilyById)

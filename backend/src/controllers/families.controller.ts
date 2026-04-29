@@ -8,13 +8,14 @@ export const getFamilies = async (req: Request, res: Response) => {
   const userId = req.user!.id;
   const userRole = req.user!.role;
 
-  if (userRole == 'caregiver') {
+  if (userRole === 'caregiver') {
     const families = await service.getAdminFamilies(userId);
     return res.status(200).json(families);
   }
 
   const family = await service.getUserFamily(userId);
-  return res.status(200).json(family);
+  if (!family) return res.status(200).json([]);
+  return res.status(200).json([family]);
 };
 
 export const createFamily = async (req: Request, res: Response) => {
@@ -50,16 +51,19 @@ export const deleteFamily = async (req: Request, res: Response) => {
 };
 
 export const getFamilyMembers = async (req: Request, res: Response) => {
-  const userId = req.user!.id;
-  const userRole = req.user!.role;
+  const userId = req.user?.id;
+  const userRole = req.user?.role;
 
-  if (userRole == 'caregiver') {
+  if (userRole == 'caregiver' && userId != null) {
     const members = await service.getAdminMemberships(userId);
     return res.status(200).json(members);
   }
-
-  const members = await service.getUserMemberships(userId);
-  return res.status(200).json(members);
+  else if (userId != null && userRole != 'caregiver'){
+    const userFamily = await service.getUserFamily(userId);
+    if (!userFamily) return res.status(200).json([]);
+    const members = await service.getUserMemberships(userFamily.family.id);
+    return res.status(200).json(members);
+  }
 };
 
 export const addFamilyMember = async (req: Request, res: Response) => {
@@ -69,10 +73,12 @@ export const addFamilyMember = async (req: Request, res: Response) => {
 };
 
 export const updateFamilyMember = async (req: Request, res: Response) => {
+  console.log(req.body)
   const memberId = getParam(req.params.fmId, "fmId");
   const data = req.body;
 
   const result = await service.updateFamilyMember(memberId, data);
+  console.log(result);
   return res.status(200).json(result);
 };
 
@@ -82,30 +88,17 @@ export const removeFamilyMember = async (req: Request, res: Response) => {
   return res.status(204).send();
 };
 
-export const createInvitation = async (req: Request, res: Response) => {
+export const getInvitation = async (req: Request, res: Response) => {
   if (!req.user) return throwErr.unauthorized("Not authenticated");
+  const userRole = req.user!.role;
 
-  const data: CreateInvitation = {
-    familyId: req.body.familyId,
-    createdBy: req.user.id,
-  };
+  if (userRole === 'caregiver') {
+    const existing = await service.getInvitation(req.user.id)
 
-  const existing = await service.getInvitation(req.user.id)
-
-  if (existing != null) return res.status(201).json(existing);
-
-  const result = await service.createInvitation(data);
-  return res.status(201).json(result);
-};
-
-export const checkInvitation = async (req: Request, res: Response) => {
-  const code = getParam(req.params.code, "code");
-  const invitation = await service.checkInvitation(code);
-  if (!invitation) {
-    return throwErr.notFound("Invalid or expired code");
+    if (existing != null) return res.status(201).json(existing);
+    const result = await service.createInvitation(req.user.id);
+    return res.status(201).json(result);
   }
-
-  return res.status(200).json(invitation);
 };
 
 export const joinFamily = async (req: Request, res: Response) => {

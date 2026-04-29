@@ -66,7 +66,7 @@ String headerFormat(DateTime dt) => DateFormat('EEEE, MMMM d, y').format(DateTim
 String durationSince(Duration time) {
   final days = time.inDays;
   if (days < 1) return 'today';
-  if (days < 30) return '$days day${days == 1 ? '' : 's'} agi';
+  if (days < 30) return '$days day${days == 1 ? '' : 's'} ago';
 
   final months = days ~/ 30;
   if (months < 12) return '$months month${months == 1 ? '' : 's'} ago';
@@ -133,4 +133,12 @@ String? instructionValidator(String? value) {
   final invalid = RegExp(r"[^a-zA-Z0-9\s\-'.,;:]");
   if (invalid.hasMatch(value)) return 'No special characters allowed.';
   return null;
+}
+
+String capitalized(String word){
+  return word.split(' ')
+    .map((word) => word.isNotEmpty
+      ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+      : '')
+    .join(' ');
 }

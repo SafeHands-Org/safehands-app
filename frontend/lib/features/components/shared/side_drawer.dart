@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/components/shared/avatar_profile.dart';
 import 'package:frontend/features/components/styles/styles.dart';
-import 'package:frontend/features/providers/auth/auth_provider.dart';
+import 'package:frontend/features/providers/providers.dart';
 import 'package:go_router/go_router.dart';
 
 class SideDrawer extends ConsumerWidget {
@@ -10,8 +10,7 @@ class SideDrawer extends ConsumerWidget {
 
   static const _menuItems = <({IconData icon, String label, String path})>[
     (icon: Icons.home_outlined,            label: 'Dashboard',           path: '/'),
-    (icon: Icons.people_outline,           label: 'Medications',         path: '/medications'),
-    (icon: Icons.description_outlined,     label: 'Health Summaries',    path: ''),
+    (icon: Icons.medical_services_outlined,           label: 'Medications',         path: '/medications'),
   ];
 
   @override
@@ -67,7 +66,7 @@ class SideDrawer extends ConsumerWidget {
                               ),
                               SizedBox(height: 2),
                               Text(
-                                user!.email!,
+                                user?.email ?? '',
                                 style: TextStyle(
                                   color: Colors.white70, fontSize: 12,
                                 ),
@@ -83,7 +82,8 @@ class SideDrawer extends ConsumerWidget {
             )
           ),
           Expanded(
-            child: ListView(
+            child:
+            ListView(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               children: _menuItems
                 .map((item) => _MenuItem(item: item))
@@ -96,7 +96,17 @@ class SideDrawer extends ConsumerWidget {
             child: SizedBox(
               width: double.infinity,
               child: TextButton.icon(
-                onPressed: () => (ref.read(authProvider.notifier).logout, ref.refresh(authProvider)),
+                onPressed: () async {
+                  await ref.read(authProvider.notifier).logout();
+                  ref.invalidate(authProvider);
+                  ref.invalidate(currentUserProvider);
+                  ref.invalidate(familiesProvider);
+                  ref.invalidate(currentFamilyProvider);
+                  ref.invalidate(familyMembersProvider);
+                  ref.invalidate(medicationsProvider);
+                  ref.invalidate(adherencesProvider);
+                  ref.invalidate(schedulesProvider);
+                },
                 icon: Icon(Icons.logout, color: cs.error),
                 label: Text(
                   'Log Out',

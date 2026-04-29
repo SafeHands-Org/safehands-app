@@ -6,22 +6,28 @@ class NotificationService {
 
   static bool _initialized = false;
   static final Map<String, List<_PendingNotification>> _queue = {};
-  static final Map<String, DateTime> _flushTimers = {};
+  static final Set<String> _flushTimers = {};
 
   static Future<void> init() async {
     if (_initialized) return;
 
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    await _plugin.initialize(
-      const InitializationSettings(android: androidSettings),
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
     );
 
+    const settings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
+
+    await _plugin.initialize(settings);
+
     await _plugin
-        .resolvePlatformSpecificImplementation;
-            AndroidFlutterLocalNotificationsPlugin()
-        ?.requestNotificationsPermission();
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.requestNotificationsPermission();
 
     await _createChannel(
       id: 'med_individual',
@@ -138,8 +144,8 @@ class NotificationService {
           ),
         );
 
-    if (!_flushTimers.containsKey(bucketKey)) {
-      _flushTimers[bucketKey] = scheduleTime;
+    if (!_flushTimers.contains(bucketKey)) {
+      _flushTimers.add(bucketKey);
       Future.delayed(const Duration(seconds: 2), () => _flush(bucketKey));
     }
   }
@@ -203,6 +209,7 @@ class NotificationService {
           importance: Importance.high,
           priority: Priority.high,
         ),
+        iOS: const DarwinNotificationDetails(),
       ),
       payload: payload,
     );
@@ -231,6 +238,7 @@ class NotificationService {
           importance: Importance.high,
           priority: Priority.high,
         ),
+        iOS: const DarwinNotificationDetails(),
       ),
     );
   }
@@ -247,9 +255,8 @@ class NotificationService {
       importance: Importance.high,
     );
     await _plugin
-        .resolvePlatformSpecificImplementation;
-            AndroidFlutterLocalNotificationsPlugin()
-        ?.createNotificationChannel(channel);
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
   }
 }
 

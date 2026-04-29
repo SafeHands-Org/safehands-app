@@ -1,16 +1,25 @@
 import 'dart:async';
 
 class Candidate {
-  final String name;
+  final String brandName;
+  final List<String> ingredientNames;
   final String rxNorm;
 
-  const Candidate({required this.name, required this.rxNorm});
+  const Candidate({
+    required this.brandName,
+    required this.ingredientNames,
+    required this.rxNorm
+  });
 
   @override
-  bool operator ==(Object other) => other is Candidate && other.name == name && other.rxNorm == rxNorm;
+  bool operator ==(Object other) =>
+  other is Candidate
+  && other.brandName == brandName
+  && other.ingredientNames == ingredientNames
+  && other.rxNorm == rxNorm;
 
   @override
-  int get hashCode => Object.hash(name, rxNorm);
+  int get hashCode => Object.hash(brandName, ingredientNames, rxNorm);
 }
 
 const Duration debounceDuration = Duration(milliseconds: 400);

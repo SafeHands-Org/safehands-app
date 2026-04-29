@@ -19,7 +19,7 @@ export const createMedication = async (req: Request, res: Response) => {
     createdBy: userId,
   };
   const result = await service.createMedication(data);
-  res.status(201).json(result);
+  res.status(201).json(result[0]);
 };
 
 export const getMedicationById = async (req: Request, res: Response) => {
@@ -33,7 +33,7 @@ export const updateMedication = async (req: Request, res: Response) => {
   const id = getParam(req.params.id, "id");
   const data: Partial<Medication> = req.body;
   const result = await service.updateMedication(id, data);
-  res.status(200).json(result);
+  res.status(200).json(result[0]);
 };
 
 export const deleteMedication = async (req: Request, res: Response) => {
@@ -43,20 +43,21 @@ export const deleteMedication = async (req: Request, res: Response) => {
 };
 
 export const getFamilyMemberMedications = async (req: Request, res: Response) => {
-  const id = req.user!.id;
-  const meds = await service.getCaregiverFamilyMedications(id);
-  res.status(200).json(meds);
+  const userId = req.user?.id;
+  const userRole = req.user?.role;
+
+  if (userRole == 'caregiver' && userId != null) {
+    const result = await service.getCaregiverFamilyMedications(userId);
+    return res.status(200).json(result);
+  }
+  else if (userRole != 'caregiver' && userId != null){
+    const result = await service.getFamilyMemberMedications(userId);
+    return res.status(200).json(result);
+  }
 };
 
 export const assignMedicationToMember = async (req: Request, res: Response) => {
   const body = req.body;
-  console.log({
-    medicationId: body.medicationId,
-    familyMemberId: body.familyMemberId,
-    priority: body.priority,
-    quantity: body.quantity,
-    active: body.active,
-  })
   const result = await service.assignMedicationToMember(body);
   res.status(201).json(result);
 };
@@ -75,14 +76,24 @@ export const removeFamilyMemberMedication = async (req: Request, res: Response) 
 };
 
 export const getMedicationSchedules = async (req: Request, res: Response) => {
-  const id = req.user!.id;
-  const result = await service.getCaregiverMedicationSchedules(id);
-  res.status(200).json(result);
+  const userId = req.user?.id;
+  const userRole = req.user?.role;
+
+  if (userRole == 'caregiver' && userId != null) {
+    const result = await service.getCaregiverMedicationSchedules(userId);
+    return res.status(200).json(result);
+  }
+  else if (userRole != 'caregiver' && userId != null){
+    const result = await service.getMemberMedicationSchedules(userId);
+    return res.status(200).json(result);
+  }
 };
 
 export const createMedicationSchedule = async (req: Request, res: Response) => {
   const data = req.body;
+  console.log(data)
   const result = await service.createMedicationSchedule(data);
+  console.log(result)
   res.status(201).json(result);
 };
 
@@ -90,7 +101,7 @@ export const updateMedicationSchedule = async (req: Request, res: Response) => {
   const id = getParam(req.params.schedId, "schedId");
   const data = req.body;
   const result = await service.updateMedicationSchedule(id, data);
-  res.status(200).json(result);
+  res.status(200).json(result[0]);
 };
 
 export const deleteMedicationSchedule = async (req: Request, res: Response) => {
@@ -100,21 +111,28 @@ export const deleteMedicationSchedule = async (req: Request, res: Response) => {
 };
 
 export const getAdherenceLogs = async (req: Request, res: Response) => {
-  const id = req.user!.id;
-  const result = await service.getCaregiverAdherenceLogs(id);
-  console.log(result.length)
-  res.status(200).json(result);
+  const userId = req.user?.id;
+  const userRole = req.user?.role;
+
+  if (userRole == 'caregiver' && userId != null) {
+    const result = await service.getCaregiverAdherenceLogs(userId);
+    return res.status(200).json(result);
+  }
+  else if (userRole != 'caregiver' && userId != null){
+    const result = await service.getMemberAdherenceLogs(userId);
+    return res.status(200).json(result);
+  }
 };
 
 export const createAdherenceLog = async (req: Request, res: Response) => {
   const data = req.body;
   const result = await service.createAdherenceLog(data);
-  res.status(201).json(result);
+  res.status(201).json(result[0]);
 };
 
 export const updateAdherenceLog = async (req: Request, res: Response) => {
   const id = getParam(req.params.logId, "logId");
   const data = req.body;
   const result = await service.updateAdherenceLog(id, data);
-  res.status(200).json(result);
+  res.status(200).json(result[0]);
 };

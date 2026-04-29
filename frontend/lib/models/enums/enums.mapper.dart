@@ -29,7 +29,7 @@ class UserRoleMapper extends EnumMapper<UserRole> {
     switch (value) {
       case r'caregiver':
         return UserRole.caregiver;
-      case r'familyMember':
+      case r'family_member':
         return UserRole.familyMember;
       case r'viewer':
         return UserRole.viewer;
@@ -44,7 +44,7 @@ class UserRoleMapper extends EnumMapper<UserRole> {
       case UserRole.caregiver:
         return r'caregiver';
       case UserRole.familyMember:
-        return r'familyMember';
+        return r'family_member';
       case UserRole.viewer:
         return r'viewer';
     }

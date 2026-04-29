@@ -39,7 +39,7 @@ class FormButton extends StatelessWidget {
       style: bt.style?.copyWith(
         backgroundColor: WidgetStatePropertyAll(active ? buttonColor ?? cs.primary : cs.primaryContainer),
         side: WidgetStatePropertyAll(BorderSide(color: active ? borderColor ?? cs.primary : cs.primaryContainer)),
-        padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 12, horizontal: 16)),
+        padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 12)),
         splashFactory: InkSplash.splashFactory,
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: radius ?? AppRadius.borderRadiusPill)

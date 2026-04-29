@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'notification_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 void medicationAlertAll(Ref ref) {
   final schedulesAsync = ref.watch(schedulesProvider);
   final assignmentsAsync = ref.watch(assignmentsProvider);
