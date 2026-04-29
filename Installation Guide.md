@@ -28,6 +28,7 @@ JWT_SECRET=<YOUR_JWT_SECRET>
 
 NODE_ENV=development
 ```
+***Edit file with your own password and JWT_SECRET***
 
 `npm install` To install dependencies to generate that node_modules folder. 
 `npm run build` To build the typescript project and generate the dist folder.
