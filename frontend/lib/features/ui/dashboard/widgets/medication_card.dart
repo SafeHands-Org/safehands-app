@@ -26,35 +26,48 @@ class CaregiverMedicationCardList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final assignments = members.expand((v) => v.assignments);
     final now = DateTime.now();
+
     final doses = assignments
         .where((a) {
+          if (a.schedule.isEmpty) return false;
           final next = a.schedule.nextDoseTime;
           return next.isAfter(now) && next.day == now.day;
         })
         .toList()
-      ..sort((a, b) => a.schedule.nextDoseTime.compareTo(b.schedule.nextDoseTime));
+      ..sort((a, b) =>
+          a.schedule.nextDoseTime.compareTo(b.schedule.nextDoseTime));
 
+    return Column(
+      children: [
+        const SectionHeader(title: 'Upcoming Doses'),
+        _buildList(doses),
+      ],
+    );
+  }
 
-      return Column(
-        children: [
-          const SectionHeader(title: 'Upcoming Doses'),
-          _buildList(doses)
-        ]
+  Widget _buildList(List<Assignment> items) {
+    if (items.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 12),
+        child: Center(
+          child: Text(
+            'No upcoming doses today',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
       );
     }
-  Widget _buildList(List<Assignment> items){
     return Column(
       children: items.map((item) {
         final med = item.reference;
         final member = item.member;
         final schedule = item.schedule;
-        print(schedule.nextDoseTime);
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: _MedicationCard(
             name: med.names.firstOrNull ?? '--',
             dosage: med.dosage,
-            time: '${schedule.nextDoseTime}',
+            time: schedule.timesOfDay.isNotEmpty ? schedule.timesOfDay.first : '--',
             member: member.name,
             status: DoseStatus.upcoming,
           ),
@@ -120,7 +133,8 @@ class _MedicationCard extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: iconBg, borderRadius: AppRadius.borderRadiusMd),
+                decoration: BoxDecoration(
+                    color: iconBg, borderRadius: AppRadius.borderRadiusMd),
                 child: Icon(iconData, color: iconColor, size: 20),
               ),
               const SizedBox(width: 12),
@@ -131,26 +145,26 @@ class _MedicationCard extends StatelessWidget {
                     Text(
                       name,
                       style: TextStyle(
-                        fontSize: 15, fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
                         color: cs.onSurface,
                       ),
                     ),
                     Text(
                       dosage,
-                      style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
+                      style:
+                          TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      timeToDisplay(time),
-                      style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+                      time == '--' ? 'No schedule set' : timeToDisplay(time),
+                      style:
+                          TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
                     ),
                   ],
                 ),
               ),
-              UserAvatar(
-                name: name,
-                radius: 32,
-              ),
+              UserAvatar(name: name, radius: 32),
             ],
           ),
           if (status == DoseStatus.upcoming) ...[
@@ -171,7 +185,8 @@ class _MedicationCard extends StatelessWidget {
                     ),
                     child: const Text(
                       'Mark as Taken',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      style:
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
@@ -185,12 +200,12 @@ class _MedicationCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 10,
-                    ),
+                        horizontal: 16, vertical: 10),
                   ),
                   child: const Text(
                     'Skip',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.w500),
                   ),
                 ),
               ],

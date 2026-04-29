@@ -16,7 +16,9 @@ import 'package:frontend/features/ui/medications/pages/medication_overview.dart'
 import 'package:frontend/features/ui/schedule/widgets/assignment_form.dart';
 import 'package:frontend/features/ui/schedule/widgets/schedule_form.dart';
 import 'package:frontend/features/ui/user/pages/user_profile.dart';
+import 'package:frontend/features/ui/assignments/pages/edit_assignment.dart';
 import 'package:frontend/models/collections/collections.dart';
+import 'package:frontend/models/medications/family_member_medication.dart';
 import 'package:frontend/models/medications/medication.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -39,32 +41,27 @@ GoRouter router(Ref ref) => GoRouter(
   },
   routes: <RouteBase>[
     StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) => ShellView(child: navigationShell),
+      builder: (context, state, navigationShell) =>
+          ShellView(child: navigationShell),
       branches: [
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/dashboard',
-              builder: (context, state) => DashboardView()
-            )
-          ]
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/family',
-              builder: (context, state) => FamilyView(),
-            )
-          ]
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/profile',
-              builder: (context, state) => UserProfileView()
-            )
-          ]
-        ),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/dashboard',
+            builder: (context, state) => DashboardView(),
+          )
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/family',
+            builder: (context, state) => FamilyView(),
+          )
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => UserProfileView(),
+          )
+        ]),
       ],
     ),
     GoRoute(
@@ -83,47 +80,66 @@ GoRouter router(Ref ref) => GoRouter(
           path: 'register',
           builder: (context, state) => const RegistrationView(),
         ),
-      ]
+      ],
     ),
     GoRoute(
       path: '/family/members/:fmId',
       parentNavigatorKey: rootNavigatorKey,
-      builder: (context, state) => MemberView(fmid: state.pathParameters['fmId']!),
+      builder: (context, state) =>
+          MemberView(fmid: state.pathParameters['fmId']!),
     ),
     GoRoute(
       path: '/family/members/:fmId/:fid',
       parentNavigatorKey: rootNavigatorKey,
-      builder: (context, state) => EditMemberView(fmid: state.pathParameters['fmId']!, fid: state.pathParameters['fid']!),
+      builder: (context, state) => EditMemberView(
+        fmid: state.pathParameters['fmId']!,
+        fid: state.pathParameters['fid']!,
+      ),
     ),
     GoRoute(
       path: '/family/edit/:fid/:name',
       parentNavigatorKey: rootNavigatorKey,
-      builder: (context, state) => EditFamilyView(fid: state.pathParameters['fid']!, familyName: state.pathParameters['name']!),
+      builder: (context, state) => EditFamilyView(
+        fid: state.pathParameters['fid']!,
+        familyName: state.pathParameters['name']!,
+      ),
     ),
     GoRoute(
       path: '/assignment/create',
       parentNavigatorKey: rootNavigatorKey,
-      builder: (context, state) => AssignmentFormView()
+      builder: (context, state) => AssignmentFormView(),
     ),
     GoRoute(
       path: '/schedule/create',
       parentNavigatorKey: rootNavigatorKey,
-      builder: (context, state){
+      builder: (context, state) {
         final members = state.extra as List<Member>;
         return ScheduleFormView(members: members);
-      }
+      },
     ),
     GoRoute(
       path: '/assignment/:fmId/logs/:fmmId',
       parentNavigatorKey: rootNavigatorKey,
-      builder: (context, state) => AdherenceView(fmid: state.pathParameters['fmId']!, fmmid: state.pathParameters['fmmId']!),
+      builder: (context, state) => AdherenceView(
+        fmid: state.pathParameters['fmId']!,
+        fmmid: state.pathParameters['fmmId']!,
+      ),
+    ),
+
+    GoRoute(
+      path: '/assignment/:fmId/edit',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) {
+        final assignment = state.extra as FamilyMemberMedication;
+        return EditAssignmentView(assignment: assignment);
+      },
     ),
 
     GoRoute(
       path: '/medications',
       parentNavigatorKey: rootNavigatorKey,
       builder: (context, state) => MedicationsView(),
-      routes: <RouteBase> [
+      routes: <RouteBase>[
         GoRoute(
           path: 'create',
           parentNavigatorKey: rootNavigatorKey,
@@ -135,9 +151,9 @@ GoRouter router(Ref ref) => GoRouter(
           builder: (context, state) {
             final medication = state.extra as Medication;
             return EditMedicationView(medication: medication);
-          }
+          },
         ),
-      ]
+      ],
     ),
   ],
 );

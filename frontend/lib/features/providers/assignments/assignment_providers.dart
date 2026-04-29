@@ -21,7 +21,7 @@ Stream<void> assignmentChanged(Ref ref) {
   return repo.changes;
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class Assignments extends _$Assignments {
   @override
   Future<MemberAssignments> build() async {
@@ -33,30 +33,30 @@ class Assignments extends _$Assignments {
   }
 
   Future<void> createFamilyMedication(MemberMedicationRequest data) async {
-    state = const AsyncLoading();
     try {
       await ref.read(assignmentRepositoryProvider).createFamilyMedication(data);
       ref.invalidateSelf();
+      await future;
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
     }
   }
 
   Future<void> updateFamilyMedication(String fmmId, MemberMedicationUpdate data) async {
-    state = const AsyncLoading();
     try {
       await ref.read(assignmentRepositoryProvider).updateFamilyMedication(fmmId, data);
       ref.invalidateSelf();
+      await future;
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
     }
   }
 
   Future<void> deleteFamilyMedication(String fmId, String fmmId) async {
-    state = const AsyncLoading();
     try {
       await ref.read(assignmentRepositoryProvider).deleteFamilyMedication(fmId, fmmId);
       ref.invalidateSelf();
+      await future;
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
     }

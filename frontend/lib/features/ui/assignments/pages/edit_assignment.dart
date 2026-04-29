@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/components/shared/form_section.dart';
 import 'package:frontend/features/components/styles/styles.dart';
-import 'package:frontend/features/providers/family/family_providers.dart';
 import 'package:frontend/features/providers/providers.dart';
+import 'package:frontend/features/providers/utils/collection_providers.dart';
 import 'package:frontend/features/ui/auth/widgets/form_buttons.dart';
 import 'package:frontend/models/medications/family_member_medication.dart';
 import 'package:frontend/services/api/models/medication/medication_requests.dart';
@@ -35,13 +35,13 @@ class _EditAssignmentViewState extends ConsumerState<EditAssignmentView> {
       text: widget.assignment.quantity.toString(),
     );
     _active = widget.assignment.active ? 'Yes' : 'No';
-    _selectedPriority = widget.assignment.priority;
+    _selectedPriority = widget.assignment.priority.isNotEmpty
+        ? widget.assignment.priority[0].toUpperCase() +
+          widget.assignment.priority.substring(1).toLowerCase()
+        : null;
 
-    ref.listenManual(familiesProvider, (previous, next) {
+    ref.listenManual(assignmentsProvider, (previous, next) {
       next.whenOrNull(
-        data: (_) {
-          if (mounted) context.canPop() ? context.pop() : context.go('/family/members/${widget.assignment.familyMemberId}');
-        },
         error: (error, stackTrace) {
           if (!mounted) return;
           final message = switch (error) {
@@ -50,10 +50,7 @@ class _EditAssignmentViewState extends ConsumerState<EditAssignmentView> {
             _ => 'Something went wrong. Please try again.',
           };
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: Color(0xFFB62320),
-            ),
+            SnackBar(content: Text(message), backgroundColor: const Color(0xFFB62320)),
           );
         },
       );
@@ -67,26 +64,97 @@ class _EditAssignmentViewState extends ConsumerState<EditAssignmentView> {
   }
 
   void _delete() async {
-    await ref.read(assignmentsProvider.notifier)
-    .deleteFamilyMedication(
-      widget.assignment.familyMemberId,
-      widget.assignment.medicationId,
-    );
-    context.go('/family/members/${widget.assignment.familyMemberId}');
+    try {
+      await ref.read(assignmentsProvider.notifier).deleteFamilyMedication(
+        widget.assignment.familyMemberId,
+        widget.assignment.id,
+      );
+      if (!mounted) return;
+      ref.invalidate(aggregateMembershipsProvider);
+      ref.invalidate(aggregateMemberProvider);
+      context.go('/family/members/${widget.assignment.familyMemberId}');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to remove: $e'), backgroundColor: const Color(0xFFB62320)),
+      );
+    }
   }
 
   void _update() async {
-    if (_formKey.currentState!.validate()) {
-      final quantity = _quantityCtrl.text.trim();
-      final active = _active == 'Yes' ? true : false;
-      await ref.read(assignmentsProvider.notifier)
-      .updateFamilyMedication(
-        widget.assignment.familyMemberId,
+    if (!_formKey.currentState!.validate()) return;
+    final quantity = _quantityCtrl.text.trim();
+    final active = _active == 'Yes';
+    try {
+      await ref.read(assignmentsProvider.notifier).updateFamilyMedication(
+        widget.assignment.id,
         MemberMedicationUpdate(
           id: widget.assignment.id,
           priority: _selectedPriority!.toLowerCase(),
           quantity: int.tryParse(quantity),
           active: active,
+        ),
+      );
+      if (!mounted) return;
+      ref.invalidate(aggregateMembershipsProvider);
+      ref.invalidate(aggregateMemberProvider);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Updated!'), backgroundColor: Color(0xFF198820)),
+      );
+      context.canPop() ? context.pop() : context.go('/family/members/${widget.assignment.familyMemberId}');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update: $e'), backgroundColor: const Color(0xFFB62320)),
+      );
+    }
+  }
+
+  void _showDialog(BuildContext context) {
+    final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
+    if (isIOS) {
+      showCupertinoDialog(
+        context: context,
+        builder: (_) => CupertinoAlertDialog(
+          title: const Text('Remove medication?'),
+          content: const Text('This will remove the assignment from this member.'),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+                _delete();
+              },
+              child: const Text('Remove'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Remove medication?'),
+          content: const Text('This will remove the assignment from this member.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _delete();
+              },
+              child: Text('Remove',
+                  style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            ),
+          ],
         ),
       );
     }
@@ -96,7 +164,6 @@ class _EditAssignmentViewState extends ConsumerState<EditAssignmentView> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
 
     return Scaffold(
       backgroundColor: cs.surface,
@@ -175,45 +242,7 @@ class _EditAssignmentViewState extends ConsumerState<EditAssignmentView> {
                       const SizedBox(height: 18),
                       FormButton(
                         label: 'Remove',
-                        onPressed: () => {
-                          if (isIOS)
-                            {
-                              if (isIOS)
-                                CupertinoAlertDialog(
-                                  title: const Text('Are you sure?'),
-                                  actions: [
-                                    CupertinoDialogAction(
-                                      onPressed: () => {},
-                                      child: const Text('Cancel'),
-                                    ),
-                                    CupertinoDialogAction(
-                                      onPressed: () {
-                                        _delete();
-                                      },
-                                      child: const Text('Confirm'),
-                                    ),
-                                  ],
-                                ),
-                            }
-                          else
-                            {
-                              AlertDialog(
-                                title: const Text('Are you sure?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {},
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      _delete();
-                                    },
-                                    child: const Text('Confirm'),
-                                  ),
-                                ],
-                              ),
-                            },
-                        },
+                        onPressed: () => _showDialog(context),
                         weight: FontWeight.w400,
                         radius: AppRadius.borderRadiusXl,
                         buttonColor: cs.errorContainer,

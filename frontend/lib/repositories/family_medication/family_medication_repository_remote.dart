@@ -24,12 +24,18 @@ class FamilyMedicationRepositoryRemote extends FamilyMedicationRepository {
   @override
   Future<MemberAssignments> getFamilyMedications() async {
     try {
-      if (_cachedFamilyMedications.isEmpty) {
-        final Response result = await _api.get('$_baseUrl/members');
-        final data = jsonDecode(result.body) as List;
+      final Response result = await _api.get('$_baseUrl/members');
+      final data = jsonDecode(result.body) as List;
 
-        final fmMedicationList = data.map((element) => FamilyMemberMedicationMapper.fromMap(element['assignment'])).toList();
-        _cachedFamilyMedications.addAll({ for (final fmMedication in fmMedicationList) fmMedication.familyMemberId: fmMedicationList});
+      _cachedFamilyMedications.clear();
+
+      for (final element in data) {
+        final fmMedication = FamilyMemberMedicationMapper.fromMap(
+          element['assignment'],
+        );
+        _cachedFamilyMedications
+            .putIfAbsent(fmMedication.familyMemberId, () => [])
+            .add(fmMedication);
       }
     } on Exception {
       rethrow;
@@ -43,9 +49,11 @@ class FamilyMedicationRepositoryRemote extends FamilyMedicationRepository {
     try {
       final Response result = await _api.post('$_baseUrl/members', data.toMap());
       final json = jsonDecode(result.body);
-      FamilyMemberMedication newMed = FamilyMemberMedicationMapper.fromMap(json[0]);
-      _cachedFamilyMedications.putIfAbsent(newMed.familyMemberId, () => []);
-      _cachedFamilyMedications[newMed.familyMemberId]!.add(newMed);
+      final raw = json is List ? json[0] : json;
+      FamilyMemberMedication newMed = FamilyMemberMedicationMapper.fromMap(raw);
+      _cachedFamilyMedications
+          .putIfAbsent(newMed.familyMemberId, () => [])
+          .add(newMed);
       _notifyChange();
     } on Exception {
       rethrow;
@@ -53,38 +61,49 @@ class FamilyMedicationRepositoryRemote extends FamilyMedicationRepository {
   }
 
   @override
-  Future<FamilyMemberMedication> getFamilyMemberMedication(String fmmId, String fmId) async {
+  Future<FamilyMemberMedication> getFamilyMemberMedication(
+    String fmmId,
+    String fmId,
+  ) async {
     try {
-      if (!_cachedFamilyMedications.containsKey(fmId)) {
-        final result = await _api.get('$_baseUrl/members/$fmmId');
-        FamilyMemberMedication medication = FamilyMemberMedicationMapper.fromMap(result.value);
-        final list = _cachedFamilyMedications.putIfAbsent(medication.familyMemberId, () => []);
-        final index = list.indexWhere((m) => m.id == medication.id);
-        list.add(medication);
-        _notifyChange();
-        return list[index];
+      final list = _cachedFamilyMedications[fmId];
+      if (list != null) {
+        final index = list.indexWhere((m) => m.id == fmmId);
+        if (index != -1) return list[index];
       }
 
-      final list = _cachedFamilyMedications[fmId];
-      final index = list!.indexWhere((m) => m.id == fmId);
-      return list[index];
+      final result = await _api.get('$_baseUrl/members/$fmmId');
+      final json = jsonDecode(result.body);
+      FamilyMemberMedication medication = FamilyMemberMedicationMapper.fromMap(json);
+      _cachedFamilyMedications
+          .putIfAbsent(medication.familyMemberId, () => [])
+          .add(medication);
+      _notifyChange();
+      return medication;
     } on Exception {
       rethrow;
     }
   }
 
   @override
-  Future<void> updateFamilyMedication(String fmmId, MemberMedicationUpdate data) async {
-    if (!_cachedFamilyMedications.containsKey(fmmId)) throw NotFoundException();
-
+  Future<void> updateFamilyMedication(
+    String fmmId,
+    MemberMedicationUpdate data,
+  ) async {
     try {
-      final Response result = await _api.put('$_baseUrl/members/$fmmId', data.toMap());
+      final Response result = await _api.put(
+        '$_baseUrl/members/$fmmId',
+        data.toMap(),
+      );
       final json = jsonDecode(result.body);
-      FamilyMemberMedication updatedMed = FamilyMemberMedicationMapper.fromMap(json);
+      final raw = json is List ? json[0] : json;
+      FamilyMemberMedication updatedMed = FamilyMemberMedicationMapper.fromMap(raw);
 
-      final list = _cachedFamilyMedications.putIfAbsent(updatedMed.familyMemberId, () => []);
+      final list = _cachedFamilyMedications.putIfAbsent(
+        updatedMed.familyMemberId,
+        () => [],
+      );
       final index = list.indexWhere((m) => m.id == updatedMed.id);
-
       if (index != -1) {
         list[index] = updatedMed;
       } else {
@@ -99,14 +118,14 @@ class FamilyMedicationRepositoryRemote extends FamilyMedicationRepository {
 
   @override
   Future<void> deleteFamilyMedication(String fmId, String fmmId) async {
-    if (!_cachedFamilyMedications.containsKey(fmId)) throw NotFoundException();
-
     try {
+      print('DELETE URL: $_baseUrl/members/$fmmId  fmId=$fmId');
       await _api.delete('$_baseUrl/members/$fmmId');
-      final list = _cachedFamilyMedications[fmId];
-      list!.removeWhere((m) => m.id == fmmId && m.familyMemberId == fmId);
-       _notifyChange();
-    } on Exception {
+      print('DELETE API done');
+      _cachedFamilyMedications[fmId]?.removeWhere((m) => m.id == fmmId);
+      _notifyChange();
+    } on Exception catch (e) {
+      print('DELETE EXCEPTION: $e');
       rethrow;
     }
   }

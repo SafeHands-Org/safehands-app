@@ -103,7 +103,7 @@ final class AssignmentsProvider
         argument: null,
         retry: null,
         name: r'assignmentsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -116,7 +116,7 @@ final class AssignmentsProvider
   Assignments create() => Assignments();
 }
 
-String _$assignmentsHash() => r'1694831ae8dc8912ad3d9b408d5a0bf4ae88c6f2';
+String _$assignmentsHash() => r'e9470cd25e13cad583f87362a85b07f9988e56a6';
 
 abstract class _$Assignments extends $AsyncNotifier<MemberAssignments> {
   FutureOr<MemberAssignments> build();

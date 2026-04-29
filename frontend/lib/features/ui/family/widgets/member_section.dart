@@ -4,6 +4,7 @@ import 'package:frontend/features/components/shared/section_header.dart';
 import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/models/models.dart';
+import 'package:frontend/models/medications/family_member_medication.dart';
 import 'package:frontend/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 
@@ -87,8 +88,9 @@ class MemberProfileSection extends ConsumerWidget {
                         child: _MedicationDetailCard(
                           fmId: member.id,
                           fmmId: med.assignment.id,
+                          assignment: med.assignment,
                           medication: med.reference,
-                          schedule: med.schedule
+                          schedule: med.schedule,
                         ),
                       ),
                     ),
@@ -103,8 +105,9 @@ class MemberProfileSection extends ConsumerWidget {
                         child: _MedicationDetailCard(
                           fmId: member.id,
                           fmmId: med.assignment.id,
+                          assignment: med.assignment,
                           medication: med.reference,
-                          schedule: med.schedule
+                          schedule: med.schedule,
                         ),
                       ),
                     ),
@@ -165,11 +168,13 @@ class _MedicationDetailCard extends StatelessWidget {
     required this.medication,
     required this.schedule,
     required this.fmId,
-    required this.fmmId
+    required this.fmmId,
+    required this.assignment,
   });
 
   final Medication medication;
   final MedicationSchedule schedule;
+  final FamilyMemberMedication assignment;
   final String fmId;
   final String fmmId;
 
@@ -289,6 +294,22 @@ class _MedicationDetailCard extends StatelessWidget {
                   child: Text(
                     'View Details',
                     style: tt.bodyMedium!.copyWith(fontWeight: FontWeight.w500, color: palette.categoryBlue),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => context.push(
+                    '/assignment/$fmId/edit',
+                    extra: assignment,
+                  ),
+                  style: TextButton.styleFrom(
+                    backgroundColor: cs.errorContainer.withValues(alpha: 0.3),
+                    foregroundColor: cs.error,
+                    shape: RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusMd, side: BorderSide(color: cs.error)),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  ),
+                  child: Text(
+                    'Edit',
+                    style: tt.bodyMedium!.copyWith(fontWeight: FontWeight.w500, color: cs.error),
                   ),
                 ),
               ],

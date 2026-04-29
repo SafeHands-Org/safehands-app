@@ -44,6 +44,8 @@ class MedicationSchedule with MedicationScheduleMappable{
   }
 
   DateTime get nextDoseTime {
+    if (timesOfDay.isEmpty) return DateTime.now().add(const Duration(days: 999));
+
     final now = DateTime.now();
     for (int daysAhead = 0; daysAhead < 8; daysAhead++) {
       final candidate = now.add(Duration(days: daysAhead));
