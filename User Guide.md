@@ -30,7 +30,6 @@ The **Main Dashboard** provides an overview of key family medication information
 
 - **Family Overview**
 - **Upcoming Doses**
-- **Quick Actions**
 
 This dashboard is the main navigation hub for caregivers.
 
@@ -80,10 +79,10 @@ To add a new medication:
 
 To edit or delete an existing medication:
 
-1. Go to the family member’s profile.
+1. Go to the Medications page.
 2. Locate the medication you want to update.
-3. Tap the **pencil icon** to edit the medication.
-4. Tap the **trash icon** to delete the medication.
+3. Tap on the medication you want to edit and hit **Confirm** when done.
+4. Tap the **Remove Medication** button to delete the medication.
 
 ---
 
