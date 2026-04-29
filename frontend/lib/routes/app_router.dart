@@ -6,6 +6,7 @@ import 'package:frontend/features/ui/auth/pages/login.dart';
 import 'package:frontend/features/ui/auth/pages/register.dart';
 import 'package:frontend/features/ui/auth/pages/startup.dart';
 import 'package:frontend/features/ui/dashboard/pages/dashboard.dart';
+import 'package:frontend/features/ui/dashboard/pages/member_dashboard.dart';
 import 'package:frontend/features/ui/family/pages/family_details.dart';
 import 'package:frontend/features/ui/family/pages/member_details.dart';
 import 'package:frontend/features/ui/medications/pages/medication_details.dart';
@@ -54,14 +55,14 @@ GoRouter router(Ref ref){
                 ),
               ],
             ),
-            //StatefulShellBranch(
-            //  routes: [
-            //    GoRoute(
-            //      path: '/profile/:userId',
-            //      builder: (context, state) => UserProfileView(),
-            //    ),
-            //  ],
-            //),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/member-dashboard',
+                  builder: (context, state) => MemberDashboardView(),
+                ),
+              ],
+            ),
           ]
         ),
       GoRoute(
