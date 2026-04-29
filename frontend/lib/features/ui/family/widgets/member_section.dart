@@ -5,6 +5,7 @@ import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/models/models.dart';
 import 'package:frontend/models/medications/family_member_medication.dart';
+import 'package:frontend/services/notification_service.dart';
 import 'package:frontend/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 
@@ -313,6 +314,42 @@ class _MedicationDetailCard extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  final medName = medication.names.isNotEmpty
+                      ? medication.names.first
+                      : 'your medication';
+                  await NotificationService.scheduleOnce(
+                    id: fmmId.hashCode,
+                    title: '💊 Medication Reminder',
+                    body: 'Time to take $medName',
+                    seconds: 10,
+                  );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            '🔔 Test notification will arrive in ~10 seconds'),
+                        backgroundColor: Color(0xFF1565C0),
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.notifications_outlined, size: 16),
+                label: const Text('Test Notification (10s)'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: cs.primary,
+                  side: BorderSide(color: cs.outlineVariant),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: AppRadius.borderRadiusMd),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                ),
+              ),
             ),
           ],
         ),
