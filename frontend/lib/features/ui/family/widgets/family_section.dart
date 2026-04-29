@@ -63,15 +63,6 @@ class FamilyMembersDetailSection extends StatelessWidget {
                             color: Colors.white,
                           ),
                         ),
-                        SizedBox(height: 24),
-                        PrimaryActionButton(
-                          onPressed: () => context.go('/schedule/create', extra: members),
-                          buttonText: 'Create Schedule',
-                          buttonIcon: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                          ),
-                        ),
                         if (admins.isNotEmpty)...[
                           const SectionHeader(title: 'Administrators'),
                           Card(

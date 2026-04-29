@@ -100,6 +100,24 @@ export const createMedicationSchedule = async (data: MedicationSchedule) => {
   return result;
 };
 
+export const getScheduleByFmmId = async (fmmId: string) => {
+  const [result] = await db
+    .select({
+      id: medicationSchedules.id,
+      fmmid: medicationSchedules.familyMemberMedicationId,
+      fmid: familyMemberships.id,
+      timesOfDay: medicationSchedules.timesOfDay,
+      daysOfWeek: medicationSchedules.daysOfWeek,
+      frequency: medicationSchedules.frequency,
+    })
+    .from(medicationSchedules)
+    .innerJoin(familyMemberMedications, eq(medicationSchedules.familyMemberMedicationId, familyMemberMedications.id))
+    .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
+    .where(eq(medicationSchedules.familyMemberMedicationId, fmmId))
+    .limit(1);
+  return result ?? null;
+};
+
 export const updateMedicationSchedule = async (id: string, data: Partial<MedicationSchedule>) =>
   await db.update(medicationSchedules).set(data).where(eq(medicationSchedules.id, id)).returning();
 
