@@ -116,7 +116,7 @@ final class AdherencesProvider
   Adherences create() => Adherences();
 }
 
-String _$adherencesHash() => r'36be7a97a0b78bc14261d7f33d8a2d8d73ac8b72';
+String _$adherencesHash() => r'0390fa9c04d40e8146553685d23cf86ab403199b';
 
 abstract class _$Adherences extends $AsyncNotifier<MemberLogs> {
   FutureOr<MemberLogs> build();

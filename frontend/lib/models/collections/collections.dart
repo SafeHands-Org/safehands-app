@@ -23,10 +23,14 @@ class Assignment with AssignmentMappable {
   String get medicationName => reference.names.firstOrNull ?? 'Unknown';
 
   List<MedicationAdherenceLog> get todaysLogs {
-    final today = DateTime.now().toIso8601String().substring(0, 10);
+    final now = DateTime.now();
+    final todayStr = now.toIso8601String().substring(0, 10);
     return logs.where((log) {
-      final dt = DateTime.tryParse('$today ${log.scheduledTime}:00');
-      return dt != null;
+      if (log.takenAt != null) {
+        final takenDate = log.takenAt!.toLocal().toIso8601String().substring(0, 10);
+        return takenDate == todayStr;
+      }
+      return false;
     }).toList();
   }
 
@@ -74,10 +78,12 @@ class Member with MemberMappable {
   }
 
   List<MedicationAdherenceLog> get todaysLogs {
-    final today = DateTime.now().toIso8601String().substring(0, 10);
+    final todayStr = DateTime.now().toLocal().toIso8601String().substring(0, 10);
     return logs.where((log) {
-      final dt = DateTime.tryParse('$today ${log.scheduledTime}:00');
-      return dt != null;
+      if (log.takenAt != null) {
+        return log.takenAt!.toLocal().toIso8601String().substring(0, 10) == todayStr;
+      }
+      return false;
     }).toList();
   }
 
@@ -157,10 +163,12 @@ class FamilyCollection with FamilyCollectionMappable {
   );
 
   List<MedicationAdherenceLog> get todayLogs {
-    final today = DateTime.now().toIso8601String().substring(0, 10);
+    final todayStr = DateTime.now().toLocal().toIso8601String().substring(0, 10);
     return logs.where((log) {
-      final dt = DateTime.tryParse('$today ${log.scheduledTime}:00');
-      return dt != null;
+      if (log.takenAt != null) {
+        return log.takenAt!.toLocal().toIso8601String().substring(0, 10) == todayStr;
+      }
+      return false;
     }).toList();
   }
 

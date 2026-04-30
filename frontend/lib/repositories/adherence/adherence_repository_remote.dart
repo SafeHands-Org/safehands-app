@@ -29,7 +29,8 @@ class MedicationAdherenceRepositoryRemote extends MedicationAdherenceRepository 
 
       _cachedLogs.clear();
       for (final element in data) {
-        final log = MedicationAdherenceLogMapper.fromMap(element['logs']);
+        final log = MedicationAdherenceLogMapper.fromMap(
+            element['logs'] as Map<String, dynamic>);
         _cachedLogs.putIfAbsent(log.fmid, () => []).add(log);
       }
     } on Exception {
@@ -40,22 +41,13 @@ class MedicationAdherenceRepositoryRemote extends MedicationAdherenceRepository 
 
   @override
   Future<void> createLog(AdherenceLogRequest data, String fmid) async {
-    if (data.takenAt != null) {
-      final logs = _cachedLogs[fmid] ?? [];
-      if (logs.any((a) =>
-          a.fmmid == data.familyMemberMedicationId &&
-          a.takenAt == data.takenAt)) {
-        throw DuplicateException();
-      }
-    }
-
     try {
       final Response result =
           await _api.post('$_baseUrl/logs', data.toMap());
       final json = jsonDecode(result.body);
       final raw = json is List ? json[0] : json;
       MedicationAdherenceLog newLog =
-          MedicationAdherenceLogMapper.fromMap(raw);
+          MedicationAdherenceLogMapper.fromMap(raw as Map<String, dynamic>);
       _cachedLogs.putIfAbsent(fmid, () => []).add(newLog);
       _notifyChange();
     } on Exception {
@@ -71,7 +63,7 @@ class MedicationAdherenceRepositoryRemote extends MedicationAdherenceRepository 
       final json = jsonDecode(result.body);
       final raw = json is List ? json[0] : json;
       MedicationAdherenceLog updatedLog =
-          MedicationAdherenceLogMapper.fromMap(raw);
+          MedicationAdherenceLogMapper.fromMap(raw as Map<String, dynamic>);
       final list =
           _cachedLogs.putIfAbsent(updatedLog.fmid, () => []);
       final index = list.indexWhere((m) => m.id == updatedLog.id);

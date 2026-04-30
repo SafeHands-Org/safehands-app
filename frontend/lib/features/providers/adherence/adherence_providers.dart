@@ -33,11 +33,11 @@ class Adherences extends _$Adherences {
     try {
       await ref.read(adherenceRepositoryProvider).createLog(data, fmid);
       ref.invalidateSelf();
-      await future;
       ref.invalidate(aggregateMembershipsProvider);
       ref.invalidate(aggregateMemberProvider);
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      print('createLog ERROR: $e\n$st');
       return false;
     }
   }
@@ -46,11 +46,11 @@ class Adherences extends _$Adherences {
     try {
       await ref.read(adherenceRepositoryProvider).updateLog(logId, data);
       ref.invalidateSelf();
-      await future;
       ref.invalidate(aggregateMembershipsProvider);
       ref.invalidate(aggregateMemberProvider);
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      print('updateLog ERROR: $e\n$st');
       return false;
     }
   }
