@@ -425,7 +425,7 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
 
                                 const SizedBox(height: 16),
 
-                                Text('Repeat on (leave empty for daily)',
+                                Text('Repeat on',
                                     style: tt.bodySmall?.copyWith(
                                         color: cs.onSurfaceVariant,
                                         fontWeight: FontWeight.w600)),

@@ -388,7 +388,7 @@ class _EditAssignmentViewState extends ConsumerState<EditAssignmentView> {
                           ),
                         ),
                         const SizedBox(height: 14),
-                        Text('Repeat on (leave empty for daily)',
+                        Text('Repeat on',
                             style: tt.bodySmall?.copyWith(
                                 color: cs.onSurfaceVariant,
                                 fontWeight: FontWeight.w600)),
