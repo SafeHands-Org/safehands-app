@@ -103,7 +103,7 @@ final class AdherencesProvider
         argument: null,
         retry: null,
         name: r'adherencesProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -116,7 +116,7 @@ final class AdherencesProvider
   Adherences create() => Adherences();
 }
 
-String _$adherencesHash() => r'ee7a6e8b4cb4fcc91602ac85f39569d8bbf7d226';
+String _$adherencesHash() => r'36be7a97a0b78bc14261d7f33d8a2d8d73ac8b72';
 
 abstract class _$Adherences extends $AsyncNotifier<MemberLogs> {
   FutureOr<MemberLogs> build();

@@ -55,7 +55,7 @@ final class FamilyMemberRepositoryProvider
 }
 
 String _$familyMemberRepositoryHash() =>
-    r'e118b3ee7524fd9d787897006376a17fb223080a';
+    r'2f848f2b9c32b94ce0a8e1c1f86c7dc5256305c7';
 
 @ProviderFor(memberChanged)
 final memberChangedProvider = MemberChangedProvider._();
@@ -189,7 +189,7 @@ final class FamilyMembersProvider
   FamilyMembers create() => FamilyMembers();
 }
 
-String _$familyMembersHash() => r'327f499345f3c1545aac0dcb0f770bd858793bc3';
+String _$familyMembersHash() => r'6c3646df8e313e1107da2314ef5d1bdf8215647b';
 
 abstract class _$FamilyMembers extends $AsyncNotifier<FamilyMemberships> {
   FutureOr<FamilyMemberships> build();

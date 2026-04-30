@@ -100,6 +100,24 @@ export const createMedicationSchedule = async (data: MedicationSchedule) => {
   return result;
 };
 
+export const getScheduleByFmmId = async (fmmId: string) => {
+  const [result] = await db
+    .select({
+      id: medicationSchedules.id,
+      fmmid: medicationSchedules.familyMemberMedicationId,
+      fmid: familyMemberships.id,
+      timesOfDay: medicationSchedules.timesOfDay,
+      daysOfWeek: medicationSchedules.daysOfWeek,
+      frequency: medicationSchedules.frequency,
+    })
+    .from(medicationSchedules)
+    .innerJoin(familyMemberMedications, eq(medicationSchedules.familyMemberMedicationId, familyMemberMedications.id))
+    .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
+    .where(eq(medicationSchedules.familyMemberMedicationId, fmmId))
+    .limit(1);
+  return result ?? null;
+};
+
 export const updateMedicationSchedule = async (id: string, data: Partial<MedicationSchedule>) =>
   await db.update(medicationSchedules).set(data).where(eq(medicationSchedules.id, id)).returning();
 
@@ -147,8 +165,32 @@ export const getCaregiverAdherenceLogs = async (userId: string) => {
   return adherences
 }
 
-export const createAdherenceLog = async (data: MedicationAdherenceLog) =>
-  await db.insert(medicationAdherenceLogs).values(data).returning();
+export const createAdherenceLog = async (data: MedicationAdherenceLog) => {
+  const sanitized = {
+    ...data,
+    takenAt: data.takenAt
+      ? (data.takenAt instanceof Date ? data.takenAt : new Date(data.takenAt as unknown as string))
+      : null,
+  };
+  const [inserted] = await db.insert(medicationAdherenceLogs).values(sanitized).returning();
+
+  const [result] = await db
+    .select({
+      id: medicationAdherenceLogs.id,
+      fmid: familyMemberships.id,
+      fmmid: medicationAdherenceLogs.familyMemberMedicationId,
+      scheduledTime: medicationAdherenceLogs.scheduledTime,
+      takenAt: medicationAdherenceLogs.takenAt,
+      status: medicationAdherenceLogs.status,
+      recordedBy: medicationAdherenceLogs.recordedBy,
+    })
+    .from(medicationAdherenceLogs)
+    .innerJoin(familyMemberMedications, eq(medicationAdherenceLogs.familyMemberMedicationId, familyMemberMedications.id))
+    .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
+    .where(eq(medicationAdherenceLogs.id, inserted.id));
+
+  return [result];
+};
 
 export const updateAdherenceLog = async (id: string, data: Partial<MedicationAdherenceLog>) =>
   await db.update(medicationAdherenceLogs).set(data).where(eq(medicationAdherenceLogs.id, id)).returning();

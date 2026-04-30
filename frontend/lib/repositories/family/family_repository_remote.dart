@@ -47,6 +47,7 @@ class FamilyRepositoryRemote extends FamilyRepository {
     try {
       final Response result = await _api.post('$_baseUrl/', {'name': name});
       Family newFamily = FamilyMapper.fromMap(jsonDecode(result.body));
+      print(jsonDecode(result.body));
       _cachedFamilies.putIfAbsent(newFamily.id, () => newFamily);
 
       _notifyChange();
@@ -80,7 +81,6 @@ class FamilyRepositoryRemote extends FamilyRepository {
       _cachedFamilies.update(id, (family) => updatedFamily);
       _notifyChange();
     } on Exception {
-      print('EXCEPTION: $Exception');
       rethrow;
     }
   }
@@ -101,4 +101,9 @@ class FamilyRepositoryRemote extends FamilyRepository {
   Future<void> saveCurrentFamily(String fid) async => await _storage.setFid(fid);
   Future<void> clearCurrentFamily() async => await _storage.clearFid();
   String? fetchCurrentFamily() => _storage.fetchFid();
+
+  void clearCache(){
+    _cachedFamilies.clear();
+    _notifyChange();
+  }
 }

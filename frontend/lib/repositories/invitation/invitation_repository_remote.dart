@@ -40,4 +40,9 @@ class InvitationRepositoryRemote extends InvitationRepository {
   Future<void> saveInviteToken(String token) async => await _storage.setInvite(token);
   Future<void> clearInviteToken() async => await _storage.clearInvite();
   String? fetchInviteToken() => _storage.fetchInvite();
+
+  void clearCache(){
+    _cachedInvitation.clear();
+    _notifyChange();
+  }
 }

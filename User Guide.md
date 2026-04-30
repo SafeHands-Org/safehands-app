@@ -42,7 +42,7 @@ This dashboard is the main navigation hub for caregivers.
 To invite a family member to your family group:
 
 1. From the **Main Dashboard**, tap **Family** on the bottom navigation bar.
-2. Tap the **Invite** button.
+2. Tap the add person icon at the top left.
 3. A **6-character code** will be generated.
 4. Share this code with the family member you want to add.
 

@@ -73,10 +73,14 @@ class _ScheduleFormViewState extends ConsumerState<ScheduleFormView> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Schedule created'),
-                backgroundColor: Color(0xFF17821E),
+                duration: Duration(milliseconds: 800),
               ),
             );
-            context.canPop() ? context.pop() : context.go('/family');
+
+            Future.delayed(const Duration(milliseconds: 300), () {
+              if (!mounted) return;
+              context.canPop() ? context.pop() : context.go('/family');
+            });
           }
         },
         error: (error, stackTrace) {
@@ -214,7 +218,7 @@ class _ScheduleFormViewState extends ConsumerState<ScheduleFormView> {
                                       const SizedBox(height: 8),
                                       DropdownButtonFormField<FamilyMemberMedication>(
                                         isExpanded: true,
-                                        value: _selectedAssignment,
+                                        initialValue: _selectedAssignment,
                                         hint: Text(
                                           _selectedMember == null
                                               ? 'Select a family member first'
@@ -320,9 +324,9 @@ class _ScheduleFormViewState extends ConsumerState<ScheduleFormView> {
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 16),
                                   child: FormButton(
-                                    label: 'Create Schedule',
+                                    label: 'Confirm',
                                     onPressed: _create,
-                                    weight: FontWeight.w400,
+                                    weight: FontWeight.w500,
                                     radius: AppRadius.borderRadiusXl,
                                   ),
                                 ),

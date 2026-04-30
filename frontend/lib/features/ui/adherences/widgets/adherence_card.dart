@@ -21,18 +21,10 @@ class AdherenceLogSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    final palette = context.palette;
-
     final member = membership.member;
     final medication = assigned.reference;
 
     final logs = assigned.logs;
-
-    final takenLogs   = assigned.allTakenLogs;
-    final missedLogs  = assigned.allMissedLogs;
-    final todayLogs   = assigned.todaysLogs;
-    final todayTaken  = assigned.todaysTaken;
 
     final medicationName = medication.isNotEmpty ? medication.names.first : 'Medication';
     final sorted = assigned.sortedLogs;
@@ -46,21 +38,7 @@ class AdherenceLogSection extends StatelessWidget {
               leading: HeaderIconButton(icon: Icons.arrow_back, onPressed: () => context.pop()),
               title: medicationName,
               subtitle: member.isNotEmpty ? member.name : 'Member',
-              statsRow: Row(
-                children: [
-                  Expanded(
-                    child: StatChipSmall(value: medication.dosage, label: 'Dosage'),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: StatChipSmall(value: medication.doseForm, label: 'Form'),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: StatChipSmall(value: '${logs.length}', label: 'Total Logs'),
-                  ),
-                ],
-              ),
+              statsRow: statsChip(context: context, instructions: medication.instructions)
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
@@ -71,68 +49,31 @@ class AdherenceLogSection extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: statsChip(
-                          context: context,
-                          color: palette.categoryGreenContainer,
-                          value: statsIndicator(
-                            label: '${todayTaken.length}/${todayLogs.isEmpty ? 0 : todayLogs.length}',
-                            value: todayLogs.isEmpty ? todayTaken.length/0 : todayTaken.length / todayLogs.length,
-                            palette: palette,
-                            context: context
-                          ),
-                          label: 'Today'
+                        child: StatChipSmall(
+                          value: medication.dosage,
+                          label: 'Dosage',
+                          color: context.palette.categoryIndigoContainer
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
                       Expanded(
-                        child: statsChip(
-                          context: context,
-                          color: palette.categoryGreenContainer,
-                          value: statsIndicator(
-                            label: '${takenLogs.isEmpty ? 0 : takenLogs.length}/${logs.isEmpty ? 0 : logs.length}',
-                            value: logs.isEmpty ? takenLogs.length/0 : takenLogs.length/logs.length,
-                            palette: palette,
-                            context: context
-                          ),
-                          label: 'Taken'
+                        child: StatChipSmall(
+                          value: medication.doseForm,
+                          label: 'Form',
+                          color: context.palette.categoryIndigoContainer
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
                       Expanded(
-                        child: statsChip(
-                          context: context,
-                          color: palette.categoryGreenContainer,
-                          value: statsIndicator(
-                            label: '${missedLogs.isEmpty ? 0 : missedLogs.length}/${logs.isEmpty ? 0 : logs.length}',
-                            value: logs.isEmpty ? missedLogs.length/0 : missedLogs.length/logs.length,
-                            palette: palette,
-                            context: context
-                          ),
-                          label: 'Missed'
+                        child: StatChipSmall(
+                          value: '${logs.length}',
+                          label: 'Total Logs',
+                          color: context.palette.categoryIndigoContainer
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  const SectionHeader(title: 'Instructions'),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(14),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(color: palette.categoryBlueContainer ,borderRadius: AppRadius.borderRadiusMd),
-                            child: Icon(Icons.info_outline,color: palette.categoryBlue,size: 16),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(child: Text(medication.instructions, style: tt.bodySmall)),
-                        ]
-                      )
-                    )
-                  ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                   const SectionHeader(title: 'Adherence Logs'),
                   if (logs.isEmpty)
                     const Padding(
@@ -162,28 +103,33 @@ class AdherenceLogSection extends StatelessWidget {
       )
     );
   }
-  Widget statsChip({required BuildContext context, required Color color, required Widget value, required String label}) {
+  Widget statsChip({required BuildContext context, required String instructions}) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
-      width: 108,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+        color: cs.surface.withValues(alpha: 0.12),
+        borderRadius: AppRadius.borderRadiusLg,
+        border: Border.all(color: cs.surface.withValues(alpha: 0.2)),
       ),
-      child: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.min,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            value,
-            const SizedBox(height: 20),
-            Text(
-              label,
-              style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface, height: 1.2),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: cs.surface.withValues(alpha: 0.12),
+                borderRadius: AppRadius.borderRadiusMd,
+                border: BoxBorder.all(color: cs.surface.withValues(alpha: 0.2))
+              ),
+              child: Icon(Icons.info_outline,color: cs.onInverseSurface, size: 16),
             ),
+            const SizedBox(width: 12),
+            Expanded(child: Text(instructions, style: TextTheme.of(context).bodySmall?.copyWith(color: cs.onInverseSurface))),
           ]
-        ),
+        )
       )
     );
   }
@@ -264,14 +210,19 @@ class _AdherenceLogCard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: AppRadius.borderRadiusCard
         ),
-        leading: CircleAvatar(
-          radius: 28,
-          backgroundColor: bg,
-          child: Icon(
-            iconData,
-            size: 28,
-            color: iconColor
-          )
+        leading: SizedBox.square(
+          dimension: 56,
+          child: DecoratedBox(
+            decoration: ShapeDecoration(
+              color: bg.withAlpha(50),
+              shape: RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusXl),
+            ),
+            child: Icon(
+              iconData,
+              size: 28,
+              color: iconColor
+            )
+          ),
         ),
         title: Text(dateDisplay.toString(), style: tt.bodyLarge?.copyWith(fontWeight: FontWeight.w500)),
         subtitle: Column(
@@ -291,10 +242,11 @@ class _AdherenceLogCard extends StatelessWidget {
 
 
 class StatChipSmall extends StatelessWidget {
-  const StatChipSmall({super.key, required this.value, required this.label});
+  const StatChipSmall({super.key, required this.value, required this.label, required this.color});
 
   final String value;
   final String label;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -304,25 +256,28 @@ class StatChipSmall extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
-        color: cs.surface.withValues(alpha: 0.12),
+        color: color.withAlpha(100),
         borderRadius: AppRadius.borderRadiusLg,
-        border: Border.all(color: cs.surface.withValues(alpha: 0.2)),
+        border: Border.all(color: color),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            newValue,
-            style: tt.titleSmall!.copyWith(
-              fontWeight: FontWeight.w700,
-              color: cs.surface
+            label,
+            style: tt.bodySmall!.copyWith(
+              fontWeight: FontWeight.w500,
+              color: cs.onSurface.withValues(alpha: 0.8)
             ),
           ),
           const SizedBox(height: 2),
           Text(
-            label,
-            style: tt.bodySmall!.copyWith(color: cs.surface.withValues(alpha: 0.8)),
+            newValue,
+            style: tt.titleSmall!.copyWith(
+              fontWeight: FontWeight.w600,
+              color: cs.onSurface
+            ),
           ),
         ],
       ),

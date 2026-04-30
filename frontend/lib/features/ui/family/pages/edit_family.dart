@@ -5,6 +5,7 @@ import 'package:frontend/features/components/shared/form_section.dart';
 import 'package:frontend/features/components/shared/section_header.dart';
 import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/features/providers/family/family_providers.dart';
+import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/features/ui/auth/widgets/form_buttons.dart';
 import 'package:frontend/utils/exceptions.dart';
 import 'package:go_router/go_router.dart';
@@ -39,12 +40,8 @@ class _EditFamilyViewState extends ConsumerState<EditFamilyView> {
           data: (_) {
             if (mounted) {
               ref.invalidate(familiesProvider);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Successfully updated family information'),
-                ),
-              );
-              context.canPop() ? context.pop() : context.go('/family');
+              ref.invalidate(aggregateMembershipsProvider);
+              ref.invalidate(aggregateMemberProvider);
             }
           },
           error: (error, stackTrace) {
@@ -74,7 +71,19 @@ class _EditFamilyViewState extends ConsumerState<EditFamilyView> {
 
   void _delete() async {
     await ref.read(familiesProvider.notifier).deleteFamily(fid: widget.fid);
-    context.go('/');
+    ref.invalidate(familiesProvider);
+    ref.invalidate(aggregateMembershipsProvider);
+    ref.invalidate(aggregateMemberProvider);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Deleted Family'),
+        duration: Duration(milliseconds: 800),
+      ),
+    );
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      context.canPop() ? context.pop() : context.go('/');
+    });
   }
 
   void _update() async {
@@ -89,6 +98,16 @@ class _EditFamilyViewState extends ConsumerState<EditFamilyView> {
       await ref
         .read(familiesProvider.notifier)
         .updateFamily(fid: widget.fid, data: _nameCtrl.text.trim());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Updated Family'),
+          duration: Duration(milliseconds: 800),
+        ),
+      );
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (!mounted) return;
+        context.canPop() ? context.pop() : context.go('/family');
+      });
     }
   }
 
@@ -138,7 +157,7 @@ class _EditFamilyViewState extends ConsumerState<EditFamilyView> {
                             padding: const EdgeInsets.only(left:16, right: 16),
                             child: FormButton(
                               label: 'Confirm',
-                              weight: FontWeight.w400,
+                              weight: FontWeight.w500,
                               radius: AppRadius.borderRadiusXl,
                               onPressed: _update
                             ),
@@ -148,17 +167,14 @@ class _EditFamilyViewState extends ConsumerState<EditFamilyView> {
                     )
                   ),
                   const SizedBox(height: 24),
-                  Padding(
-                    padding: const EdgeInsets.only(left:16, right: 16),
-                    child: FormButton(
-                      label: 'Delete Family',
-                      onPressed: () => _showDialog(context),
-                      weight: FontWeight.w400,
-                      radius: AppRadius.borderRadiusXl,
-                      buttonColor: cs.errorContainer,
-                      borderColor: cs.error,
-                      textColor: cs.error,
-                    ),
+                  FormButton(
+                    label: 'Delete Family',
+                    onPressed: () => _showDialog(context),
+                    weight: FontWeight.w500,
+                    radius: AppRadius.borderRadiusXl,
+                    buttonColor: cs.errorContainer,
+                    borderColor: cs.error,
+                    textColor: cs.error,
                   ),
                 ],
               ),

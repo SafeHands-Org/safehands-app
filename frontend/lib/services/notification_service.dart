@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
@@ -5,44 +6,177 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static bool _initialized = false;
-  static final Map<String, List<_PendingNotification>> _queue = {};
-  static final Set<String> _flushTimers = {};
+
+  static final Map<int, Timer> _timers = {};
 
   static Future<void> init() async {
     if (_initialized) return;
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
 
-    const settings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
+    await _plugin.initialize(
+      const InitializationSettings(
+          android: androidSettings, iOS: iosSettings),
     );
-
-    await _plugin.initialize(settings);
 
     await _plugin
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-      ?.requestNotificationsPermission();
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
 
     await _createChannel(
-      id: 'med_individual',
+      id: 'med_reminders',
       name: 'Medication Reminders',
-      description: 'Individual medication dose notifications',
-    );
-
-    await _createChannel(
-      id: 'med_grouped',
-      name: 'Grouped Medication Reminders',
-      description: 'Grouped medication dose notifications',
+      description: 'Medication dose reminder notifications',
     );
 
     _initialized = true;
   }
+
+
+  static Future<void> _show({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    await _plugin.show(
+      id,
+      title,
+      body,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'med_reminders',
+          'Medication Reminders',
+          importance: Importance.max,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+          playSound: true,
+          enableVibration: true,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+      payload: payload,
+    );
+  }
+
+  static Future<void> scheduleOnce({
+    required int id,
+    required String title,
+    required String body,
+    int seconds = 10,
+    String? payload,
+  }) async {
+    assert(_initialized, 'Call NotificationService.init() first.');
+
+    _timers[id]?.cancel();
+
+    _timers[id] = Timer(Duration(seconds: seconds), () async {
+      await _show(id: id, title: title, body: body, payload: payload);
+      _timers.remove(id);
+    });
+  }
+
+  static Future<void> scheduleDaily({
+    required int id,
+    required String title,
+    required String body,
+    required int hour,
+    required int minute,
+    String? payload,
+  }) async {
+    assert(_initialized, 'Call NotificationService.init() first.');
+
+    _timers[id]?.cancel();
+
+    final now = DateTime.now();
+    var next = DateTime(now.year, now.month, now.day, hour, minute);
+    if (next.isBefore(now)) {
+      next = next.add(const Duration(days: 1));
+    }
+
+    final delay = next.difference(now);
+
+    _timers[id] = Timer(delay, () async {
+      await _show(id: id, title: title, body: body, payload: payload);
+      _timers.remove(id);
+      scheduleDaily(
+          id: id, title: title, body: body,
+          hour: hour, minute: minute, payload: payload);
+    });
+  }
+
+  static Future<void> cancelScheduled(int id) async {
+    _timers[id]?.cancel();
+    _timers.remove(id);
+    await _plugin.cancel(id);
+  }
+
+  static Future<void> cancelAll() async {
+    for (final t in _timers.values) {
+      t.cancel();
+    }
+    _timers.clear();
+    await _plugin.cancelAll();
+  }
+
+
+  static Future<void> notifyMedicineTaken({
+    required int notificationId,
+    required String memberName,
+    required String medicineName,
+    required String groupKey,
+  }) =>
+      _show(
+        id: notificationId,
+        title: 'Medication Taken ✓',
+        body: '$memberName has taken $medicineName.',
+      );
+
+  static Future<void> notifyMedicineMissed({
+    required int notificationId,
+    required String memberName,
+    required String medicineName,
+    required String groupKey,
+  }) =>
+      _show(
+        id: notificationId,
+        title: 'Medication Missed ⚠️',
+        body: '$memberName has missed $medicineName!',
+      );
+
+  static Future<void> notifyScheduleChange({
+    required int notificationId,
+    required String memberName,
+    required String medicineName,
+    required String groupKey,
+  }) =>
+      _show(
+        id: notificationId,
+        title: 'Schedule Changed',
+        body: "$memberName's schedule for $medicineName has changed.",
+      );
+
+  static Future<void> notifyMemberAdded({
+    required int notificationId,
+    required String memberName,
+    required String groupKey,
+  }) =>
+      _show(
+        id: notificationId,
+        title: 'Member Added',
+        body: '$memberName has been added to the family group!',
+      );
 
   static Future<void> sendNotification({
     required int notificationId,
@@ -53,195 +187,18 @@ class NotificationService {
     String? payload,
   }) async {
     assert(_initialized, 'Call NotificationService.init() first.');
-
-    _enqueue(
-      notificationId: notificationId,
-      title: title,
-      body: body,
-      scheduleTime: scheduleTime,
-      groupKey: groupKey,
-      payload: payload,
-    );
-  }
-
-  static Future<void> notifyMedicineTaken({
-    required int notificationId,
-    required String memberName,
-    required String medicineName,
-    required DateTime scheduleTime,
-    required String groupKey,
-  }) =>
-      sendNotification(
-        notificationId: notificationId,
-        title: 'Medication Taken',
-        body: '$memberName has taken $medicineName.',
-        scheduleTime: scheduleTime,
-        groupKey: groupKey,
-      );
-
-  static Future<void> notifyMedicineMissed({
-    required int notificationId,
-    required String memberName,
-    required String medicineName,
-    required DateTime scheduleTime,
-    required String groupKey,
-  }) =>
-      sendNotification(
-        notificationId: notificationId,
-        title: 'Medication Missed',
-        body: '$memberName has missed $medicineName!',
-        scheduleTime: scheduleTime,
-        groupKey: groupKey,
-      );
-
-  static Future<void> notifyScheduleChange({
-    required int notificationId,
-    required String memberName,
-    required String medicineName,
-    required DateTime scheduleTime,
-    required String groupKey,
-  }) =>
-      sendNotification(
-        notificationId: notificationId,
-        title: 'Schedule Change',
-        body: '$memberName\'s schedule for $medicineName has changed.',
-        scheduleTime: scheduleTime,
-        groupKey: groupKey,
-      );
-
-  static Future<void> notifyMemberAdded({
-    required int notificationId,
-    required String memberName,
-    required String groupKey,
-  }) =>
-      sendNotification(
-        notificationId: notificationId,
-        title: 'Member Added',
-        body: '$memberName has been added to the family group!',
-        scheduleTime: DateTime.now(),
-        groupKey: groupKey,
-      );
-
-  static void _enqueue({
-    required int notificationId,
-    required String title,
-    required String body,
-    required DateTime scheduleTime,
-    required String groupKey,
-    String? payload,
-  }) {
-    final bucketKey =
-        '${groupKey}_${scheduleTime.year}${scheduleTime.month}${scheduleTime.day}'
-        '${scheduleTime.hour}${scheduleTime.minute}';
-
-    _queue.putIfAbsent(bucketKey, () => []).add(
-          _PendingNotification(
-            notificationId: notificationId,
-            title: title,
-            body: body,
-            groupKey: groupKey,
-            payload: payload,
-          ),
-        );
-
-    if (!_flushTimers.contains(bucketKey)) {
-      _flushTimers.add(bucketKey);
-      Future.delayed(const Duration(seconds: 2), () => _flush(bucketKey));
-    }
-  }
-
-  static Future<void> _flush(String bucketKey) async {
-    final pending = _queue.remove(bucketKey);
-    _flushTimers.remove(bucketKey);
-
-    if (pending == null || pending.isEmpty) return;
-
-    if (pending.length == 1) {
-      await _showNotification(
-        notificationId: pending.first.notificationId,
-        title: pending.first.title,
-        body: pending.first.body,
-        channelId: 'med_individual',
-        groupKey: pending.first.groupKey,
-        payload: pending.first.payload,
-      );
+    final delay = scheduleTime.difference(DateTime.now());
+    if (delay.isNegative) {
+      await _show(id: notificationId, title: title, body: body, payload: payload);
     } else {
-      final lines = pending.map((n) => n.body).toList();
-
-      for (final n in pending) {
-        await _showNotification(
-          notificationId: n.notificationId,
-          title: n.title,
-          body: n.body,
-          channelId: 'med_grouped',
-          groupKey: n.groupKey,
-        );
-      }
-
-      await _showInboxNotification(
-        notificationId: bucketKey.hashCode,
-        title: '${pending.length} Medications',
-        lines: lines,
-        groupKey: pending.first.groupKey,
-      );
+      _timers[notificationId]?.cancel();
+      _timers[notificationId] = Timer(delay, () async {
+        await _show(id: notificationId, title: title, body: body, payload: payload);
+        _timers.remove(notificationId);
+      });
     }
   }
 
-  static Future<void> _showNotification({
-    required int notificationId,
-    required String title,
-    required String body,
-    required String channelId,
-    required String groupKey,
-    String? payload,
-  }) async {
-    await _plugin.show(
-      notificationId,
-      title,
-      body,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          channelId,
-          channelId == 'med_individual'
-              ? 'Medication Reminders'
-              : 'Grouped Medication Reminders',
-          groupKey: groupKey,
-          importance: Importance.high,
-          priority: Priority.high,
-        ),
-        iOS: const DarwinNotificationDetails(),
-      ),
-      payload: payload,
-    );
-  }
-
-  static Future<void> _showInboxNotification({
-    required int notificationId,
-    required String title,
-    required List<String> lines,
-    required String groupKey,
-  }) async {
-    await _plugin.show(
-      notificationId,
-      title,
-      lines.join(', '),
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          'med_grouped',
-          'Grouped Medication Reminders',
-          styleInformation: InboxStyleInformation(
-            lines,
-            summaryText: '${lines.length} medications',
-          ),
-          groupKey: groupKey,
-          setAsGroupSummary: true,
-          importance: Importance.high,
-          priority: Priority.high,
-        ),
-        iOS: const DarwinNotificationDetails(),
-      ),
-    );
-  }
 
   static Future<void> _createChannel({
     required String id,
@@ -252,26 +209,12 @@ class NotificationService {
       id,
       name,
       description: description,
-      importance: Importance.high,
+      importance: Importance.max,
+      playSound: true,
     );
     await _plugin
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(channel);
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
   }
-}
-
-class _PendingNotification {
-  final int notificationId;
-  final String title;
-  final String body;
-  final String groupKey;
-  final String? payload;
-
-  _PendingNotification({
-    required this.notificationId,
-    required this.title,
-    required this.body,
-    required this.groupKey,
-    this.payload,
-  });
 }

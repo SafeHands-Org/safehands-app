@@ -54,7 +54,7 @@ final class FamilyRepositoryProvider
   }
 }
 
-String _$familyRepositoryHash() => r'c417b1f7e573a172737a38f7da5ada0364276974';
+String _$familyRepositoryHash() => r'51e0d486ceb651a3b22623870bbfbd374e53f275';
 
 @ProviderFor(invitationRepository)
 final invitationRepositoryProvider = InvitationRepositoryProvider._();
@@ -102,7 +102,7 @@ final class InvitationRepositoryProvider
 }
 
 String _$invitationRepositoryHash() =>
-    r'd3835817b2f0008c71cfd46f0b93b4e894a43c67';
+    r'affcbe639a0fefeb80d49161ef14cea662b04d23';
 
 @ProviderFor(familyChanges)
 final familyChangesProvider = FamilyChangesProvider._();
@@ -271,7 +271,7 @@ final class CurrentFamilyObjectProvider
 }
 
 String _$currentFamilyObjectHash() =>
-    r'786ac903f54585d8f6e727c15d074b8fa06e5c0b';
+    r'2bc1f0c52f96850cb71420ac4e7eb909e152054b';
 
 @ProviderFor(CurrentFamily)
 final currentFamilyProvider = CurrentFamilyProvider._();
@@ -297,7 +297,7 @@ final class CurrentFamilyProvider
   CurrentFamily create() => CurrentFamily();
 }
 
-String _$currentFamilyHash() => r'1159e8a53d1e1772850acd63af217b54a332cd28';
+String _$currentFamilyHash() => r'a8c371c177819dda20843d3c72ea9329c5c69304';
 
 abstract class _$CurrentFamily extends $AsyncNotifier<String> {
   FutureOr<String> build();

@@ -13,12 +13,10 @@ class MemberView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final familyAsync = ref.watch(aggregateMemberProvider(fmid));
 
-    return Scaffold(
-      body: switch (familyAsync) {
-        AsyncLoading() => const Scaffold(body: LoadingCard()),
-        AsyncError(:final error) => Scaffold(body: ErrorCard(message: error.toString())),
-        AsyncData(:final value) => MemberProfileSection(member: value),
-      },
-    );
+    return switch (familyAsync) {
+      AsyncLoading() => const Scaffold(body: LoadingCard()),
+      AsyncError(:final error) => Scaffold(body: ErrorCard(message: error.toString())),
+      AsyncData(:final value) => MemberProfileSection(member: value),
+    };
   }
 }

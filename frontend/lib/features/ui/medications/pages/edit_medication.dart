@@ -41,10 +41,8 @@ class _EditMedicationViewState extends ConsumerState<EditMedicationView> {
           data: (_) {
             if (mounted) {
               ref.invalidate(medicationsProvider);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Success!'), backgroundColor: Color(0xFF198820)),
-              );
-              context.canPop() ? context.pop() : context.go('/medications');
+              ref.invalidate(aggregateMembershipsProvider);
+              ref.invalidate(aggregateMemberProvider);
             }
           },
           error:(error, stackTrace) {
@@ -72,7 +70,18 @@ class _EditMedicationViewState extends ConsumerState<EditMedicationView> {
 
   void _delete() async {
     await ref.read(medicationsProvider.notifier).deleteMedication(widget.medication.id);
-    context.go('/medications');
+    ref.invalidate(medicationsProvider);
+    ref.invalidate(aggregateMembershipsProvider);
+    ref.invalidate(aggregateMemberProvider);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Deleted Medication'),
+        duration: Duration(milliseconds: 800),
+      ),
+    );
+    Future.delayed(const Duration(milliseconds: 300), () {
+      context.go('/medications');
+    });
   }
 
   void _update() async {
@@ -88,6 +97,18 @@ class _EditMedicationViewState extends ConsumerState<EditMedicationView> {
             instructions: _instructionsController.text.trim()
           )
       );
+      ref.invalidate(medicationsProvider);
+      ref.invalidate(aggregateMembershipsProvider);
+      ref.invalidate(aggregateMemberProvider);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Updated Medication'),
+          duration: Duration(milliseconds: 800),
+        ),
+      );
+      Future.delayed(const Duration(milliseconds: 300), () {
+        context.go('/medications');
+      });
     }
   }
 

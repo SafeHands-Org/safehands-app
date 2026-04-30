@@ -38,7 +38,7 @@ class MedicationCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: AppRadius.borderRadiusCard
       ),
-      leading:medicationAvatar(cs, med.doseForm),
+      leading: medicationAvatar(cs, med.doseForm),
       title: Text(
         '${med.names.first} ${med.dosage} ${med.doseForm} ',
         style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),

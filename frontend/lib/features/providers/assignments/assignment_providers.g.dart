@@ -57,7 +57,7 @@ final class AssignmentRepositoryProvider
 }
 
 String _$assignmentRepositoryHash() =>
-    r'95aae3fcb2349d23dad10ce8dad5c14cdfb9cf71';
+    r'e13c5b128fbc9cc4672cda6dd4ad3729b6206ffe';
 
 @ProviderFor(assignmentChanged)
 final assignmentChangedProvider = AssignmentChangedProvider._();
@@ -103,7 +103,7 @@ final class AssignmentsProvider
         argument: null,
         retry: null,
         name: r'assignmentsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -116,7 +116,7 @@ final class AssignmentsProvider
   Assignments create() => Assignments();
 }
 
-String _$assignmentsHash() => r'1694831ae8dc8912ad3d9b408d5a0bf4ae88c6f2';
+String _$assignmentsHash() => r'8192b564e9802b2acb47cfc66775d7684186e0a3';
 
 abstract class _$Assignments extends $AsyncNotifier<MemberAssignments> {
   FutureOr<MemberAssignments> build();

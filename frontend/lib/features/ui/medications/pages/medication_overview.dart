@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/features/components/shared/primary_action_button.dart';
 import 'package:frontend/features/components/shared/section_header.dart';
 import 'package:frontend/features/components/shared/state_widget.dart';
 import 'package:frontend/features/components/styles/styles.dart';
@@ -23,7 +24,12 @@ class MedicationsView extends ConsumerWidget {
           return MedicationScaffold(
             child: RefreshIndicator(
               onRefresh: () => ref.refresh(medicationsProvider.future),
-              child: ErrorBody()
+              child: EmptyBody(action: PrimaryActionButton(
+                  onPressed: () => context.push('/medications/create'),
+                  buttonText: 'Create Medication',
+                  buttonIcon: Icon(Icons.add)
+                )
+              )
             )
           );
         }

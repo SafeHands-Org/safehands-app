@@ -1,20 +1,19 @@
 import 'dart:convert';
+import 'package:frontend/services/shared_preferences.dart';
 import 'package:frontend/utils/exceptions.dart';
 import 'package:http/http.dart';
 
-typedef TokenProvider = String? Function();
-
 class ApiService {
   final Client _client;
+  final SharedPreferenceService _storage;
 
-  ApiService(this._client);
+  ApiService(this._client, this._storage);
 
-  TokenProvider? _tokenProvider;
-  set tokenProvider(TokenProvider token) => _tokenProvider = token;
+  String? get token => _storage.getToken();
 
   Future<Map<String, String>> _header() async {
     var headers = {'Content-Type': 'application/json'};
-    var authHeader = _tokenProvider?.call();
+    var authHeader = token;
     if (authHeader != null) headers.addAll({'Authorization': authHeader});
     return headers;
   }
@@ -65,7 +64,6 @@ class ApiService {
 
   Future<dynamic> _handleRequest(Response res) async {
     final status = res.statusCode;
-    print(status);
     switch (status) {
       case 200: return res;
       case 201: return res;

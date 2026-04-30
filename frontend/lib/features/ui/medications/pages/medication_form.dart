@@ -104,35 +104,41 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
   void initState() {
     super.initState();
     _debouncedSearch = debounce<List<Candidate>?, String>(_search);
-    ref.listenManual(medicationsProvider,
-      (previous, next) {
-        if (previous is! AsyncLoading) return;
-        next.whenOrNull(
-          data: (_) {
-            if (mounted) {
-              ref.invalidate(medicationsProvider);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Created medication'),
-                  backgroundColor: Color(0xFF17821E),
-                ),
-              );
-              context.canPop() ? context.pop() : context.go('/medications');
-            }
-          },
-          error:(error, stackTrace) {
+    ref.listenManual(medicationsProvider, (previous, next) {
+      next.whenOrNull(
+        data: (_) {
+          if (!mounted) return;
+          ref.invalidate(medicationsProvider);
+          ref.invalidate(aggregateMembershipsProvider);
+          ref.invalidate(aggregateMemberProvider);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Created Medication'),
+              duration: Duration(milliseconds: 800),
+            ),
+          );
+          Future.delayed(const Duration(milliseconds: 300), () {
             if (!mounted) return;
-            final message = switch (error) {
-              ServerException() => 'Request timed out. Try again.',
-              _ => 'Something went wrong. Please try again.',
-            };
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(message), backgroundColor: Color(0xFFB62320)),
-            );
-          }
-        );
-      }
-    );
+            context.canPop() ? context.pop() : context.go('/medications');
+          });
+        },
+        error: (error, _) {
+          if (!mounted) return;
+
+          final message = switch (error) {
+            ServerException() => 'Request timed out. Try again.',
+            _ => 'Something went wrong. Please try again.',
+          };
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: const Color(0xFFB62320),
+            ),
+          );
+        },
+      );
+    });
   }
 
   @override
@@ -244,14 +250,14 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
                             validator: (v) => (v == null || v.trim().isEmpty) ? 'Please enter a instructions' : null,
                           )
                         ),
-                        FormButton(
-                          label: 'Create Medication',
-                          onPressed: () => _createMedication(),
-                          weight: FontWeight.w400,
-                          radius: AppRadius.borderRadiusXl,
-                          buttonColor: cs.errorContainer,
-                          borderColor: cs.error,
-                          textColor: cs.error,
+                        Padding(
+                          padding: const EdgeInsets.only(left:16, right: 16),
+                          child: FormButton(
+                            label: 'Confirm',
+                            weight: FontWeight.w500,
+                            radius: AppRadius.borderRadiusXl,
+                            onPressed: () => _createMedication()
+                          ),
                         ),
                       ],
                     )

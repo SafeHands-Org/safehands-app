@@ -9,18 +9,36 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'family_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-FamilyRepositoryRemote familyRepository(Ref ref) => FamilyRepositoryRemote(
-  ref.watch(apiServiceProvider),
-  ref.watch(sharedPreferenceServiceProvider),
-  ref.watch(familyUrlProvider),
-);
+FamilyRepositoryRemote familyRepository(Ref ref) {
+  final repo = FamilyRepositoryRemote(
+    ref.watch(apiServiceProvider),
+    ref.watch(sharedPreferenceServiceProvider),
+    ref.read(familyUrlProvider),
+  );
+
+  ref.onDispose(() {
+    repo.clearCurrentFamily();
+    repo.clearCache;
+  });
+
+  return repo;
+}
 
 @Riverpod(keepAlive: true)
-InvitationRepositoryRemote invitationRepository(Ref ref) => InvitationRepositoryRemote(
-  ref.watch(apiServiceProvider),
-  ref.watch(sharedPreferenceServiceProvider),
-  ref.watch(familyUrlProvider),
-);
+InvitationRepositoryRemote invitationRepository(Ref ref) {
+  final repo = InvitationRepositoryRemote(
+    ref.watch(apiServiceProvider),
+    ref.watch(sharedPreferenceServiceProvider),
+    ref.read(familyUrlProvider),
+  );
+
+  ref.onDispose(() {
+    repo.clearInviteToken();
+    repo.clearCache;
+  });
+
+  return repo;
+}
 
 @riverpod
 Stream<void> familyChanges(Ref ref) {
@@ -51,7 +69,11 @@ Future<Family?> getFamilyById(Ref ref, String fid) async {
 Future<Family?> currentFamilyObject(Ref ref) async {
   final provider = await ref.watch(familiesProvider.future);
   final reference = await ref.watch(currentFamilyProvider.future);
-  if (provider.isEmpty || reference.isEmpty) return Family.empty();
+
+  print('familiesProvider: $provider');
+  print("currentFamiliesProvider $reference");
+
+  if (provider.isEmpty || reference.isEmpty) {print('THE DASHBOARD IS EMPTY'); return Family.empty();}
 
   Family family = provider[reference]!;
 
@@ -67,6 +89,7 @@ class CurrentFamily extends _$CurrentFamily {
   Future<String> _getCurrentFamily() async {
     state = const AsyncLoading();
     final id = ref.read(familyRepositoryProvider).fetchCurrentFamily();
+    print('THE SAVED KEY IS: $id');
     if (id == null) {
       final families = await ref.read(familyRepositoryProvider).getFamilies();
       if (families.values.isNotEmpty) {
@@ -77,6 +100,7 @@ class CurrentFamily extends _$CurrentFamily {
       }
       return '';
     }
+    print('RETURNING THIS KEY INSTEAD $id');
     return id;
   }
 
