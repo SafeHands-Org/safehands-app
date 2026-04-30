@@ -5,14 +5,13 @@ import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/models/models.dart';
 import 'package:frontend/models/medications/family_member_medication.dart';
+import 'package:frontend/services/notification_service.dart';
 import 'package:frontend/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 
 class MemberProfileSection extends ConsumerWidget {
   const MemberProfileSection({super.key, required this.member});
-
   final Member member;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activeAssignments = member.assignments.where((a) => a.assignment.isActive);
@@ -20,7 +19,6 @@ class MemberProfileSection extends ConsumerWidget {
     final currentUser = ref.watch(currentUserProvider);
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
@@ -38,7 +36,7 @@ class MemberProfileSection extends ConsumerWidget {
             IconButton(
               padding: EdgeInsets.zero,
               constraints: BoxConstraints(),
-              icon: Icon(Icons.edit_square, color: cs.onInverseSurface),
+              icon: Icon(Icons.tune, color: cs.onInverseSurface),
               onPressed: () => context.push('/family/members/${member.id}/${member.family.id}',)
             ),
           ],
@@ -49,7 +47,7 @@ class MemberProfileSection extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -79,7 +77,6 @@ class MemberProfileSection extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-
                   if (activeAssignments.isNotEmpty)...[
                     SectionHeader(title: 'Active Medications (${activeAssignments.length})'),
                     ...activeAssignments.map(
@@ -96,7 +93,6 @@ class MemberProfileSection extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                   ],
-
                   if (inactiveAssignments.isNotEmpty)...[
                     SectionHeader(title: 'Inactive Medications (${inactiveAssignments.length})'),
                     ...inactiveAssignments.map(
@@ -122,17 +118,14 @@ class MemberProfileSection extends ConsumerWidget {
     );
   }
 }
-
 class _ContactRow extends StatelessWidget {
   const _ContactRow({
     required this.icon, required this.iconBg, required this.iconColor,
     required this.label, required this.value,
   });
-
   final IconData icon;
   final Color iconBg, iconColor;
   final String label, value;
-
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
@@ -162,7 +155,6 @@ class _ContactRow extends StatelessWidget {
     );
   }
 }
-
 class _MedicationDetailCard extends StatelessWidget {
   const _MedicationDetailCard({
     required this.medication,
@@ -171,22 +163,18 @@ class _MedicationDetailCard extends StatelessWidget {
     required this.fmmId,
     required this.assignment,
   });
-
   final Medication medication;
   final MedicationSchedule schedule;
   final FamilyMemberMedication assignment;
   final String fmId;
   final String fmmId;
-
   @override
   Widget build(BuildContext context) {
     final primaryName = medication.names.firstOrNull ?? 'Unknown';
     final altNames = medication.names.skip(1).join(', ');
-
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
     final palette = context.palette;
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -219,7 +207,6 @@ class _MedicationDetailCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-
             Text(
               'Instructions',
               style: tt.bodySmall!.copyWith(fontWeight: FontWeight.w600, color: cs.onSurfaceVariant),
@@ -246,7 +233,6 @@ class _MedicationDetailCard extends StatelessWidget {
                       border: BoxBorder.all(color: cs.primary),
                       color: cs.primaryContainer,
                       borderRadius: AppRadius.borderRadiusMd
-
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -263,11 +249,9 @@ class _MedicationDetailCard extends StatelessWidget {
                 ).toList(),
               ),
             ],
-
             const SizedBox(height: 10),
             Divider(color: cs.outlineVariant, height: 1),
             const SizedBox(height: 12),
-
             Row(
               children: [
                 Expanded(
@@ -279,7 +263,6 @@ class _MedicationDetailCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -314,22 +297,55 @@ class _MedicationDetailCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  final medName = medication.names.isNotEmpty
+                      ? medication.names.first
+                      : 'your medication';
+                  await NotificationService.scheduleOnce(
+                    id: fmmId.hashCode,
+                    title: '💊 Medication Reminder',
+                    body: 'Time to take $medName',
+                    seconds: 10,
+                  );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            '🔔 Test notification will arrive in ~10 seconds'),
+                        backgroundColor: Color(0xFF1565C0),
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.notifications_outlined, size: 16),
+                label: const Text('Test Notification (10s)'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: cs.primary,
+                  side: BorderSide(color: cs.outlineVariant),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: AppRadius.borderRadiusMd),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
-
 class _InfoCell extends StatelessWidget {
   const _InfoCell({required this.label, required this.value});
   final String label, value;
-
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

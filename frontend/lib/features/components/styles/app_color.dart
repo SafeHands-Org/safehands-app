@@ -63,7 +63,7 @@ class PaletteExtension extends ThemeExtension<PaletteExtension> {
     page: LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 239, 243, 255)],
+      colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 231, 231, 231)],
     ),
     statusUpToDate:           Color(0xFF16A34A),
     statusPending:            Color(0xFF3B82F6),
@@ -71,13 +71,13 @@ class PaletteExtension extends ThemeExtension<PaletteExtension> {
     statusAttention:          Color(0xFFD4A955),
 
     categoryBlue:             Color(0xFF3B82F6),
-    categoryBlueContainer:    Color(0xFFBFDBFE),
+    categoryBlueContainer:    Color.fromARGB(255, 221, 236, 255),
     categoryGreen:            Color(0xFF16A34A),
-    categoryGreenContainer:   Color(0xFFBBF7D0),
+    categoryGreenContainer:   Color(0xFFDFFFEA),
     categoryOrange:           Color(0xFFF97316),
     categoryOrangeContainer:  Color(0xFFFED7AA),
     categoryIndigo:           Color(0xFF6366F1),
-    categoryIndigoContainer:  Color(0xFFC0CDF6),
+    categoryIndigoContainer:  Color.fromARGB(255, 216, 225, 255),
     categoryCyan:             Color(0xFF06B6D4),
     categoryCyanContainer:    Color(0xFFC7F9FC),
 

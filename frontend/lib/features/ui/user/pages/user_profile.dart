@@ -41,70 +41,75 @@ class CaregiverAccountView extends ConsumerWidget {
           style: tt.titleMedium?.copyWith(color: cs.onInverseSurface),
           textAlign: TextAlign.center,
         ),
+        toolbarHeight: 70,
         bottom: PreferredSize(
-          preferredSize: Size(double.infinity, 65),
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Row(
-              children: [
-                UserAvatar(radius: 40),
-                SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(currentUser?.name ?? '---',
-                      style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.w700),
-                    ),
-                    Text(currentUser?.namedRole ?? '---',
-                      style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w500),)
-                  ],
-                ),
-              ],
-            ),
+          preferredSize: Size(double.infinity, 70),
+          child: PreferredSize(
+          preferredSize: Size(double.infinity, 70),
+          child: Container(
+            padding: EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  UserAvatar(radius: 40),
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(currentUser?.name ?? '---',
+                        style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.w700),
+                      ),
+                      Text(currentUser?.namedRole ?? '---',
+                        style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w500),)
+                    ],
+                  ),
+                ],
+              ),
+            )
           )
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(gradient: context.palette.page),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+      body: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
           child: Center(
             child: switch(currentFamily){
-              AsyncLoading<Family?>() => CircularProgressIndicator(),
-              AsyncError() => ErrorCard(message: 'Could not load data'),
-              AsyncData<Family?>(:final value?) => Column(
+              AsyncLoading() => CircularProgressIndicator(),
+              AsyncError(:final stackTrace) => ErrorCard(message: stackTrace.toString(), action: () => ref.invalidate(currentFamilyObjectProvider)),
+              AsyncData(:final value?) => Column(
                 children: [
-                  SectionHeader(title: 'Familiy Groups'),
-                  Card(
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ListTile(
-                        contentPadding: EdgeInsets.all(16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: AppRadius.borderRadiusCard
-                        ),
-                        leading: FamilyAvatar(radius: 28),
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(value.name, style: tt.bodyLarge!.copyWith(fontWeight: FontWeight.w700)),
-                            Text("Created ${value.ageLabel}", style: tt.labelSmall),
-                          ],
-                        ),
-                        trailing: IconButton(
-                          onPressed: () => context.push('/family'),
-                          icon: Icon(Icons.chevron_right, size: 20),
+                  if (value.isEmpty)...[
+                    SizedBox.shrink()
+                  ] else...[
+                    SectionHeader(title: 'Familiy Groups'),
+                    Card(
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.all(16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: AppRadius.borderRadiusCard
+                          ),
+                          leading: FamilyAvatar(radius: 28),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(value.name, style: tt.bodyLarge!.copyWith(fontWeight: FontWeight.w700)),
+                              Text("Created ${value.ageLabel}", style: tt.labelSmall),
+                            ],
+                          ),
+                          trailing: IconButton(
+                            onPressed: () => context.go('/family'),
+                            icon: Icon(Icons.chevron_right, size: 20),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ]
                 ]
               ),
               AsyncData<Family?>(value: null) => Text(''),
             }
           )
         )
-      )
     );
   }
 }
@@ -122,15 +127,11 @@ class MemberAccountView extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Container(decoration: BoxDecoration(gradient: context.palette.header)),
-        title: Text(
-          'My Account',
-          style: tt.titleMedium?.copyWith(color: cs.onInverseSurface),
-          textAlign: TextAlign.center,
-        ),
+        scrolledUnderElevation: 5.0,
         bottom: PreferredSize(
-          preferredSize: Size(double.infinity, 65),
+          preferredSize: Size(double.infinity, 70),
           child: Padding(
-            padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: EdgeInsets.all(16),
             child: Row(
               children: [
                 UserAvatar(radius: 40),
@@ -138,10 +139,11 @@ class MemberAccountView extends ConsumerWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(currentUser?.name ?? '---',
-                      style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.w700),
-                    ),
-                    Text(currentUser?.namedRole ?? '---',
+                    Text(
+                      currentUser?.name ?? '---',
+                      style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.w700),),
+                    Text(
+                      currentUser?.namedRole ?? '---',
                       style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w500),)
                   ],
                 ),
@@ -150,80 +152,95 @@ class MemberAccountView extends ConsumerWidget {
           )
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(gradient: context.palette.page),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-          child: Center(
-            child: switch(currentFamily){
-              AsyncLoading<Family?>() => CircularProgressIndicator(),
-              AsyncError() => ErrorCard(message: 'Could not load data'),
-              AsyncData<Family?>(:final value?) => Column(
-                children: [
-                  SectionHeader(title: 'Familiy Groups'),
-                  Card(
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ListTile(
-                        contentPadding: EdgeInsets.all(16),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+        child: Center(
+          child: switch(currentFamily){
+            AsyncLoading() => CircularProgressIndicator(),
+            AsyncError() => ErrorCard(message: 'Could not load data', action: () => ref.invalidate(currentFamilyObjectProvider)),
+            AsyncData(:final value?) => Column(
+              children: [
+                SectionHeader(title: 'Familiy Groups'),
+                Card(
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ListTile(
+                      contentPadding: EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: AppRadius.borderRadiusCard
+                      ),
+                      leading: FamilyAvatar(radius: 28),
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(value.name, style: tt.bodyLarge!.copyWith(fontWeight: FontWeight.w700)),
+                          Text("Created ${value.ageLabel}", style: tt.labelSmall),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Spacer(),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: TextButton.icon(
+                      onPressed: () async {
+                        final auth = ref.read(authProvider.notifier);
+                        final container = ProviderScope.containerOf(context);
+                        final familyRepo = ref.read(familyRepositoryProvider);
+                        final invitationRepo = ref.read(invitationRepositoryProvider);
+                        final familyMemberRepo = ref.read(familyMemberRepositoryProvider);
+                        final assignmentRepo = ref.read(assignmentRepositoryProvider);
+                        final medicationRepo = ref.read(medicationRepositoryProvider);
+                        final scheduleRepo = ref.read(scheduleRepositoryProvider);
+                        final adherenceRepo = ref.read(adherenceRepositoryProvider);
+
+                        await auth.logout();
+
+                        familyRepo.clearCurrentFamily();
+                        familyRepo.clearCache();
+                        invitationRepo.clearInviteToken();
+                        invitationRepo.clearCache();
+                        familyMemberRepo.clearCache();
+                        assignmentRepo.clearCache();
+                        medicationRepo.clearCache();
+                        scheduleRepo.clearCache();
+                        adherenceRepo.clearCache();
+
+                        container.invalidate(familiesProvider);
+                        container.invalidate(invitationsProvider);
+                        container.invalidate(familyMembersProvider);
+                        container.invalidate(assignmentsProvider);
+                        container.invalidate(medicationsProvider);
+                        container.invalidate(schedulesProvider);
+                        container.invalidate(adherencesProvider);
+
+                        print('Finished Logging out');
+
+                        if (context.mounted) context.go('/login');
+                      },
+                      icon: Icon(Icons.logout, color: cs.error),
+                      label: Text(
+                        'Log Out',
+                        style: TextStyle(color: cs.error, fontWeight: FontWeight.w600),
+                      ),
+                      style: TextButton.styleFrom(
+                        backgroundColor: cs.errorContainer,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
-                          borderRadius: AppRadius.borderRadiusCard
-                        ),
-                        leading: FamilyAvatar(radius: 28),
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(value.name, style: tt.bodyLarge!.copyWith(fontWeight: FontWeight.w700)),
-                            Text("Created ${value.ageLabel}", style: tt.labelSmall),
-                          ],
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: cs.error)
                         ),
                       ),
                     ),
                   ),
-                  Spacer(),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: TextButton.icon(
-                        onPressed: () async {
-                          await ref.read(currentFamilyProvider.notifier).clear();
-                          await ref.read(authProvider.notifier).logout();
-                          ref.invalidate(authProvider);
-                          ref.invalidate(currentUserProvider);
-                          ref.invalidate(familiesProvider);
-                          ref.invalidate(currentFamilyProvider);
-                          ref.invalidate(currentFamilyObjectProvider);
-                          ref.invalidate(familyMembersProvider);
-                          ref.invalidate(medicationsProvider);
-                          ref.invalidate(adherencesProvider);
-                          ref.invalidate(schedulesProvider);
-                          ref.invalidate(familyRepositoryProvider);
-                          ref.invalidate(familyMemberRepositoryProvider);
-                          ref.invalidate(assignmentRepositoryProvider);
-                          ref.invalidate(scheduleRepositoryProvider);
-                          ref.invalidate(adherenceRepositoryProvider);
-                          ref.invalidate(medicationRepositoryProvider);
-                          if (context.mounted) context.go('/login');
-                        },
-                        icon: Icon(Icons.logout, color: cs.error),
-                        label: Text(
-                          'Log Out',
-                          style: TextStyle(color: cs.error, fontWeight: FontWeight.w600),
-                        ),
-                        style: TextButton.styleFrom(
-                          backgroundColor: cs.errorContainer,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                      ),
-                    ),
-                  ),
-                ]
-              ),
-              AsyncData<Family?>(value: null) => Text(''),
-            }
-          )
+                ),
+              ]
+            ),
+            AsyncData(value: null) => EmptyBody(),
+          }
         )
       )
     );

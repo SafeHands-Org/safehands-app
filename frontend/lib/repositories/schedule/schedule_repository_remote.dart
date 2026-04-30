@@ -104,4 +104,9 @@ class ScheduleRepositoryRemote extends ScheduleRepository {
       rethrow;
     }
   }
+
+  void clearCache(){
+    _cachedSchedules.clear();
+    _notifyChange();
+  }
 }

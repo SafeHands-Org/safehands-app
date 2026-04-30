@@ -7,6 +7,7 @@ class PrimaryActionButton extends StatelessWidget {
     required this.onPressed,
     required this.buttonText,
     required this.buttonIcon,
+    this.borderRadiusGeometry
   });
 
   static const TextStyle buttonTextStyle = TextStyle(fontSize: 15, fontWeight: FontWeight.w600);
@@ -14,6 +15,7 @@ class PrimaryActionButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String buttonText;
   final Widget buttonIcon;
+  final BorderRadiusGeometry? borderRadiusGeometry;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class PrimaryActionButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusPill)
+          shape: RoundedRectangleBorder(borderRadius: borderRadiusGeometry ?? AppRadius.borderRadiusPill)
         ),
       ),
     );

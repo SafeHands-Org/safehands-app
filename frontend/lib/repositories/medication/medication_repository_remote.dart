@@ -110,4 +110,9 @@ class MedicationRepositoryRemote extends MedicationRepository{
       rethrow;
     }
   }
+
+  void clearCache(){
+    _cachedMedications.clear();
+    _notifyChange();
+  }
 }

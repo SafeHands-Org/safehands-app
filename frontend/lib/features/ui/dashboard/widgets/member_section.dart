@@ -1,8 +1,12 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/features/components/shared/section_header.dart';
 import 'package:frontend/models/models.dart';
 import 'package:frontend/utils/utils.dart';
+import 'package:intl/intl.dart';
 
 enum DoseStatus { taken, missed, upcoming }
 
@@ -15,62 +19,28 @@ class MemberDashboardSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref){
     final cs = Theme.of(context).colorScheme;
     final now = DateTime.now();
-    final dateStr = '${_weekday(now.weekday)}, ${_month(now.month)} ${now.day}';
+    final dateStr = DateFormat.MMMMEEEEd().format(now);
 
     final assignments = member.assignments;
 
-    return Column(
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
       children: [
-        Expanded(
-          child: ListView(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                    'Welcome Back, ${member.name}!',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: cs.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    dateStr,
-                    style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant),
-                  ),
-                  const SizedBox(height: 24),
-                  _SummaryRow(medications: assignments),
-                  const SizedBox(height: 28),
-                  Text(
-                    'Your Medications',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: cs.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ...assignments.map(
-                      (med) => Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: _MedicationCard(med: med),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          )
-        )
-      ]
+        SectionHeader(title: 'Overview'),
+        _SummaryRow(medications: assignments),
+        const SizedBox(height: 28),
+        Divider(),
+        SectionHeader(title: "My Medications"),
+        const SizedBox(height: 12),
+        ...assignments.map(
+          (med) => Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: _MedicationCard(med: med),
+          ),
+        ),
+      ],
     );
   }
-  static String _weekday(int d) => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][d - 1];
-  static String _month(int m) => ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m - 1];
 }
 
 class _SummaryRow extends StatelessWidget {
@@ -92,14 +62,17 @@ class _SummaryRow extends StatelessWidget {
 
 
     int taken = takenToday.length, missed = missedToday.length, upcoming = doses.length;
-    return Row(
-      children: [
-        _SummaryChip(label: 'Taken', count: taken, color: Colors.green),
-        const SizedBox(width: 10),
-        _SummaryChip(label: 'Missed', count: missed, color: Colors.red),
-        const SizedBox(width: 10),
-        _SummaryChip(label: 'Upcoming', count: upcoming, color: Colors.orange),
-      ],
+    return Padding(
+      padding: EdgeInsets.only(left: 16, right: 16),
+      child: Row(
+        children: [
+          _SummaryChip(label: 'Taken', count: taken, color: Colors.green),
+          const SizedBox(width: 10),
+          _SummaryChip(label: 'Missed', count: missed, color: Colors.red),
+          const SizedBox(width: 10),
+          _SummaryChip(label: 'Upcoming', count: upcoming, color: Colors.orange),
+        ],
+      )
     );
   }
 }
@@ -113,6 +86,7 @@ class _SummaryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -134,7 +108,7 @@ class _SummaryChip extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               label,
-              style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+              style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant, fontWeight: FontWeight.w600),
             ),
           ],
         ),

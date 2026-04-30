@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/providers/auth/auth_provider.dart';
+import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/features/ui/auth/widgets/register_email.dart';
+import 'package:frontend/features/ui/auth/widgets/register_invite.dart';
 import 'package:frontend/features/ui/auth/widgets/register_password.dart';
 import 'package:frontend/features/ui/auth/widgets/register_profile.dart';
 import 'package:frontend/utils/exceptions.dart';
@@ -20,8 +22,9 @@ class _RegistrationViewState extends ConsumerState<RegistrationView> {
   String _email = '';
   String _password = '';
   String _role = '';
+  String _pin = '';
 
-  Widget _buildStep() {
+   Widget _buildStep() {
     switch (_step) {
       case 0: return RegisterStepEmail(
         key: const ValueKey(0),
@@ -39,14 +42,25 @@ class _RegistrationViewState extends ConsumerState<RegistrationView> {
         }),
         onBack: () => setState(() => _step = 0),
       );
-      default: return RegisterStepProfile(
+      case 2: return RegisterStepProfile(
         key: const ValueKey(2),
         onNext: (name, role) {
-          _role = role;
-          _name = name;
-          _createAccount();
+          setState(() {
+            _role = role;
+            _name = name;
+            if (_role != 'caregiver') _step = 3;
+          });
+          if (_role == 'caregiver') _createAccount();
         },
         onBack: () => setState(() => _step = 1),
+      );
+      default: return RegisterStepInvite(
+        key: const ValueKey(2),
+        onNext: (pin) {
+          _pin = pin;
+          _createAccount();
+        },
+        onBack: () => setState(() => _step = 2),
       );
     }
   }
@@ -54,12 +68,12 @@ class _RegistrationViewState extends ConsumerState<RegistrationView> {
   @override
   void initState(){
     super.initState();
-    ref.listenManual(authProvider,
-    (previous, next) {next.whenOrNull(
+    ref.listenManual(authProvider, (previous, next) {
+      next.whenOrNull(
         data: (_) {
-          if (mounted) context.go('/dashboard');
+          if (mounted && _role == 'caregiver') context.go('/dashboard');
         },
-        error:(error, stackTrace) {
+        error: (error, stackTrace) {
           if (!mounted) return;
           final message = switch (error) {
             ServerException() => 'Request timed out. Try again.',
@@ -68,7 +82,7 @@ class _RegistrationViewState extends ConsumerState<RegistrationView> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(message), backgroundColor: Color(0xFFB62320)),
           );
-        }
+        },
       );
     });
   }
@@ -80,6 +94,15 @@ class _RegistrationViewState extends ConsumerState<RegistrationView> {
       password: _password,
       role: _role,
     );
+
+    if (_role == 'family_member') {
+      final user = ref.read(authProvider).value;
+      if (user == null || !user.isLoggedIn) return;
+
+      await ref.read(familyMembersProvider.notifier).joinFamily(_pin);
+      if (mounted) context.go('/dashboard');
+
+    }
   }
 
   @override

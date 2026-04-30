@@ -22,35 +22,143 @@ class CaregiverMedicationCardList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final assignments = members.expand((v) => v.assignments);
+    final fid = ref.watch(currentFamilyProvider).value ?? '';
+    final membersAsync = ref.watch(aggregateMembershipsProvider(fid));
+    final liveMembers = membersAsync.value ?? members;
+
     final now = DateTime.now();
 
-    final doses = assignments
-        .where((a) {
-          if (a.schedule.isEmpty) return false;
-          final next = a.schedule.nextDoseTime;
-          return next.isAfter(now) && next.day == now.day;
-        })
-        .toList()
-      ..sort((a, b) =>
-          a.schedule.nextDoseTime.compareTo(b.schedule.nextDoseTime));
+    final List<({Assignment assignment, String timeStr, DateTime scheduledDt})>
+    allDoses = [];
 
-    return Column(
-      children: [
-        const SectionHeader(title: 'Upcoming Doses'),
-        if (doses.isEmpty)
+    for (final m in liveMembers) {
+      for (final a in m.assignments) {
+        if (a.schedule.isEmpty) continue;
+
+        final daysOfWeek = a.schedule.daysOfWeek;
+        if (daysOfWeek.isNotEmpty) {
+          final todayWeekday = now.weekday; // 1=Mon ... 7=Sun
+          const dayMap = {
+            'monday': 1,
+            'tuesday': 2,
+            'wednesday': 3,
+            'thursday': 4,
+            'friday': 5,
+            'saturday': 6,
+            'sunday': 7,
+          };
+          final scheduledToday = daysOfWeek.any(
+            (d) => dayMap[d.toLowerCase()] == todayWeekday,
+          );
+          if (!scheduledToday) continue;
+        }
+
+        for (final timeStr in a.schedule.timesOfDay) {
+          final parts = timeStr.split(':');
+          if (parts.length < 2) continue;
+          final hour = int.tryParse(parts[0]) ?? 0;
+          final minute = int.tryParse(parts[1]) ?? 0;
+          final scheduledDt = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            hour,
+            minute,
+          );
+
+          final shortTime = timeStr.length >= 5
+              ? timeStr.substring(0, 5)
+              : timeStr;
+          final alreadyLogged = a.todaysLogs.any((log) {
+            final logTime = log.scheduledTime.length >= 5
+                ? log.scheduledTime.substring(0, 5)
+                : log.scheduledTime;
+            return logTime == shortTime;
+          });
+          if (alreadyLogged) continue;
+
+          allDoses.add((
+            assignment: a,
+            timeStr: shortTime,
+            scheduledDt: scheduledDt,
+          ));
+        }
+      }
+    }
+
+    final missed = allDoses.where((d) => d.scheduledDt.isBefore(now)).toList()
+      ..sort((a, b) => a.scheduledDt.compareTo(b.scheduledDt));
+
+    final upcoming =
+        allDoses.where((d) => !d.scheduledDt.isBefore(now)).toList()
+          ..sort((a, b) => a.scheduledDt.compareTo(b.scheduledDt));
+
+    if (missed.isEmpty && upcoming.isEmpty) {
+      return Column(
+        children: [
+          const SectionHeader(title: 'Upcoming Doses'),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
             child: Center(
-              child: Text('No upcoming doses today',
-                  style: TextStyle(color: Colors.grey)),
+              child: Text(
+                'All doses logged for today 🎉',
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
-          )
-        else
-          ...doses.map((item) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _MedicationCard(assignment: item),
-              )),
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (missed.isNotEmpty) ...[
+          const SectionHeader(title: "Missed Doses"),
+          ...missed.map(
+            (d) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _MedicationCard(
+                key: ValueKey(
+                  '${d.assignment.assignment.id}_${d.timeStr}_missed',
+                ),
+                assignment: d.assignment,
+                scheduledTimeStr: d.timeStr,
+                isMissed: true,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+
+        if (upcoming.isNotEmpty) ...[
+          const SectionHeader(title: 'Upcoming Doses'),
+          ...upcoming
+              .take(6)
+              .map(
+                (d) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _MedicationCard(
+                    key: ValueKey(
+                      '${d.assignment.assignment.id}_${d.timeStr}_upcoming',
+                    ),
+                    assignment: d.assignment,
+                    scheduledTimeStr: d.timeStr,
+                    isMissed: false,
+                  ),
+                ),
+              ),
+          if (upcoming.length > 6)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Center(
+                child: Text(
+                  '+${upcoming.length - 6} more doses later today',
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+              ),
+            ),
+        ],
       ],
     );
   }
@@ -58,79 +166,123 @@ class CaregiverMedicationCardList extends ConsumerWidget {
 
 class _MedicationCard extends ConsumerStatefulWidget {
   final Assignment assignment;
-  const _MedicationCard({required this.assignment});
+  final String scheduledTimeStr;
+  final bool isMissed;
+  const _MedicationCard({
+    super.key,
+    required this.assignment,
+    required this.scheduledTimeStr,
+    required this.isMissed,
+  });
 
   @override
   ConsumerState<_MedicationCard> createState() => _MedicationCardState();
 }
 
 class _MedicationCardState extends ConsumerState<_MedicationCard> {
-  bool _logging = false;
+  bool _loggingTaken = false;
+  bool _loggingSkipped = false;
+  String? _loggedStatus;
+
+  String? _getUserId() {
+    final authUser = ref.read(authProvider).value;
+    if (authUser != null && (authUser.id?.isNotEmpty ?? false)) {
+      return authUser.id!;
+    }
+    final current = ref.read(currentUserProvider);
+    if (current != null && (current.id?.isNotEmpty ?? false)) {
+      return current.id!;
+    }
+    return null;
+  }
+
+  String _getTimeStr(Assignment a) => widget.scheduledTimeStr;
 
   Future<void> _markTaken() async {
-    setState(() => _logging = true);
-    final currentUser = ref.read(currentUserProvider);
-    if (currentUser == null) {
-      setState(() => _logging = false);
+    setState(() => _loggingTaken = true);
+    final userId = _getUserId();
+    if (userId == null) {
+      setState(() => _loggingTaken = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Not logged in'),
+          backgroundColor: Color(0xFFB62320),
+        ),
+      );
       return;
     }
 
     final a = widget.assignment;
     final now = DateTime.now();
-    final timeStr = a.schedule.timesOfDay.isNotEmpty
-        ? a.schedule.timesOfDay.first
-        : '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+    final timeStr = _getTimeStr(a);
 
-    final ok = await ref.read(adherencesProvider.notifier).createLog(
+    final ok = await ref
+        .read(adherencesProvider.notifier)
+        .createLog(
           AdherenceLogRequest(
             familyMemberMedicationId: a.assignment.id,
             scheduledTime: timeStr,
-            takenAt: now,
+            takenAt: now.toUtc(),
             status: 'taken',
-            recordedBy: currentUser.id!,
+            recordedBy: userId,
           ),
           a.member.id,
         );
 
     if (!mounted) return;
-    setState(() => _logging = false);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(ok
-          ? '✓ ${a.medicationName} marked as taken'
-          : 'Failed to log — try again'),
-      backgroundColor:
-          ok ? const Color(0xFF17821E) : const Color(0xFFB62320),
-      duration: const Duration(seconds: 2),
-    ));
+    setState(() {
+      _loggingTaken = false;
+      if (ok) _loggedStatus = 'taken';
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          ok
+              ? '✓ ${a.medicationName} marked as taken'
+              : 'Failed to log — try again',
+        ),
+        backgroundColor: ok ? const Color(0xFF17821E) : const Color(0xFFB62320),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   Future<void> _markSkipped() async {
-    setState(() => _logging = true);
-    final currentUser = ref.read(currentUserProvider);
-    if (currentUser == null) {
-      setState(() => _logging = false);
+    setState(() => _loggingSkipped = true);
+    final userId = _getUserId();
+    if (userId == null) {
+      setState(() => _loggingSkipped = false);
       return;
     }
 
     final a = widget.assignment;
-    final now = DateTime.now();
-    final timeStr = a.schedule.timesOfDay.isNotEmpty
-        ? a.schedule.timesOfDay.first
-        : '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+    final timeStr = _getTimeStr(a);
 
-    await ref.read(adherencesProvider.notifier).createLog(
+    final ok = await ref
+        .read(adherencesProvider.notifier)
+        .createLog(
           AdherenceLogRequest(
             familyMemberMedicationId: a.assignment.id,
             scheduledTime: timeStr,
             takenAt: null,
             status: 'skipped',
-            recordedBy: currentUser.id!,
+            recordedBy: userId,
           ),
           a.member.id,
         );
 
     if (!mounted) return;
-    setState(() => _logging = false);
+    setState(() {
+      _loggingSkipped = false;
+      if (ok) _loggedStatus = 'skipped';
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(ok ? 'Dose skipped' : 'Failed to skip — try again'),
+        backgroundColor: ok ? const Color(0xFF555555) : const Color(0xFFB62320),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -139,20 +291,31 @@ class _MedicationCardState extends ConsumerState<_MedicationCard> {
     final palette = context.palette;
     final a = widget.assignment;
     final med = a.reference;
+    // ignore: unused_local_variable
     final schedule = a.schedule;
 
-    final timeDisplay = schedule.timesOfDay.isNotEmpty
-        ? timeToDisplay(schedule.timesOfDay.first)
-        : 'No time set';
-
+    final timeDisplay = timeToDisplay(widget.scheduledTimeStr);
     final medName = med.names.isNotEmpty ? med.names.first : '--';
+    final cardColor = widget.isMissed
+        ? Colors.red.withValues(alpha: 0.05)
+        : cs.surface;
+    final borderColor = widget.isMissed
+        ? Colors.red.withValues(alpha: 0.3)
+        : cs.outlineVariant;
+    final iconColor = widget.isMissed ? Colors.red : palette.statusPending;
+    final iconBg = widget.isMissed
+        ? Colors.red.withValues(alpha: 0.12)
+        : palette.statusPending.withValues(alpha: 0.12);
+    final iconData = widget.isMissed
+        ? Icons.warning_amber_rounded
+        : Icons.access_time;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: cardColor,
         borderRadius: AppRadius.borderRadiusCard,
-        border: Border.all(color: cs.outlineVariant),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         children: [
@@ -162,10 +325,10 @@ class _MedicationCardState extends ConsumerState<_MedicationCard> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                    color: palette.statusPending.withValues(alpha: 0.12),
-                    borderRadius: AppRadius.borderRadiusMd),
-                child: Icon(Icons.access_time,
-                    color: palette.statusPending, size: 20),
+                  color: iconBg,
+                  borderRadius: AppRadius.borderRadiusMd,
+                ),
+                child: Icon(iconData, color: iconColor, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -173,24 +336,29 @@ class _MedicationCardState extends ConsumerState<_MedicationCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      medName,
+                      '$medName ${med.dosage}',
                       style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: cs.onSurface),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: cs.onSurface,
+                      ),
                     ),
-                    Text(med.dosage,
-                        style: TextStyle(
-                            fontSize: 13, color: cs.onSurfaceVariant)),
                     const SizedBox(height: 2),
-                    Text(timeDisplay,
-                        style: TextStyle(
-                            fontSize: 12, color: cs.onSurfaceVariant)),
-                    Text('For: ${a.member.name}',
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: cs.onSurfaceVariant,
-                            fontStyle: FontStyle.italic)),
+                    Text(
+                      timeDisplay,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: cs.onSurfaceVariant,
+                      ),
+                    ),
+                    Text(
+                      'Recipient: ${a.member.name}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: cs.onSurfaceVariant,
+                        fontWeight: FontWeight.w500
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -198,50 +366,118 @@ class _MedicationCardState extends ConsumerState<_MedicationCard> {
             ],
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _logging
-                    ? const Center(
-                        child: SizedBox(
+          if (_loggedStatus != null)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: _loggedStatus == 'taken'
+                    ? Colors.green.withValues(alpha: 0.1)
+                    : Colors.grey.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: _loggedStatus == 'taken'
+                      ? Colors.green.withValues(alpha: 0.3)
+                      : Colors.grey.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    _loggedStatus == 'taken'
+                        ? Icons.check_circle
+                        : Icons.do_not_disturb,
+                    color: _loggedStatus == 'taken'
+                        ? Colors.green
+                        : Colors.grey,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    _loggedStatus == 'taken' ? 'Taken' : 'Skipped',
+                    style: TextStyle(
+                      color: _loggedStatus == 'taken'
+                          ? Colors.green
+                          : Colors.grey,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: _loggingTaken
+                      ? const Center(
+                          child: SizedBox(
                             width: 20,
                             height: 20,
-                            child:
-                                CircularProgressIndicator(strokeWidth: 2)))
-                    : ElevatedButton(
-                        onPressed: _markTaken,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: cs.tertiary,
-                          foregroundColor: cs.surface,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 10),
-                          elevation: 0,
-                        ),
-                        child: const Text('Mark as Taken',
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      : ElevatedButton(
+                          onPressed:
+                              (_loggingTaken ||
+                                  _loggingSkipped ||
+                                  _loggedStatus != null)
+                              ? null
+                              : _markTaken,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: cs.tertiary,
+                            foregroundColor: cs.surface,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            elevation: 0,
+                          ),
+                          child: const Text(
+                            'Mark as Taken',
                             style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600)),
-                      ),
-              ),
-              const SizedBox(width: 8),
-              TextButton(
-                onPressed: _logging ? null : _markSkipped,
-                style: TextButton.styleFrom(
-                  backgroundColor: cs.outlineVariant,
-                  foregroundColor: cs.onSurfaceVariant,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 10),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                 ),
-                child: const Text('Skip',
-                    style: TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.w500)),
-              ),
-            ],
-          ),
+                const SizedBox(width: 8),
+                _loggingSkipped
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : TextButton(
+                        onPressed:
+                            (_loggingTaken ||
+                                _loggingSkipped ||
+                                _loggedStatus != null)
+                            ? null
+                            : _markSkipped,
+                        style: TextButton.styleFrom(
+                          backgroundColor: cs.outlineVariant.withValues(red: 0.9, blue: 0.9, green: 0.9),
+                          foregroundColor: cs.onSurfaceVariant,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
+                        ),
+                        child: const Text(
+                          'Skip',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+              ],
+            ),
         ],
       ),
     );

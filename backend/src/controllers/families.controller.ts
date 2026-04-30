@@ -7,12 +7,13 @@ import { getParam } from "../middleware/auth.middleware";
 export const getFamilies = async (req: Request, res: Response) => {
   const userId = req.user!.id;
   const userRole = req.user!.role;
-
+  console.log(`/families HIT with UserId: ${userId} Role: ${userRole}`)
   if (userRole === 'caregiver') {
+    console.log('Entering caregiver route for /families...')
     const families = await service.getAdminFamilies(userId);
     return res.status(200).json(families);
   }
-
+  console.log('Entering family member route for /families...')
   const family = await service.getUserFamily(userId);
   if (!family) return res.status(200).json([]);
   return res.status(200).json([family]);
@@ -66,12 +67,6 @@ export const getFamilyMembers = async (req: Request, res: Response) => {
   }
 };
 
-export const addFamilyMember = async (req: Request, res: Response) => {
-  const data: Memberships = req.body;
-  const result = await service.addFamilyMember(data);
-  return res.status(201).json(result);
-};
-
 export const updateFamilyMember = async (req: Request, res: Response) => {
   console.log(req.body)
   const memberId = getParam(req.params.fmId, "fmId");
@@ -101,7 +96,7 @@ export const getInvitation = async (req: Request, res: Response) => {
   }
 };
 
-export const joinFamily = async (req: Request, res: Response) => {
+export const addFamilyMember = async (req: Request, res: Response) => {
   if (!req.user) return throwErr.unauthorized("Not authenticated");
 
   const joinCode = req.body.joinCode;

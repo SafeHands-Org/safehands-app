@@ -7,10 +7,19 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'medication_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-MedicationRepositoryRemote medicationRepository(Ref ref) => MedicationRepositoryRemote(
-  ref.watch(apiServiceProvider),
-  ref.read(medicationUrlProvider)
-);
+MedicationRepositoryRemote medicationRepository(Ref ref) {
+  final repo = MedicationRepositoryRemote(
+    ref.watch(apiServiceProvider),
+    ref.read(medicationUrlProvider)
+  );
+
+  ref.onDispose(() {
+    repo.clearCache;
+  });
+
+  return repo;
+}
+
 
 @riverpod
 Stream<void> medicationChanged(Ref ref) {

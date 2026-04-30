@@ -4,7 +4,6 @@ import 'package:frontend/features/components/shared/form_section.dart';
 import 'package:frontend/features/components/shared/section_header.dart';
 import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/features/providers/providers.dart';
-import 'package:frontend/features/providers/utils/collection_providers.dart';
 import 'package:frontend/features/ui/auth/widgets/form_buttons.dart';
 import 'package:frontend/models/families/family_member.dart';
 import 'package:frontend/models/medications/medication.dart';
@@ -234,7 +233,7 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                                         const SizedBox(height: 8),
                                         DropdownButtonFormField<String>(
                                           isExpanded: true,
-                                          value: _selectedMedicationId,
+                                          initialValue: _selectedMedicationId,
                                           hint: const Text(
                                               'Select a medication'),
                                           decoration:
@@ -269,7 +268,7 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                                   loading: () => const FormSection(
                                       title: 'Medication',
                                       child: LinearProgressIndicator()),
-                                  error: (_, __) => const FormSection(
+                                  error: (_, _) => const FormSection(
                                       title: 'Medication',
                                       child:
                                           Text('Failed to load medications')),
@@ -284,7 +283,7 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                                         const SizedBox(height: 8),
                                         DropdownButtonFormField<String>(
                                           isExpanded: true,
-                                          value: _selectedMemberId,
+                                          initialValue: _selectedMemberId,
                                           hint: const Text(
                                               'Select a family member'),
                                           decoration:
@@ -314,7 +313,7 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                                   loading: () => const FormSection(
                                       title: 'Family Member',
                                       child: LinearProgressIndicator()),
-                                  error: (_, __) => const FormSection(
+                                  error: (_, _) => const FormSection(
                                       title: 'Family Member',
                                       child: Text(
                                           'Failed to load family members')),
@@ -338,10 +337,12 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                                     ctrl: _quantityCtrl,
                                     hintText: 'Enter a quantity',
                                     validators: (v) {
-                                      if (v == null || v.trim().isEmpty)
+                                      if (v == null || v.trim().isEmpty) {
                                         return 'Please enter a quantity';
-                                      if (int.tryParse(v.trim()) == null)
+                                      }
+                                      if (int.tryParse(v.trim()) == null) {
                                         return 'Must be a whole number';
+                                      }
                                       return null;
                                     },
                                   ),

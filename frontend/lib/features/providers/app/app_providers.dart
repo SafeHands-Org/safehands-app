@@ -29,7 +29,8 @@ Client appClient(Ref ref) {
 
 @Riverpod(keepAlive: true)
 ApiService apiService(Ref ref) => ApiService(
-  ref.watch(appClientProvider)
+  ref.watch(appClientProvider),
+  ref.watch(sharedPreferenceServiceProvider)
 );
 
 @riverpod

@@ -5,7 +5,6 @@ import 'package:frontend/models/models.dart';
 import 'package:frontend/repositories/family_medication/family_medication_repository.dart';
 import 'package:frontend/services/api/api_service.dart';
 import 'package:frontend/services/api/models/medication/medication_requests.dart';
-import 'package:frontend/utils/exceptions.dart';
 import 'package:frontend/utils/types.dart';
 import 'package:http/http.dart';
 
@@ -136,5 +135,10 @@ class FamilyMedicationRepositoryRemote extends FamilyMedicationRepository {
       print('DELETE EXCEPTION: $e');
       rethrow;
     }
+  }
+
+  void clearCache(){
+    _cachedFamilyMedications.clear();
+    _notifyChange();
   }
 }

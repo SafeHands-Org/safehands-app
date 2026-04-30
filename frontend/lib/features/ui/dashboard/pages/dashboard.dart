@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/components/shared/app_gradient_header.dart';
+import 'package:frontend/features/components/shared/primary_action_button.dart';
 import 'package:frontend/features/components/shared/side_drawer.dart';
 import 'package:frontend/features/components/shared/state_widget.dart';
 import 'package:frontend/features/components/styles/styles.dart';
@@ -10,13 +11,14 @@ import 'package:frontend/features/ui/dashboard/widgets/caregiver_section.dart';
 import 'package:frontend/features/ui/dashboard/widgets/dashboard_header.dart';
 import 'package:frontend/features/ui/dashboard/widgets/member_section.dart';
 import 'package:frontend/models/models.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class DashboardView extends ConsumerWidget {
   const DashboardView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print('DashboardView build');
     final role = ref.watch(userRoleProvider);
     if (role == UserRole.caregiver) {
       return CaregiverDashboardView();
@@ -50,7 +52,12 @@ class CaregiverDashboardView extends ConsumerWidget {
           flexibleSpace: Container(decoration: BoxDecoration(gradient: context.palette.header)),
         ),
         drawer: const SideDrawer(),
-        body: const LoadingBody()
+        body: EmptyBody(action: PrimaryActionButton(
+            onPressed: () => context.push('/family/create'),
+            buttonText: 'Create a Family',
+            buttonIcon: Icon(Icons.add)
+          )
+        )
       );
     }
 
@@ -67,7 +74,6 @@ class CaregiverDashboardView extends ConsumerWidget {
             ),
             flexibleSpace: Container(decoration: BoxDecoration(gradient: context.palette.header)),
           ),
-          drawer: const SideDrawer(),
           body: const LoadingBody()
         );
       }
@@ -146,6 +152,9 @@ class MemberDashboardView extends ConsumerWidget {
       .firstWhereOrNull((v) => v.uid == currentUser?.id)
     ));
 
+    final now = DateTime.now();
+    final dateStr = DateFormat.MMMMEEEEd().format(now);
+
     if (currentUser == null || membersLoading) {
       return Scaffold(
         appBar: AppBar(
@@ -180,21 +189,39 @@ class MemberDashboardView extends ConsumerWidget {
           appBar: AppBar(
             flexibleSpace: Container(decoration: BoxDecoration(gradient: context.palette.header)),
           ),
+
           body: RefreshIndicator(
             onRefresh: () => ref.refresh(aggregateMemberProvider(membership.id).future),
             child: ErrorBody()
           ),
+
         );
       }
       case AsyncData<Member>(:final value): {
         return Scaffold(
           appBar: AppBar(
             flexibleSpace: Container(decoration: BoxDecoration(gradient: context.palette.header)),
-            scrolledUnderElevation: 5.0
+            scrolledUnderElevation: 5.0,
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Welcome Back, ${currentUser.name}!',
+                  style: TextTheme.of(context).titleMedium?.copyWith(color: ColorScheme.of(context).onInverseSurface),
+                  textAlign: TextAlign.center
+                ),
+                Text(
+                  dateStr,
+                  style: TextTheme.of(context).bodyMedium?.copyWith(color: ColorScheme.of(context).onInverseSurface),
+                  textAlign: TextAlign.center
+                ),
+              ],
+            ),
+            centerTitle: false
           ),
           body: RefreshIndicator(
             onRefresh: () => ref.refresh(aggregateMemberProvider(membership.id).future),
-            child: MemberDashboardSection(member: value)
+            child: value.assignments.isEmpty ? EmptyBody() : MemberDashboardSection(member: value)
           ),
         );
       }

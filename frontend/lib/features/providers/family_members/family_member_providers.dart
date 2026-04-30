@@ -8,10 +8,18 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'family_member_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-FamilyMemberRepositoryRemote familyMemberRepository(Ref ref) => FamilyMemberRepositoryRemote(
-  ref.watch(apiServiceProvider),
-  ref.watch(familyUrlProvider),
-);
+FamilyMemberRepositoryRemote familyMemberRepository(Ref ref) {
+  final repo = FamilyMemberRepositoryRemote(
+    ref.watch(apiServiceProvider),
+    ref.read(familyUrlProvider),
+  );
+
+  ref.onDispose(() {
+    repo.clearCache;
+  });
+
+  return repo;
+}
 
 @riverpod
 Stream<void> memberChanged(Ref ref) {
@@ -35,19 +43,11 @@ class FamilyMembers extends _$FamilyMembers {
     return repo.getFamilyMembers();
   }
 
-  Future<void> addFamilyMember(String userId, FamilyMemberRequest data) async {
-    state = const AsyncLoading();
-    try {
-      await ref.read(familyMemberRepositoryProvider).addFamilyMember(userId, data);
-    } catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
-    }
-  }
-
   Future<void> updateFamilyMember(String id, FamilyMemberUpdate data) async {
     state = const AsyncLoading();
     try {
       await ref.read(familyMemberRepositoryProvider).updateFamilyMember(id, data);
+
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
     }
@@ -57,6 +57,17 @@ class FamilyMembers extends _$FamilyMembers {
     state = const AsyncLoading();
     try {
       await ref.read(familyMemberRepositoryProvider).removeFamilyMember(id);
+
+    } catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+    }
+  }
+
+  Future<void> joinFamily(String joinCode) async {
+    state = const AsyncLoading();
+    try {
+      await ref.read(familyMemberRepositoryProvider).joinFamily(joinCode);
+
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
     }

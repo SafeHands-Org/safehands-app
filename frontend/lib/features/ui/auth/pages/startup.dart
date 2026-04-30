@@ -52,37 +52,42 @@ class StartupView extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        ElevatedButton(
+                        SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
                           onPressed: () => context.push('/auth/login'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: cs.surface,
-                            shape: RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusLg, side: BorderSide(color: cs.surface)),
-                            fixedSize: Size.fromWidth(150.0)
-                          ),
-                          child: Text(
-                            'Log In',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: cs.primary
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: cs.surface,
+                              shape: RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusLg, side: BorderSide(color: cs.surface)),
+                            ),
+                            child: Text(
+                              'Log In',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: cs.primary
+                              ),
                             ),
                           ),
                         ),
-                        SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: () => context.push('/auth/register'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white.withValues(alpha: 0.1),
-                            shape: RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusLg, side: BorderSide(color: cs.surface))
-                          ),
-                          child: Text(
-                            'Create Account',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                        SizedBox(height: 12),
+                        SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () => context.push('/auth/register'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white.withValues(alpha: 0.1),
+                              shape: RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusLg, side: BorderSide(color: cs.surface))
+                            ),
+                            child: Text(
+                              'Create Account',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),

@@ -97,15 +97,37 @@ class SideDrawer extends ConsumerWidget {
               width: double.infinity,
               child: TextButton.icon(
                 onPressed: () async {
-                  await ref.read(authProvider.notifier).logout();
-                  ref.invalidate(authProvider);
-                  ref.invalidate(currentUserProvider);
-                  ref.invalidate(familiesProvider);
-                  ref.invalidate(currentFamilyProvider);
-                  ref.invalidate(familyMembersProvider);
-                  ref.invalidate(medicationsProvider);
-                  ref.invalidate(adherencesProvider);
-                  ref.invalidate(schedulesProvider);
+                  final auth = ref.read(authProvider.notifier);
+                  final container = ProviderScope.containerOf(context);
+                  final familyRepo = ref.read(familyRepositoryProvider);
+                  final invitationRepo = ref.read(invitationRepositoryProvider);
+                  final familyMemberRepo = ref.read(familyMemberRepositoryProvider);
+                  final assignmentRepo = ref.read(assignmentRepositoryProvider);
+                  final medicationRepo = ref.read(medicationRepositoryProvider);
+                  final scheduleRepo = ref.read(scheduleRepositoryProvider);
+                  final adherenceRepo = ref.read(adherenceRepositoryProvider);
+
+                  await auth.logout();
+
+                  familyRepo.clearCurrentFamily();
+                  familyRepo.clearCache();
+                  invitationRepo.clearInviteToken();
+                  invitationRepo.clearCache();
+                  familyMemberRepo.clearCache();
+                  assignmentRepo.clearCache();
+                  medicationRepo.clearCache();
+                  scheduleRepo.clearCache();
+                  adherenceRepo.clearCache();
+
+                  container.invalidate(familiesProvider);
+                  container.invalidate(invitationsProvider);
+                  container.invalidate(familyMembersProvider);
+                  container.invalidate(assignmentsProvider);
+                  container.invalidate(medicationsProvider);
+                  container.invalidate(schedulesProvider);
+                  container.invalidate(adherencesProvider);
+
+                  if (context.mounted) context.go('/login');
                 },
                 icon: Icon(Icons.logout, color: cs.error),
                 label: Text(
@@ -115,7 +137,7 @@ class SideDrawer extends ConsumerWidget {
                 style: TextButton.styleFrom(
                   backgroundColor: cs.errorContainer,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: cs.error)),
                 ),
               ),
             ),

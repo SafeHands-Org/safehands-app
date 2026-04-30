@@ -10,10 +10,18 @@ part 'assignment_providers.g.dart';
 typedef DailyMedProgress = ({int? taken, int? total});
 
 @Riverpod(keepAlive: true)
-FamilyMedicationRepositoryRemote assignmentRepository(Ref ref) => FamilyMedicationRepositoryRemote(
-  ref.watch(apiServiceProvider),
-  ref.read(medicationUrlProvider),
-);
+FamilyMedicationRepositoryRemote assignmentRepository(Ref ref) {
+  final repo = FamilyMedicationRepositoryRemote(
+    ref.watch(apiServiceProvider),
+    ref.read(medicationUrlProvider),
+  );
+
+  ref.onDispose(repo.clearCache);
+
+  return repo;
+}
+
+
 
 @riverpod
 Stream<void> assignmentChanged(Ref ref) {

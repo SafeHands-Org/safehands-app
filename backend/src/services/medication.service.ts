@@ -165,8 +165,32 @@ export const getCaregiverAdherenceLogs = async (userId: string) => {
   return adherences
 }
 
-export const createAdherenceLog = async (data: MedicationAdherenceLog) =>
-  await db.insert(medicationAdherenceLogs).values(data).returning();
+export const createAdherenceLog = async (data: MedicationAdherenceLog) => {
+  const sanitized = {
+    ...data,
+    takenAt: data.takenAt
+      ? (data.takenAt instanceof Date ? data.takenAt : new Date(data.takenAt as unknown as string))
+      : null,
+  };
+  const [inserted] = await db.insert(medicationAdherenceLogs).values(sanitized).returning();
+
+  const [result] = await db
+    .select({
+      id: medicationAdherenceLogs.id,
+      fmid: familyMemberships.id,
+      fmmid: medicationAdherenceLogs.familyMemberMedicationId,
+      scheduledTime: medicationAdherenceLogs.scheduledTime,
+      takenAt: medicationAdherenceLogs.takenAt,
+      status: medicationAdherenceLogs.status,
+      recordedBy: medicationAdherenceLogs.recordedBy,
+    })
+    .from(medicationAdherenceLogs)
+    .innerJoin(familyMemberMedications, eq(medicationAdherenceLogs.familyMemberMedicationId, familyMemberMedications.id))
+    .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
+    .where(eq(medicationAdherenceLogs.id, inserted.id));
+
+  return [result];
+};
 
 export const updateAdherenceLog = async (id: string, data: Partial<MedicationAdherenceLog>) =>
   await db.update(medicationAdherenceLogs).set(data).where(eq(medicationAdherenceLogs.id, id)).returning();

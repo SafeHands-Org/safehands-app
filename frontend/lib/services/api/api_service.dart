@@ -15,7 +15,6 @@ class ApiService {
     var headers = {'Content-Type': 'application/json'};
     var authHeader = token;
     if (authHeader != null) headers.addAll({'Authorization': authHeader});
-    print(headers);
     return headers;
   }
 
@@ -65,7 +64,6 @@ class ApiService {
 
   Future<dynamic> _handleRequest(Response res) async {
     final status = res.statusCode;
-    print(status);
     switch (status) {
       case 200: return res;
       case 201: return res;

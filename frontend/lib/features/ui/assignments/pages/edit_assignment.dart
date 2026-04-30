@@ -4,13 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/components/shared/form_section.dart';
 import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/features/providers/providers.dart';
-import 'package:frontend/features/providers/utils/collection_providers.dart';
 import 'package:frontend/features/ui/auth/widgets/form_buttons.dart';
 import 'package:frontend/models/medications/family_member_medication.dart';
 import 'package:frontend/models/medications/medication_schedule.dart';
 import 'package:frontend/services/api/models/medication/medication_requests.dart';
 import 'package:frontend/services/notification_service.dart';
-import 'package:frontend/utils/exceptions.dart';
 import 'package:go_router/go_router.dart';
 
 class EditAssignmentView extends ConsumerStatefulWidget {
@@ -44,12 +42,12 @@ class _EditAssignmentViewState extends ConsumerState<EditAssignmentView> {
   @override
   void initState() {
     super.initState();
-    _quantityCtrl = TextEditingController(
-        text: widget.assignment.quantity.toString());
+    _quantityCtrl = TextEditingController(text: widget.assignment.quantity.toString());
     _active = widget.assignment.active ? 'Yes' : 'No';
     final p = widget.assignment.priority;
-    _selectedPriority =
-        p.isNotEmpty ? p[0].toUpperCase() + p.substring(1).toLowerCase() : null;
+    _selectedPriority = p.isNotEmpty ? p[0]
+      .toUpperCase() + p.substring(1)
+      .toLowerCase() : null;
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadSchedule());
   }
@@ -62,8 +60,7 @@ class _EditAssignmentViewState extends ConsumerState<EditAssignmentView> {
 
   Future<void> _loadSchedule() async {
     final repo = ref.read(scheduleRepositoryProvider);
-    final found =
-        await repo.getScheduleForAssignment(widget.assignment.id);
+    final found = await repo.getScheduleForAssignment(widget.assignment.id);
     if (!mounted) return;
     setState(() {
       _existingSchedule = found;
@@ -199,8 +196,7 @@ class _EditAssignmentViewState extends ConsumerState<EditAssignmentView> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Updated!'),
-        backgroundColor: Color(0xFF198820),
+        content: Text('Updated Information'),
       ));
       context.canPop()
           ? context.pop()

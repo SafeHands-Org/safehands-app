@@ -147,25 +147,6 @@ class MemberOverviewHeader extends ConsumerWidget {
 
     List<String> memberNames = <String>[];
 
-    familyAsync.maybeWhen(
-      data: (fc) => memberNames = fc.members.map((v) => v.name).toList(),
-      orElse: () => memberNames = <String>[],
-    );
-
-    final activeMeds = familyAsync.maybeWhen(
-      data: (fc) => '${fc.activeMeds}',
-      orElse: () => '--',
-    );
-
-    final fid = familyAsync.maybeWhen(
-      data: (fc) => fc.family.id,
-      orElse: () => '--',
-    );
-    //final adherencePct = familyAsync.maybeWhen(
-    //  data: (fc) => '${fc.adherencePercentage}%',
-    //  orElse: () => '--',
-    //);
-
     return Container(
       decoration: BoxDecoration(gradient: context.palette.header),
       height: 215,

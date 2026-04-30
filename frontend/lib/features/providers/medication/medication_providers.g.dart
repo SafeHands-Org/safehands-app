@@ -55,7 +55,7 @@ final class MedicationRepositoryProvider
 }
 
 String _$medicationRepositoryHash() =>
-    r'496f8631e6f1fafbf82ab73e6690b22ae5d25de4';
+    r'e208535a3f1d6ab7ff26222ec3b9cbd9ff0ad759';
 
 @ProviderFor(medicationChanged)
 final medicationChangedProvider = MedicationChangedProvider._();

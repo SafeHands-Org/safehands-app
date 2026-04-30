@@ -15,7 +15,7 @@ class UserAvatar extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return CircleAvatar(
       radius: radius,
-      backgroundColor: cs.secondaryContainer,
+      backgroundColor: cs.outlineVariant.withValues(red: 0.9, blue: 0.9, green: 0.9),
       child: name != null ? Text(
         UserAvatar._initials(name!),
         style: TextStyle(
@@ -54,15 +54,15 @@ class FamilyAvatar extends StatelessWidget {
       height: radius * 2,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 2),
+        border: Border.all(color: cs.secondary.withAlpha(150), width: 2),
       ),
       child: CircleAvatar(
         radius: radius,
-        backgroundColor: cs.outlineVariant,
+        backgroundColor: cs.secondaryContainer,
         child: Icon(
           Icons.groups_2,
           size: 50,
-          color: Colors.grey[600],
+          color: cs.secondary.withValues(alpha: 0.8)
         )
       ),
     );

@@ -42,10 +42,8 @@ class _EditMemberViewState extends ConsumerState<EditMemberView> {
           data: (_) {
             if (mounted) {
               ref.invalidate(familyMembersProvider);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Success!'), backgroundColor: Color(0xFF198820)),
-              );
-              context.canPop() ? context.pop() : context.go('/family/members/${widget.fmid}');
+              ref.invalidate(aggregateMembershipsProvider);
+              ref.invalidate(aggregateMemberProvider);
             }
           },
           error:(error, stackTrace) {
@@ -68,7 +66,18 @@ class _EditMemberViewState extends ConsumerState<EditMemberView> {
     await ref.read(familyMembersProvider.notifier).removeFamilyMember(
       widget.fmid
     );
-    context.go('/family');
+    ref.invalidate(familyMembersProvider);
+    ref.invalidate(aggregateMembershipsProvider);
+    ref.invalidate(aggregateMemberProvider);
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Deleted Member'),
+          duration: Duration(milliseconds: 800),
+        ),
+      );
+    Future.delayed(const Duration(milliseconds: 300), () {
+      context.go('/family');
+    });
   }
 
   void _update() async {
@@ -78,6 +87,16 @@ class _EditMemberViewState extends ConsumerState<EditMemberView> {
         widget.fmid,
         FamilyMemberUpdate(riskLevel: nextRiskLevel)
       );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Updated Member'),
+          duration: Duration(milliseconds: 800),
+        ),
+      );
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (!mounted) return;
+        context.go('/family/members/${widget.fmid}');
+      });
     }
   }
 
@@ -145,7 +164,7 @@ class _EditMemberViewState extends ConsumerState<EditMemberView> {
                     child: FormButton(
                       label: 'Remove Family Member',
                       onPressed: () => _showDialog(context),
-                      weight: FontWeight.w400,
+                      weight: FontWeight.w500,
                       radius: AppRadius.borderRadiusXl,
                       buttonColor: cs.errorContainer,
                       borderColor: cs.error,

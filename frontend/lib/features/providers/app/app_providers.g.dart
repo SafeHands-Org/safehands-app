@@ -178,7 +178,7 @@ final class ApiServiceProvider
   }
 }
 
-String _$apiServiceHash() => r'c7d1bfb508aa4171a4da91220708e844d6a48ebd';
+String _$apiServiceHash() => r'06882d372a6f7997ecf3b1446ae3c133bd6284ec';
 
 @ProviderFor(remoteStartup)
 final remoteStartupProvider = RemoteStartupProvider._();

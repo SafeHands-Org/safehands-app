@@ -7,10 +7,18 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'schedule_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-ScheduleRepositoryRemote scheduleRepository(Ref ref) => ScheduleRepositoryRemote(
-  ref.watch(apiServiceProvider),
-  ref.read(medicationUrlProvider)
-);
+ScheduleRepositoryRemote scheduleRepository(Ref ref) {
+  final repo = ScheduleRepositoryRemote(
+    ref.watch(apiServiceProvider),
+    ref.read(medicationUrlProvider)
+  );
+
+  ref.onDispose(() {
+    repo.clearCache;
+  });
+
+  return repo;
+}
 
 @riverpod
 Stream<void> scheduleChanged(Ref ref) {

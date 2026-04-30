@@ -59,8 +59,12 @@ Future<List<Member>> aggregateMemberships(Ref ref, String fid) async {
   final logs      = await ref.watch(adherencesProvider.future);
   final schedules = await ref.watch(schedulesProvider.future);
   final families  = await ref.watch(familiesProvider.future);
+  
+  print(families.keys);
 
   final family = families[fid]!;
+
+
   final memberships = Map<String, FamilyMember>.from(members);
   memberships.removeWhere((k, v) => v.fid != fid);
 

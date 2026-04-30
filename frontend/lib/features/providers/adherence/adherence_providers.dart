@@ -1,5 +1,4 @@
 import 'package:frontend/features/providers/providers.dart';
-import 'package:frontend/features/providers/utils/collection_providers.dart';
 import 'package:frontend/repositories/adherence/adherence_repository_remote.dart';
 import 'package:frontend/services/api/models/medication/medication_requests.dart';
 import 'package:frontend/utils/types.dart';
@@ -33,7 +32,6 @@ class Adherences extends _$Adherences {
     try {
       await ref.read(adherenceRepositoryProvider).createLog(data, fmid);
       ref.invalidateSelf();
-      await future;
       ref.invalidate(aggregateMembershipsProvider);
       ref.invalidate(aggregateMemberProvider);
       return true;
@@ -46,7 +44,6 @@ class Adherences extends _$Adherences {
     try {
       await ref.read(adherenceRepositoryProvider).updateLog(logId, data);
       ref.invalidateSelf();
-      await future;
       ref.invalidate(aggregateMembershipsProvider);
       ref.invalidate(aggregateMemberProvider);
       return true;

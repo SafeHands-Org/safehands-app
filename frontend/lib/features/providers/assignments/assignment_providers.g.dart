@@ -57,7 +57,7 @@ final class AssignmentRepositoryProvider
 }
 
 String _$assignmentRepositoryHash() =>
-    r'95aae3fcb2349d23dad10ce8dad5c14cdfb9cf71';
+    r'e13c5b128fbc9cc4672cda6dd4ad3729b6206ffe';
 
 @ProviderFor(assignmentChanged)
 final assignmentChangedProvider = AssignmentChangedProvider._();

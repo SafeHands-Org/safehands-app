@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/providers/api/api_providers.dart';
-import 'package:frontend/features/providers/app/app_providers.dart';
-import 'package:frontend/features/providers/family/family_providers.dart';
-import 'package:frontend/features/providers/family_members/family_member_providers.dart';
 import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/models/enums/enums.dart';
 import 'package:frontend/models/user/auth_user.dart';
@@ -14,11 +10,15 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'auth_provider.g.dart';
 
 @Riverpod(keepAlive: true)
-AuthRepository authRepository(Ref ref) => AuthRepositoryRemote(
-  ref.watch(apiServiceProvider),
-  ref.watch(sharedPreferenceServiceProvider),
-  ref.read(authUrlProvider),
-);
+AuthRepository authRepository(Ref ref) {
+  final repo = AuthRepositoryRemote(
+    ref.watch(apiServiceProvider),
+    ref.watch(sharedPreferenceServiceProvider),
+    ref.read(authUrlProvider),
+  );
+
+  return repo;
+}
 
 @Riverpod(keepAlive: true)
 UserRole userRole(Ref ref) => ref.watch(authProvider).value?.role ?? UserRole.familyMember;

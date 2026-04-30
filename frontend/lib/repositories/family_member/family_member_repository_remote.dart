@@ -20,6 +20,18 @@ class FamilyMemberRepositoryRemote extends FamilyMemberRepository {
   final _changeController = StreamController<void>.broadcast();
   final _cachedMembers = <String, FamilyMember>{};
 
+  Future<void> joinFamily(String joinCode) async {
+    try {
+      final result = await _api.post('$_baseUrl/members', {'joinCode': joinCode});
+      final json = jsonDecode(result.body);
+      FamilyMember newFamilyMember = FamilyMemberMapper.fromMap(json);
+      _cachedMembers[newFamilyMember.id] = newFamilyMember;
+      _notifyChange();
+    } on Exception {
+      rethrow;
+    }
+  }
+
   @override
   Future<FamilyMemberships> getFamilyMembers() async {
     try {
@@ -37,21 +49,6 @@ class FamilyMemberRepositoryRemote extends FamilyMemberRepository {
       rethrow;
     }
     return Map.unmodifiable(_cachedMembers);
-  }
-
-  @override
-  Future<void> addFamilyMember(String userId, FamilyMemberRequest data) async {
-    if (_cachedMembers.values.any((m) => m.uid == userId)) throw DuplicateException("Member already added.");
-
-    try {
-      final result = await _api.post('$_baseUrl/members', data.toMap());
-      final json = jsonDecode(result.body);
-      FamilyMember newFamilyMember = FamilyMemberMapper.fromMap(json);
-      _cachedMembers[newFamilyMember.id] = newFamilyMember;
-      _notifyChange();
-    } on Exception {
-      rethrow;
-    }
   }
 
   @override
@@ -97,5 +94,10 @@ class FamilyMemberRepositoryRemote extends FamilyMemberRepository {
     } on Exception {
       rethrow;
     }
+  }
+
+  void clearCache(){
+    _cachedMembers.clear();
+    _notifyChange();
   }
 }

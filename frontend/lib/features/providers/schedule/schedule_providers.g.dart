@@ -55,7 +55,7 @@ final class ScheduleRepositoryProvider
 }
 
 String _$scheduleRepositoryHash() =>
-    r'a3b3b983caf2eb3d74ac1c86e9f56b6b60b77d35';
+    r'68e4407f18d061418de9799c75976ffcf92a28e4';
 
 @ProviderFor(scheduleChanged)
 final scheduleChangedProvider = ScheduleChangedProvider._();
