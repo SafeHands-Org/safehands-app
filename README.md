@@ -1,28 +1,37 @@
-# SafeHands - Caring for every hand in your family.
-SafeHands is a platform for adults managing medications for their families who need a reliable way to ensure medications are taken safely and correctly. We are a family medication management app that centralizes
-schedules, instructions, and adherence tracking for every
-family member.  Unlike single-user reminder apps, paper
-logs, or pharmacy printouts, our product provides shared
-visibility, proactive alerts, and an opt-in emergency mode
-that gives clinicians immediate, read-only access to
-critical medication information to avoid adverse side
-effects and complications.​
+# SafeHands
+SafeHands is a family-oriented medication management app designed to help a caregiver keep track of their family members' medications in one place. 
 
-# How to Run
-In order to run this application through an emulator or simulator, Docker must be set up first. Open Docker and have it running in the background while you run the following commands on your terminal:
+## Data Source
+This product uses publicly available data from the U.S. National Library of Medicine (NLM), National Institutes of Health, Department of Health and Human Services; NLM is not responsible for the product and does not endorse or recommend this or any other product. NLM has its own set of terms and conditions. For more information please visit: https://lhncbc.nlm.nih.gov/RxNav/TermsofService.html
 
-`cd backend` This is to switch to the backend directory where all these commands need to occur. Not the safehands-app directory.
+## Disclaimers
+This application is meant to help keep track of medications. It is not intended to provide medical advice, diagnosis or treatment. Always consult a licensed medical professional regarding any medical decisions, questions and/or concerns includingo but not limited to medications, medication dosage, medication frequency, and medication compatibility.
 
-`npm install` To install dependencies to generate that node_modules folder. It’ll install the packages in package.json
+The developers of SafeHands are not liable for misuse, malpractice, or any issues arising from use of this application. By using this application, you acknowledge that you understand and accept this disclaimer.
 
-`npm run build` To build the typescript project and generate the dist folder.
+## Key Features
+* Main Dashboard - Designed for easy navigation and a family overview
+* Adherence Tracking - Keep track of adherence
+* Medication Scheduling - Create medication schedules for each family member
+* Medication Entry - Easily remove and add medications
+* Notifications - Get reminded when it's time to take a medication
+* Family Management - Add and remove family members as needed
 
-`docker compose run --rm backend npm run migrate` This will apply the migration that is in the drizzle folder already to the database in the docker container
+## Tech Stack
+### Frontend
+* Flutter
+* Dart
+* Riverpod (state management)
+* HTTP (API communication)
 
-`docker compose up --build` This will build the image again using. You’ll know the backend is now running if it says “Server running on port 8000”
+### Backend
+* Node.js
+* Express.js
+* Drizzle ORM (queries)
+* Zod (validation)
+* JWT Authentication
 
-These steps must be succesfully completed before you can run the emulator. If the Docker isn't working use `docker compose down -v` to start over with a clean slate. Once Docker is up and running, run the following commands in a new terminal. Do NOT close Docker. If you do, the build will fail. Once Docker has been successfully set up you only need to run `docker compose up` going forward. To start the Flutter app, follow the following commands:
-
-`cd frontend` This will switch you to the frontend directory where the Flutter files live.
-
-`flutter run -d <device_id>` This builds the app and allows you to choose which device to run it on.
+### Database
+* PostgreSQL
+* Drizzle schema
+* Drizzle migration
