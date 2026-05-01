@@ -16,9 +16,9 @@ class FamilyView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final role = ref.watch(userRoleProvider);
     if (role == UserRole.caregiver) {
-      return CaregiverFamilyView();
+      return const CaregiverFamilyView();
     } else {
-      return MemberFamilyView();
+      return const MemberFamilyView();
     }
   }
 }
@@ -33,23 +33,34 @@ class CaregiverFamilyView extends ConsumerWidget {
     if (familyAsync.isLoading) return const LoadingCard();
     if (familyAsync.hasError) return ErrorCard(message: familyAsync.error.toString());
 
-    final fid = familyAsync.value!.id;
-    final membersAsync = ref.watch(aggregateMembershipsProvider(fid));
+    final family = familyAsync.value;
+
+    if (family == null || family.isEmpty) {
+      return TemplateStatePage(
+        body: EmptyBody(
+          action: PrimaryActionButton(
+            onPressed: () => context.push('/family/create'),
+            buttonText: 'Create a Family',
+            buttonIcon: const Icon(Icons.add),
+          ),
+        ),
+      );
+    }
+
+    final membersAsync = ref.watch(aggregateMembershipsProvider(family.id));
 
     switch (membersAsync) {
-      case AsyncLoading(): return TemplateStatePage(body: LoadingBody());
-      case AsyncError(): return TemplateStatePage(body: RefreshIndicator(
-        onRefresh: () => ref.refresh(aggregateMembershipsProvider(fid).future),
-        child: ErrorBody()
-      ));
-      case AsyncData(:final value) when value.isEmpty: return TemplateStatePage(body: EmptyBody(
-        action: PrimaryActionButton(
-          onPressed: () => context.push('/family/create'),
-          buttonText: 'Create a Family',
-          buttonIcon: Icon(Icons.add)
-        )
-      ));
-      case AsyncData(:final value): return FamilyMembersDetailSection(members: value, family: familyAsync.value!);
+      case AsyncLoading():
+        return TemplateStatePage(body: LoadingBody());
+      case AsyncError():
+        return TemplateStatePage(
+          body: RefreshIndicator(
+            onRefresh: () => ref.refresh(aggregateMembershipsProvider(family.id).future),
+            child: ErrorBody(),
+          ),
+        );
+      case AsyncData(:final value):
+        return FamilyMembersDetailSection(members: value, family: family);
     }
   }
 }
@@ -62,23 +73,28 @@ class MemberFamilyView extends ConsumerWidget {
     final familyAsync = ref.watch(currentFamilyObjectProvider);
 
     switch (familyAsync) {
-      case AsyncData(:final value?): {
-        if (value.isEmpty){
-          return EmptyCard(message: 'No Family Yet');
+      case AsyncData(:final value):
+        if (value == null || value.isEmpty) {
+          return const EmptyCard(message: 'No Family Yet');
         }
-        final fid = value.id;
-        final membersAsync = ref.watch(aggregateMembershipsProvider(fid));
+        final membersAsync = ref.watch(aggregateMembershipsProvider(value.id));
         switch (membersAsync) {
           case AsyncLoading(): return const LoadingCard();
           case AsyncError(:final error): return ErrorCard(message: error.toString());
-          case AsyncData(:final value) when value.isEmpty: return const EmptyCard(message: 'No family members found.', icon: Icons.people_outline);
-          case AsyncData(:final value): return MembersFamilyDetailSection(members: value, family: familyAsync.value!);
+          case AsyncData(:final value) when value.isEmpty:
+            return const EmptyCard(
+              message: 'No family members found.',
+              icon: Icons.people_outline,
+            );
+          case AsyncData(:final value):
+            return MembersFamilyDetailSection(
+              members: value,
+              family: familyAsync.value!,
+            );
         }
-      }
       case AsyncError(:final error): return ErrorCard(message: error.toString());
       case AsyncLoading(): return const LoadingCard();
       default: return EmptyBody();
     }
   }
 }
-

@@ -149,10 +149,14 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
         );
       }
 
+      ref.read(assignmentRepositoryProvider).clearCache();
+      ref.read(scheduleRepositoryProvider).clearCache();
+
       ref.invalidate(assignmentsProvider);
       ref.invalidate(schedulesProvider);
       ref.invalidate(aggregateMembershipsProvider);
       ref.invalidate(aggregateMemberProvider);
+      ref.invalidate(adherencesProvider);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

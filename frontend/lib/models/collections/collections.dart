@@ -160,6 +160,17 @@ class FamilyCollection with FamilyCollectionMappable {
     this.schedules,
   );
 
+  factory FamilyCollection.empty() => FamilyCollection(
+    Family.empty(),
+    const [],
+    const [],
+    const [],
+    const [],
+    const [],
+  );
+
+  bool get isEmpty => family.isEmpty && members.isEmpty;
+
   List<MedicationAdherenceLog> get todayLogs {
     final todayStr = DateTime.now().toLocal().toIso8601String().substring(0, 10);
     return logs.where((log) {

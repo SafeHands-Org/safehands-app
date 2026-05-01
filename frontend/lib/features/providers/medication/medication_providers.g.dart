@@ -114,7 +114,7 @@ final class MedicationsProvider
   Medications create() => Medications();
 }
 
-String _$medicationsHash() => r'cc2cf0f1b2b78b90f393891fd1f845dbdb47cdb8';
+String _$medicationsHash() => r'4f36c1c5e2d031b38207fb9b3b7a81f71c25e343';
 
 abstract class _$Medications extends $AsyncNotifier<UserMedications> {
   FutureOr<UserMedications> build();

@@ -34,6 +34,7 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
 
   String? _rxcui;
   List<String>? _ingredientNames;
+  bool _isSaving = false;
 
   String? _currentQuery;
   late Iterable<Widget> _lastOptions = const <Widget>[];
@@ -41,10 +42,7 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
 
   Future<List<Candidate>?> _search(String query) async {
     _currentQuery = query;
-
-    if (query.isEmpty) {
-      return const [];
-    }
+    if (query.isEmpty) return const [];
 
     final uri = Uri.parse(
       'https://rxnav.nlm.nih.gov/REST/approximateTerm.json'
@@ -53,7 +51,6 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
 
     final response = await http.get(uri);
     if (response.statusCode != 200) return const [];
-
     if (_currentQuery != query) return null;
     _currentQuery = null;
 
@@ -69,15 +66,13 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
         if (candidate != null) seen.add(candidate);
       }
     }
-
     return seen.toList();
   }
 
   Future<Candidate?> _getProperties(String rxcui, String name) async {
     final uri = Uri.parse(
-     'https://rxnav.nlm.nih.gov/REST/rxcui/${Uri.encodeComponent(rxcui)}/related.json?tty=BN+IN'
+      'https://rxnav.nlm.nih.gov/REST/rxcui/${Uri.encodeComponent(rxcui)}/related.json?tty=BN+IN',
     );
-
     final response = await http.get(uri);
     if (response.statusCode != 200) return null;
 
@@ -90,13 +85,11 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
     for (final group in types) {
       final String tty = group['tty'] ?? '';
       final List<dynamic> props = group['conceptProperties'] ?? [];
-
       for (final prop in props) {
         if (tty == 'BN') brandName = capitalized(prop['name']);
         if (tty == 'IN') ingredientNames.add(capitalized(prop['name']));
       }
     }
-
     return Candidate(brandName: brandName, ingredientNames: ingredientNames, rxNorm: rxcui);
   }
 
@@ -104,11 +97,14 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
   void initState() {
     super.initState();
     _debouncedSearch = debounce<List<Candidate>?, String>(_search);
+
     ref.listenManual(medicationsProvider, (previous, next) {
+      if (!_isSaving) return;
+
       next.whenOrNull(
         data: (_) {
           if (!mounted) return;
-          ref.invalidate(medicationsProvider);
+          _isSaving = false;
           ref.invalidate(aggregateMembershipsProvider);
           ref.invalidate(aggregateMemberProvider);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -124,12 +120,11 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
         },
         error: (error, _) {
           if (!mounted) return;
-
+          _isSaving = false;
           final message = switch (error) {
             ServerException() => 'Request timed out. Try again.',
             _ => 'Something went wrong. Please try again.',
           };
-
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(message),
@@ -153,14 +148,14 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
 
   void _createMedication() async {
     if (_formKey.currentState!.validate()) {
-      await ref
-        .read(medicationsProvider.notifier)
-        .createMedication(MedicationRequest(
+      _isSaving = true;
+      await ref.read(medicationsProvider.notifier).createMedication(
+        MedicationRequest(
           names: [_medicationController.text.trim(), ...?_ingredientNames],
           dosage: _doseStrengthController.text.trim(),
           doseForm: _doseFormController.text.trim(),
-          instructions: _instructionsController.text.trim()
-        )
+          instructions: _instructionsController.text.trim(),
+        ),
       );
     }
   }
@@ -174,14 +169,14 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
       appBar: AppBar(
         leading: BackButton(
           color: cs.onInverseSurface,
-          onPressed: () => context.canPop() ? context.pop() : context.go('/medications')
+          onPressed: () => context.canPop() ? context.pop() : context.go('/medications'),
         ),
         flexibleSpace: Container(decoration: BoxDecoration(gradient: context.palette.header)),
         title: Text(
           'Medication Form',
           style: tt.titleMedium?.copyWith(color: cs.onInverseSurface),
-          textAlign: TextAlign.center
-        )
+          textAlign: TextAlign.center,
+        ),
       ),
       body: Form(
         key: _formKey,
@@ -196,7 +191,7 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
                 SectionHeader(title: 'Create a new medication'),
                 Card(
                   child: Container(
-                    padding: EdgeInsets.fromLTRB(5, 16, 5, 16),
+                    padding: const EdgeInsets.fromLTRB(5, 16, 5, 16),
                     child: Column(
                       children: [
                         FormSection(
@@ -207,12 +202,14 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
                                 child: TextFormField(
                                   controller: _medicationController,
                                   decoration: formFieldDecoration(context: context),
-                                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Please enter a medication name' : null,
+                                  validator: (v) => (v == null || v.trim().isEmpty)
+                                      ? 'Please enter a medication name'
+                                      : null,
                                 ),
                               ),
-                              SizedBox(width: 5),
-                              searchAnchor()
-                            ]
+                              const SizedBox(width: 5),
+                              searchAnchor(),
+                            ],
                           ),
                         ),
                         FormSection(
@@ -221,16 +218,9 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
                             controller: _doseFormController,
                             hintText: 'Choose or enter a dose form',
                             options: const [
-                              'Tablet',
-                              'Capsule',
-                              'Injection',
-                              'Cream',
-                              'Ointment',
-                              'Gel',
-                              'Patch',
-                              'Solution',
-                              'Suspension',
-                              'Drops',
+                              'Tablet', 'Capsule', 'Injection', 'Cream',
+                              'Ointment', 'Gel', 'Patch', 'Solution',
+                              'Suspension', 'Drops',
                             ],
                           ),
                         ),
@@ -238,39 +228,48 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
                           title: 'Dose Strength',
                           child: TextFormField(
                             controller: _doseStrengthController,
-                            decoration: formFieldDecoration(context: context, hintText: "Enter the medication instructions")
-                          )
+                            decoration: formFieldDecoration(
+                              context: context,
+                              hintText: 'Enter the dose strength',
+                            ),
+                          ),
                         ),
                         FormSection(
                           title: 'Instructions',
                           child: TextFormField(
                             controller: _instructionsController,
                             maxLines: 4,
-                            decoration: formFieldDecoration(context: context, hintText: 'Medication instructions'),
-                            validator: (v) => (v == null || v.trim().isEmpty) ? 'Please enter a instructions' : null,
-                          )
+                            decoration: formFieldDecoration(
+                              context: context,
+                              hintText: 'Medication instructions',
+                            ),
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Please enter instructions'
+                                : null,
+                          ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left:16, right: 16),
+                          padding: const EdgeInsets.only(left: 16, right: 16),
                           child: FormButton(
                             label: 'Confirm',
                             weight: FontWeight.w500,
                             radius: AppRadius.borderRadiusXl,
-                            onPressed: () => _createMedication()
+                            onPressed: () => _createMedication(),
                           ),
                         ),
                       ],
-                    )
-                  )
-                )
+                    ),
+                  ),
+                ),
               ],
-            )
-          )
-        )
-      )
+            ),
+          ),
+        ),
+      ),
     );
   }
-  Widget searchAnchor(){
+
+  Widget searchAnchor() {
     return SearchAnchor(
       searchController: _rxNormController,
       builder: (BuildContext context, SearchController controller) {
@@ -280,30 +279,33 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
           child: IconButton(
             onPressed: controller.openView,
             padding: EdgeInsets.zero,
-            constraints: BoxConstraints(minHeight: 49),
-            icon: Icon(Icons.search, size: 28),
+            constraints: const BoxConstraints(minHeight: 49),
+            icon: const Icon(Icons.search, size: 28),
             style: IconButton.styleFrom(
               backgroundColor: cs.outlineVariant,
               foregroundColor: cs.outline,
-              shape: RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusXl)
-            )
-          )
+              shape: RoundedRectangleBorder(
+                borderRadius: AppRadius.borderRadiusXl,
+              ),
+            ),
+          ),
         );
       },
       suggestionsBuilder: (BuildContext context, SearchController controller) async {
-        final List<Candidate>? results = await _debouncedSearch(
-          controller.text,
-        );
-
+        final List<Candidate>? results = await _debouncedSearch(controller.text);
         if (results == null) return _lastOptions;
 
         _lastOptions = results.map((candidate) {
           return ListTile(
-            title: candidate.brandName.isNotEmpty ? Text(candidate.brandName) : Text(candidate.ingredientNames.first),
+            title: candidate.brandName.isNotEmpty
+                ? Text(candidate.brandName)
+                : Text(candidate.ingredientNames.first),
             onTap: () {
               setState(() {
                 controller.closeView(candidate.brandName);
-                _medicationController.text = candidate.brandName.isNotEmpty ? candidate.brandName : candidate.ingredientNames.first;
+                _medicationController.text = candidate.brandName.isNotEmpty
+                    ? candidate.brandName
+                    : candidate.ingredientNames.first;
                 _ingredientNames = candidate.ingredientNames;
                 _rxcui = candidate.rxNorm;
               });

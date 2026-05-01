@@ -10,16 +10,13 @@ part 'medication_providers.g.dart';
 MedicationRepositoryRemote medicationRepository(Ref ref) {
   final repo = MedicationRepositoryRemote(
     ref.watch(apiServiceProvider),
-    ref.read(medicationUrlProvider)
+    ref.read(medicationUrlProvider),
   );
-
   ref.onDispose(() {
     repo.clearCache;
   });
-
   return repo;
 }
-
 
 @riverpod
 Stream<void> medicationChanged(Ref ref) {
@@ -33,32 +30,34 @@ class Medications extends _$Medications {
   Future<UserMedications> build() async {
     final repo = ref.read(medicationRepositoryProvider);
     ref.watch(medicationChangedProvider);
-
     return repo.getAllMedications();
   }
 
   Future<void> createMedication(MedicationRequest data) async {
-    state = const AsyncValue.loading();
     try {
       await ref.read(medicationRepositoryProvider).createMedication(data);
+      ref.invalidateSelf();
+      await future;
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
     }
   }
 
   Future<void> updateMedication(String medId, MedicationUpdate data) async {
-    state = const AsyncValue.loading();
     try {
       await ref.read(medicationRepositoryProvider).updateMedication(medId, data);
+      ref.invalidateSelf();
+      await future;
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
     }
   }
 
   Future<void> deleteMedication(String medId) async {
-    state = const AsyncValue.loading();
     try {
       await ref.read(medicationRepositoryProvider).deleteMedication(medId);
+      ref.invalidateSelf();
+      await future;
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
     }
