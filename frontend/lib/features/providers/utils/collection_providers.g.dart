@@ -48,7 +48,7 @@ final class CurrentMembersProvider
   }
 }
 
-String _$currentMembersHash() => r'01c08b5c2b410e24cbbea61de7ddefa89c45a812';
+String _$currentMembersHash() => r'a565be8eb0fe7bc67808af37031cc70eba060699';
 
 @ProviderFor(currentAssignments)
 final currentAssignmentsProvider = CurrentAssignmentsProvider._();
@@ -89,7 +89,7 @@ final class CurrentAssignmentsProvider
 }
 
 String _$currentAssignmentsHash() =>
-    r'33fea0f7f6ba7a84036e3f86a65ac16c1689d995';
+    r'05240b42ae792fec29f7d46ea39c0ddfeed0e308';
 
 @ProviderFor(currentMedications)
 final currentMedicationsProvider = CurrentMedicationsProvider._();
@@ -170,7 +170,7 @@ final class CurrentSchedulesProvider
   }
 }
 
-String _$currentSchedulesHash() => r'75a28977f3eb71d757d97bc40cdfadfb64834f3d';
+String _$currentSchedulesHash() => r'887f3020e61e7b4bfe258774c1cbe8d6beb35213';
 
 @ProviderFor(aggregateMember)
 final aggregateMemberProvider = AggregateMemberFamily._();
@@ -221,7 +221,7 @@ final class AggregateMemberProvider
   }
 }
 
-String _$aggregateMemberHash() => r'334ee53e1a0397253091f83b5e601f520aea02c0';
+String _$aggregateMemberHash() => r'a212fe84ca980d14891e2de9cf42907cc583f37c';
 
 final class AggregateMemberFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Member>, String> {
@@ -297,7 +297,7 @@ final class AggregateMembershipsProvider
 }
 
 String _$aggregateMembershipsHash() =>
-    r'b2f6b1f9703a9c21c8a06a3fa1e6fcde6bdf9f12';
+    r'52de25954bf26c83d09690883fb0b7c5a7d879ce';
 
 final class AggregateMembershipsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Member>>, String> {
@@ -354,4 +354,4 @@ final class AggregateFamilyProvider
   }
 }
 
-String _$aggregateFamilyHash() => r'6f686e919720f4841f4a581cb2ca15dd326f6b51';
+String _$aggregateFamilyHash() => r'b57d67956091c2986a26383c037c799e2eb6eea2';

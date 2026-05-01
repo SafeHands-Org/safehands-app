@@ -24,16 +24,17 @@ class FamilyRepositoryRemote extends FamilyRepository {
   @override
   Future<Map<String, Family>> getFamilies() async {
     try {
-      if (_cachedFamilies.isEmpty) {
-        final result = await _api.get('$_baseUrl/');
-        final data = jsonDecode(result.body) as List;
+      final result = await _api.get('$_baseUrl/');
+      final data = jsonDecode(result.body) as List;
 
-        if (data.isEmpty) return <String, Family>{};
+      if (data.isEmpty) return <String, Family>{};
 
-        final familyList = data.map((element) => FamilyMapper.fromMap(element['family'])).toList();
-
-        _cachedFamilies.addAll({for (final family in familyList) family.id: family});
-      }
+      _cachedFamilies.clear();
+      final familyList = data
+          .map((element) => FamilyMapper.fromMap(element['family']))
+          .toList();
+      _cachedFamilies.addAll(
+          {for (final family in familyList) family.id: family});
     } on Exception {
       rethrow;
     }

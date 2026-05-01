@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/features/components/shared/shell_page.dart';
 import 'package:frontend/features/providers/auth/auth_provider.dart';
 import 'package:frontend/features/ui/adherences/pages/adherence_overview.dart';
+import 'package:frontend/features/ui/assignments/pages/assignment_form.dart';
 import 'package:frontend/features/ui/assignments/pages/edit_assignment.dart';
 import 'package:frontend/features/ui/auth/pages/login.dart';
 import 'package:frontend/features/ui/auth/pages/register.dart';
@@ -15,10 +16,7 @@ import 'package:frontend/features/ui/family/pages/member_details.dart';
 import 'package:frontend/features/ui/medications/pages/edit_medication.dart';
 import 'package:frontend/features/ui/medications/pages/medication_form.dart';
 import 'package:frontend/features/ui/medications/pages/medication_overview.dart';
-import 'package:frontend/features/ui/schedule/widgets/assignment_form.dart';
-import 'package:frontend/features/ui/schedule/widgets/schedule_form.dart';
 import 'package:frontend/features/ui/user/pages/user_profile.dart';
-import 'package:frontend/models/collections/collections.dart';
 import 'package:frontend/models/medications/family_member_medication.dart';
 import 'package:frontend/models/medications/medication.dart';
 import 'package:go_router/go_router.dart';
@@ -114,14 +112,6 @@ GoRouter router(Ref ref) => GoRouter(
       path: '/assignment/create',
       parentNavigatorKey: rootNavigatorKey,
       builder: (context, state) => AssignmentFormView(),
-    ),
-    GoRoute(
-      path: '/schedule/create',
-      parentNavigatorKey: rootNavigatorKey,
-      builder: (context, state) {
-        final members = state.extra as List<Member>;
-        return ScheduleFormView(members: members);
-      },
     ),
     GoRoute(
       path: '/assignment/:fmId/logs/:fmmId',

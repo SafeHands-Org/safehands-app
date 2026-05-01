@@ -219,7 +219,7 @@ final class GetFamilyByIdProvider
   }
 }
 
-String _$getFamilyByIdHash() => r'fee503b053f92dd752001768bf4c4ea90ae67935';
+String _$getFamilyByIdHash() => r'29eec32213980c5988cd8c3d07ddc837526090e6';
 
 final class GetFamilyByIdFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Family?>, String> {
@@ -271,7 +271,7 @@ final class CurrentFamilyObjectProvider
 }
 
 String _$currentFamilyObjectHash() =>
-    r'2bc1f0c52f96850cb71420ac4e7eb909e152054b';
+    r'2d0eff2e6db5ed0882279cd0c96c4a198f190f33';
 
 @ProviderFor(CurrentFamily)
 final currentFamilyProvider = CurrentFamilyProvider._();
@@ -297,7 +297,7 @@ final class CurrentFamilyProvider
   CurrentFamily create() => CurrentFamily();
 }
 
-String _$currentFamilyHash() => r'a8c371c177819dda20843d3c72ea9329c5c69304';
+String _$currentFamilyHash() => r'4deafee69507d6aae05e72f2232e7178a5fd229c';
 
 abstract class _$CurrentFamily extends $AsyncNotifier<String> {
   FutureOr<String> build();
@@ -341,7 +341,7 @@ final class FamiliesProvider
   Families create() => Families();
 }
 
-String _$familiesHash() => r'3a758d51ba712492c11e483268cdfd7e4a3732b9';
+String _$familiesHash() => r'3dcc90a287e756205c1ec912619e46cebf457e68';
 
 abstract class _$Families extends $AsyncNotifier<UserFamilies> {
   FutureOr<UserFamilies> build();
@@ -385,7 +385,7 @@ final class InvitationsProvider
   Invitations create() => Invitations();
 }
 
-String _$invitationsHash() => r'a5a37089425601ecacc27121ae6acfa83d2636bf';
+String _$invitationsHash() => r'e8f959b06a4a39c69fa2cfb9562d7f9105901ea3';
 
 abstract class _$Invitations extends $AsyncNotifier<Invitation> {
   FutureOr<Invitation> build();

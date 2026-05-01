@@ -51,7 +51,7 @@ class AppGradientHeader extends StatelessWidget {
                         Text(title!, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white)),
                       ],
                     ),
-                    if (statsRow != null) ...[const SizedBox(height: 16), statsRow!],
+                    if (statsRow != null) ...[const SizedBox(height: 8), statsRow!],
                   ],
                 ),
               ),

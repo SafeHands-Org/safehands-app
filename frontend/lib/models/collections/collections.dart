@@ -70,6 +70,14 @@ class Member with MemberMappable {
   List<MedicationSchedule> get schedules =>
       assignments.map((a) => a.schedule).where((s) => s.isNotEmpty).toList();
 
+  List<MedicationSchedule> get todaySchedules => todaysAssignments
+    .map((e) => e.schedule)
+    .where((s) => s.isScheduledToday)
+    .toList();
+
+  List<Assignment> get todaysAssignments =>
+    assignments.where((a) => a.assignment.isActive).toList();
+
   String status(String fmmid) {
     final match = todaysLogs.where((log) => log.fmmid == fmmid);
     return match.isNotEmpty ? match.first.status : 'upcoming';
@@ -122,7 +130,7 @@ class Member with MemberMappable {
   Duration get membershipAge => DateTime.now().difference(member.createdAt);
 
   int get todaysDoseCount =>
-      schedules.where((s) => s.isScheduledToday).length;
+      todaySchedules.expand((v) => v.timesOfDay).length;
   int get todayTakenCount =>
       todaysLogs.where((log) => log.taken).length;
   int get todayMissedCount =>
@@ -159,6 +167,17 @@ class FamilyCollection with FamilyCollectionMappable {
     this.logs,
     this.schedules,
   );
+
+  factory FamilyCollection.empty() => FamilyCollection(
+    Family.empty(),
+    const [],
+    const [],
+    const [],
+    const [],
+    const [],
+  );
+
+  bool get isEmpty => family.isEmpty && members.isEmpty;
 
   List<MedicationAdherenceLog> get todayLogs {
     final todayStr = DateTime.now().toLocal().toIso8601String().substring(0, 10);

@@ -29,6 +29,11 @@ class AdherenceLogSection extends StatelessWidget {
     final medicationName = medication.isNotEmpty ? medication.names.first : 'Medication';
     final sorted = assigned.sortedLogs;
 
+    if (assigned.logs.isEmpty){
+      return TemplateStatePage(body: EmptyBody(
+        type: 'adherences', role: UserRole.caregiver
+      ));
+    }
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -41,7 +46,7 @@ class AdherenceLogSection extends StatelessWidget {
               statsRow: statsChip(context: context, instructions: medication.instructions)
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -113,23 +118,8 @@ class AdherenceLogSection extends StatelessWidget {
         border: Border.all(color: cs.surface.withValues(alpha: 0.2)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: cs.surface.withValues(alpha: 0.12),
-                borderRadius: AppRadius.borderRadiusMd,
-                border: BoxBorder.all(color: cs.surface.withValues(alpha: 0.2))
-              ),
-              child: Icon(Icons.info_outline,color: cs.onInverseSurface, size: 16),
-            ),
-            const SizedBox(width: 12),
-            Expanded(child: Text(instructions, style: TextTheme.of(context).bodySmall?.copyWith(color: cs.onInverseSurface))),
-          ]
-        )
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Text(instructions, style: TextTheme.of(context).bodySmall?.copyWith(color: cs.onInverseSurface, fontWeight: FontWeight.w600)),
       )
     );
   }

@@ -15,8 +15,6 @@ export async function initDb() {
       migrationsTable: "__drizzle_migrations",
       migrationsSchema: "public",
     });
-
-    console.log("Database connected and migrations applied");
   } catch (err) {
     console.error("Database startup failed:", err);
     process.exit(1);

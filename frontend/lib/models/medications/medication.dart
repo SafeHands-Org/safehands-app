@@ -2,25 +2,8 @@ import 'package:dart_mappable/dart_mappable.dart';
 
 part 'medication.mapper.dart';
 
-/*
-"medication": {
-  "id": "b1c75884-aa8e-4e99-a269-e0e3c49afefb",
-  "names": [
-    "Advil",
-    "Ibuprofen"
-  ],
-  "rxcui": "530646",
-  "dosage": "200 mg",
-  "doseForm": "tablet",
-  "instructions": "Take 1 tablet every 6-8 hours with food as needed for pain or fever.",
-  "createdBy": "8daf9445-940d-48dc-b946-9ad9efdd171f",
-  "createdAt": "2026-04-01 20:52:50.867098"
-}
-
-*/
-
 @MappableClass()
-class Medication with MedicationMappable{
+class Medication with MedicationMappable {
   final String id;
   final List<String> names;
   final String? rxcui;
@@ -54,4 +37,7 @@ class Medication with MedicationMappable{
 
   bool get isEmpty => id.isEmpty && names.isEmpty && dosage.isEmpty;
   bool get isNotEmpty => !isEmpty;
+
+  String get displayName => names.isNotEmpty ? names.first : 'Unknown Medication';
+  String get alternateName => names.length > 1 ? names.last != names.first ? names.last : '' : '';
 }

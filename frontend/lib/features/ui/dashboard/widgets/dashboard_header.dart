@@ -1,43 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/features/components/shared/app_gradient_header.dart';
 import 'package:frontend/features/components/shared/stat_chip.dart';
 import 'package:frontend/features/providers/auth/auth_provider.dart';
 import 'package:frontend/features/providers/utils/collection_providers.dart';
-import 'package:frontend/models/collections/collections.dart';
-import 'package:frontend/utils/utils.dart';
-
-class MemberDashboardHeader extends ConsumerWidget {
-  const MemberDashboardHeader({super.key, required this.member, });
-
-  final Member member;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final greeting = 'Welcome, ${member.name.split(' ').first}!';
-    return Container(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(greeting, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white)),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-
-            ],
-          )
-        ],
-      ),
-    );
-  }
-}
-
 
 class CaregiverDashboardHeader extends ConsumerWidget {
   const CaregiverDashboardHeader({super.key});
@@ -104,24 +69,6 @@ class CaregiverDashboardHeader extends ConsumerWidget {
           )
         ],
       ),
-    );
-  }
-}
-
-class EmptyDashboardHeader extends ConsumerWidget {
-  const EmptyDashboardHeader({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentUser = ref.watch(currentUserProvider);
-
-    return AppGradientHeader(
-      leading: HeaderIconButton(
-        icon: Icons.menu,
-        onPressed: () => Scaffold.of(context).openDrawer(),
-      ),
-      subtitle: headerFormat(DateTime.now()),
-      title: 'Welcome, ${currentUser?.name}!',
     );
   }
 }

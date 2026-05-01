@@ -7,10 +7,12 @@ part 'api_providers.g.dart';
 @Riverpod(keepAlive: true)
 String baseUrl(Ref ref) {
   if (Platform.isAndroid) {
+    // Use http://{YOUR_MACHINES_IP}:8000 when running physically
     return 'http://10.0.2.2:8000';
   }
 
   if (Platform.isIOS) {
+    // Use http://{YOUR_MACHINES_IP}:8000 when running physically
     return 'http://127.0.0.1:8000';
   }
 

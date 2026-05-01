@@ -1,5 +1,19 @@
-import 'dart:async';
+import 'dart:developer' as developer;
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:frontend/routes/app_router.dart';
+import 'package:go_router/go_router.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+@pragma('vm:entry-point')
+void _onBackgroundNotificationTap(NotificationResponse response) {
+  developer.log(
+    'Background notification tapped — id: ${response.id}, payload: ${response.payload}',
+    name: 'NotificationService',
+  );
+}
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _plugin =
@@ -7,22 +21,40 @@ class NotificationService {
 
   static bool _initialized = false;
 
-  static final Map<int, Timer> _timers = {};
-
   static Future<void> init() async {
     if (_initialized) return;
 
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
 
+    tz.initializeTimeZones();
+    final TimezoneInfo timeZoneInfo = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(timeZoneInfo.identifier));
+
     await _plugin.initialize(
-      const InitializationSettings(
-          android: androidSettings, iOS: iosSettings),
+      settings: const InitializationSettings(
+        android: androidSettings, iOS: iosSettings),
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        developer.log(
+          'Foreground notification tapped — id: ${response.id}, payload: ${response.payload}',
+          name: 'NotificationService',
+        );
+        final payload = response.payload;
+        if (payload == null) return;
+
+        final params = Uri.splitQueryString(payload);
+        final fmId = params['fmId'];
+        final fmmId = params['fmmId'];
+
+        if (fmId != null && fmmId != null) {
+          rootNavigatorKey.currentContext?.go('/assignment/$fmId/logs/$fmmId');
+        }
+      },
+      onDidReceiveBackgroundNotificationResponse: _onBackgroundNotificationTap,
     );
 
     await _plugin
@@ -47,10 +79,10 @@ class NotificationService {
     String? payload,
   }) async {
     await _plugin.show(
-      id,
-      title,
-      body,
-      const NotificationDetails(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           'med_reminders',
           'Medication Reminders',
@@ -78,13 +110,30 @@ class NotificationService {
     String? payload,
   }) async {
     assert(_initialized, 'Call NotificationService.init() first.');
-
-    _timers[id]?.cancel();
-
-    _timers[id] = Timer(Duration(seconds: seconds), () async {
-      await _show(id: id, title: title, body: body, payload: payload);
-      _timers.remove(id);
-    });
+    await _plugin.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: tz.TZDateTime.now(tz.local).add(Duration(seconds: seconds)),
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'med_reminders',
+          'Medication Reminders',
+          importance: Importance.max,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+          playSound: true,
+          enableVibration: true,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      payload: payload,
+    );
   }
 
   static Future<void> scheduleDaily({
@@ -96,37 +145,46 @@ class NotificationService {
     String? payload,
   }) async {
     assert(_initialized, 'Call NotificationService.init() first.');
-
-    _timers[id]?.cancel();
-
-    final now = DateTime.now();
-    var next = DateTime(now.year, now.month, now.day, hour, minute);
-    if (next.isBefore(now)) {
-      next = next.add(const Duration(days: 1));
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    tz.TZDateTime scheduledDate = tz.TZDateTime(
+      tz.local, now.year, now.month, now.day, hour, minute,
+    );
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
-    final delay = next.difference(now);
-
-    _timers[id] = Timer(delay, () async {
-      await _show(id: id, title: title, body: body, payload: payload);
-      _timers.remove(id);
-      scheduleDaily(
-          id: id, title: title, body: body,
-          hour: hour, minute: minute, payload: payload);
-    });
+    await _plugin.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'med_reminders',
+          'Medication Reminders',
+          importance: Importance.max,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+          playSound: true,
+          enableVibration: true,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,  // this is what makes it repeat daily
+      payload: payload,
+    );
   }
 
   static Future<void> cancelScheduled(int id) async {
-    _timers[id]?.cancel();
-    _timers.remove(id);
-    await _plugin.cancel(id);
+    await _plugin.cancel(id: id);
   }
 
   static Future<void> cancelAll() async {
-    for (final t in _timers.values) {
-      t.cancel();
-    }
-    _timers.clear();
     await _plugin.cancelAll();
   }
 
@@ -149,11 +207,11 @@ class NotificationService {
     required String medicineName,
     required String groupKey,
   }) =>
-      _show(
-        id: notificationId,
-        title: 'Medication Missed ⚠️',
-        body: '$memberName has missed $medicineName!',
-      );
+    _show(
+      id: notificationId,
+      title: 'Medication Missed ⚠️',
+      body: '$memberName has missed $medicineName!',
+    );
 
   static Future<void> notifyScheduleChange({
     required int notificationId,
@@ -187,16 +245,31 @@ class NotificationService {
     String? payload,
   }) async {
     assert(_initialized, 'Call NotificationService.init() first.');
-    final delay = scheduleTime.difference(DateTime.now());
-    if (delay.isNegative) {
-      await _show(id: notificationId, title: title, body: body, payload: payload);
-    } else {
-      _timers[notificationId]?.cancel();
-      _timers[notificationId] = Timer(delay, () async {
-        await _show(id: notificationId, title: title, body: body, payload: payload);
-        _timers.remove(notificationId);
-      });
-    }
+    final tz.TZDateTime scheduledDate = tz.TZDateTime.from(scheduleTime, tz.local);
+    await _plugin.zonedSchedule(
+      id: notificationId,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'med_reminders',
+          'Medication Reminders',
+          importance: Importance.max,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+          playSound: true,
+          enableVibration: true,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      payload: payload,
+    );
   }
 
 

@@ -4,13 +4,29 @@ import { eq } from "drizzle-orm";
 import { Medication, FamilyMemberMedication, MedicationSchedule, MedicationAdherenceLog } from "../db/types";
 
 export const getAllMedications = async (userId: string) => {
-  const meds = await db
-    .select({ medication : medications })
+  const userRole = await db
+    .select({ role: users.role })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  const role = userRole[0]?.role;
+
+  if (role === 'caregiver') {
+    return await db
+      .select({ medication: medications })
+      .from(medications)
+      .innerJoin(users, eq(users.id, medications.createdBy))
+      .where(eq(medications.createdBy, userId));
+  }
+
+  return await db
+    .select({ medication: medications })
     .from(medications)
-    .innerJoin(users, eq(users.id, medications.createdBy))
-    .where(eq(medications.createdBy, userId));
-  return meds
-}
+    .innerJoin(familyMemberMedications, eq(familyMemberMedications.medicationId, medications.id))
+    .innerJoin(familyMemberships, eq(familyMemberships.id, familyMemberMedications.familyMemberId))
+    .where(eq(familyMemberships.userId, userId));
+};
 
 export const createMedication = async (data: Medication) =>
   await db.insert(medications).values(data).returning();
@@ -24,8 +40,14 @@ export const updateMedication = async (id: string, data: Partial<Medication>) =>
 export const deleteMedication = async (id: string) =>
   await db.delete(medications).where(eq(medications.id, id));
 
-export const getFamilyMemberMedications = async (memberId: string) =>
-  await db.select({assignment: familyMemberMedications}).from(familyMemberMedications).where(eq(familyMemberMedications.familyMemberId, memberId));
+export const getFamilyMemberMedications = async (userId: string) => {
+  const result = await db
+    .select({ assignment: familyMemberMedications })
+    .from(familyMemberMedications)
+    .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
+    .where(eq(familyMemberships.userId, userId));
+  return result;
+}
 
 export const getCaregiverFamilyMedications = async (userId: string) => {
   const medications = await db

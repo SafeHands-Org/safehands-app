@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/features/components/shared/avatar_profile.dart';
 import 'package:frontend/features/components/shared/primary_action_button.dart';
 import 'package:frontend/features/components/shared/section_header.dart';
+import 'package:frontend/features/components/shared/state_widget.dart';
 import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/features/ui/family/pages/family_invite.dart';
 import 'package:frontend/models/models.dart';
@@ -65,7 +66,9 @@ class FamilyMembersDetailSection extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        AvatarStack(names: [...members.map((v) => v.name)]),
+                        if (members.isNotEmpty)...[
+                          AvatarStack(names: [...members.map((v) => v.name)]),
+                        ],
                         Text(
                           "${members.length} members",
                           style: TextStyle(
@@ -83,14 +86,13 @@ class FamilyMembersDetailSection extends StatelessWidget {
           ),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 6, 20, 6),
-        children: [
-          Column(
-            children: [
-              if (members.isEmpty) ...[
-                Center(child: Text('No Members yet')),
-              ] else ...[
+      body: members.isEmpty
+      ? EmptyBody(type: 'members', role: UserRole.caregiver)
+      : ListView(
+          padding: const EdgeInsets.fromLTRB(20, 6, 20, 6),
+          children: [
+            Column(
+              children: [
                 SizedBox(height: 12),
                 PrimaryActionButton(
                   onPressed: () => context.go('/assignment/create'),
@@ -121,10 +123,9 @@ class FamilyMembersDetailSection extends StatelessWidget {
                   ),
                 ],
               ],
-            ],
-          )
-        ]
-      ),
+            )
+          ]
+        ),
     );
   }
   Widget _buildList(List<Member> members) {

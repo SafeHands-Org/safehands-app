@@ -1,6 +1,72 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/components/shared/primary_action_button.dart';
 import 'package:frontend/features/components/styles/styles.dart';
+import 'package:frontend/models/enums/enums.dart';
+
+Map<String, (String, String, String?, IconData)> caregiverActions = {
+  'dashboard' : (
+    'No Information to Show.',
+    'View member\'s active medication overview\'s here.',
+    'Create a Family',
+    Icons.people
+  ),
+  'family' : (
+    'No Family to Show',
+    'View your family\'s information here.',
+    'Create a Family',
+    Icons.diversity_1
+  ),
+  'members' : (
+    'No Members to Show',
+    'When people join your family group, they\'ll appear here.',
+    'View Family Invite',
+    Icons.people
+  ),
+  'medications' : (
+    'No Medications to Show',
+    'When a new medication is saved, they\'ll appear here.',
+    'Create a New Medication',
+    Icons.medication
+  ),
+  'assignments' : (
+    'No Medications to Show',
+    'When a medication for this member is assigned, they\'ll appear here.',
+    'Assign a New Medication',
+    Icons.assignment
+  ),
+  'adherences' : (
+    'No Logs to Show',
+    'When an assigned medication has been active, adherence logs will appear here.',
+    null,
+    Icons.folder
+  ),
+};
+
+Map<String, (String, String, String?, IconData)> memberActions = {
+  'dashboard' : (
+    'No Information to Show.',
+    'When taking active medications, they\'ll appear here.',
+    null,
+    Icons.people
+  ),
+  'family' : (
+    'No Family to Show',
+    'View your family\'s information here.',
+    null,
+    Icons.diversity_1
+  ),
+  'assignments' : (
+    'No Medications to Show',
+    'When your caregiver assigns you a medication, they\'ll appear here.',
+    null,
+    Icons.assignment
+  ),
+  'adherences' : (
+    'No Logs to Show',
+    'When this medication has been active, adherence logs will appear here.',
+    null,
+    Icons.folder
+  ),
+};
 
 class ErrorCard extends StatelessWidget {
   const ErrorCard({super.key, required this.message, this.action});
@@ -43,7 +109,9 @@ class ErrorCard extends StatelessWidget {
 }
 
 class ErrorBody extends StatelessWidget {
-  const ErrorBody({super.key});
+  const ErrorBody({super.key, required this.callback});
+
+  final VoidCallback callback;
 
   @override
   Widget build(BuildContext context) {
@@ -53,17 +121,46 @@ class ErrorBody extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-          Icon(
-            Icons.error_outline,
-            color: cs.error,
-            size: 32,
+          SizedBox.square(
+            dimension: 75,
+            child: Icon(
+              Icons.error_outline_rounded,
+              color: cs.outline,
+              size: 75,
+            ),
           ),
-          const SizedBox(height: 8),
           Text(
-            'Something went wrong. Please try again later.',
+            'Request',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: cs.error),
+            style: TextTheme.of(context).headlineMedium?.copyWith(
+              color: cs.outline,
+              height: 1.5,
+            ),
           ),
+          Text(
+            'We couldn\'t load this right now. Please try again.',
+            textAlign: TextAlign.center,
+            style: TextTheme.of(context).bodyLarge?.copyWith(
+              color: cs.outline,
+              fontWeight: FontWeight.w600,
+              height: 1.5,
+            ),
+          ),
+          TextButton.icon(
+            onPressed: callback,
+            icon: Icon(Icons.refresh_rounded, color: cs.onInverseSurface),
+            label: Text(
+              'Retry',
+              style: TextTheme.of(context).bodyLarge?.copyWith(
+                color: cs.onInverseSurface,
+                fontWeight: FontWeight.w600,
+                height: 1.5,
+              ),
+            ),
+            style: ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(cs.primary),
+            ),
+          )
         ],
       ),
     );
@@ -107,33 +204,94 @@ class EmptyCard extends StatelessWidget {
 }
 
 class EmptyBody extends StatelessWidget {
-  const EmptyBody({super.key, this.action, this.callback});
+  const EmptyBody({
+    super.key,
+    required this.type,
+    required this.role,
+    this.redirect,
+    this.refresh
+  });
 
-  final PrimaryActionButton? action;
-  final VoidCallback? callback;
+  final String type;
+  final UserRole role;
+  final VoidCallback? redirect;
+  final VoidCallback? refresh;
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.image,
-            color: cs.outline,
-            size: 32,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Nothing here yet.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: cs.outline, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 24),
-          if (action != null) Padding(padding: EdgeInsetsGeometry.only(left: 50, right: 50), child: action)
-        ],
+    final tt = Theme.of(context).textTheme;
+
+    final (String title, String subtitle, String? label, IconData icon) = switch(role){
+      UserRole.caregiver => caregiverActions[type] as (String, String, String?, IconData),
+      _ => memberActions[type] as (String, String, String?, IconData)
+    };
+
+    return RefreshIndicator(
+      onRefresh: () async => redirect,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    pageIcon(cs, icon),
+                    Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: tt.headlineMedium?.copyWith(
+                        color: cs.outline,
+                        height: 1.5,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      textAlign: TextAlign.center,
+                      style: tt.bodyLarge?.copyWith(
+                        color: cs.outline,
+                        fontWeight: FontWeight.w600,
+                        height: 1.5,
+                      ),
+                    ),
+                    if (redirect != null && label != null) pageButton(cs, tt, label),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
+    );
+  }
+  Widget pageIcon(ColorScheme cs, IconData icon) {
+    return SizedBox.square(
+      dimension: 75,
+      child: Icon(
+        icon,
+        color: cs.outline,
+        size: 75,
+      ),
+    );
+  }
+  Widget pageButton(ColorScheme cs, TextTheme tt, String label){
+    return Padding(
+      padding:EdgeInsets.all(16),
+      child: FilledButton(
+        onPressed: () => redirect,
+        style: ButtonStyle(
+          backgroundColor: WidgetStatePropertyAll(cs.primary),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: tt.titleMedium?.copyWith(color: cs.surface, height: 1.5, fontWeight: FontWeight.w500)
+        ),
+      )
     );
   }
 }

@@ -3,7 +3,7 @@ import 'package:dart_mappable/dart_mappable.dart';
 part 'invitation.mapper.dart';
 
 @MappableClass()
-class Invitation with InvitationMappable{
+class Invitation with InvitationMappable {
   final String id;
   final String familyId;
   final String token;
@@ -15,6 +15,17 @@ class Invitation with InvitationMappable{
     required this.familyId,
     required this.token,
     required this.createdBy,
-    required this.createdAt
+    required this.createdAt,
   });
+
+  factory Invitation.empty() => Invitation(
+    id: '',
+    familyId: '',
+    token: '',
+    createdBy: '',
+    createdAt: DateTime.now(),
+  );
+
+  bool get isEmpty => id.isEmpty && familyId.isEmpty && token.isEmpty;
+  bool get isNotEmpty => !isEmpty;
 }

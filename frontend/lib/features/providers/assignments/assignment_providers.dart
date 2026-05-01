@@ -15,13 +15,9 @@ FamilyMedicationRepositoryRemote assignmentRepository(Ref ref) {
     ref.watch(apiServiceProvider),
     ref.read(medicationUrlProvider),
   );
-
   ref.onDispose(repo.clearCache);
-
   return repo;
 }
-
-
 
 @riverpod
 Stream<void> assignmentChanged(Ref ref) {
@@ -34,15 +30,14 @@ class Assignments extends _$Assignments {
   @override
   Future<MemberAssignments> build() async {
     final repo = ref.read(assignmentRepositoryProvider);
-
     ref.watch(assignmentChangedProvider);
-
     return repo.getFamilyMedications();
   }
 
   Future<void> createFamilyMedication(MemberMedicationRequest data) async {
     try {
       await ref.read(assignmentRepositoryProvider).createFamilyMedication(data);
+      ref.read(assignmentRepositoryProvider).clearCache();
       ref.invalidateSelf();
       await future;
     } catch (error, stackTrace) {
@@ -53,6 +48,7 @@ class Assignments extends _$Assignments {
   Future<void> updateFamilyMedication(String fmmId, MemberMedicationUpdate data) async {
     try {
       await ref.read(assignmentRepositoryProvider).updateFamilyMedication(fmmId, data);
+      ref.read(assignmentRepositoryProvider).clearCache();
       ref.invalidateSelf();
       await future;
     } catch (error, stackTrace) {
@@ -63,6 +59,7 @@ class Assignments extends _$Assignments {
   Future<void> deleteFamilyMedication(String fmId, String fmmId) async {
     try {
       await ref.read(assignmentRepositoryProvider).deleteFamilyMedication(fmId, fmmId);
+      ref.read(assignmentRepositoryProvider).clearCache();
       ref.invalidateSelf();
       await future;
     } catch (error, stackTrace) {

@@ -116,7 +116,7 @@ final class AssignmentsProvider
   Assignments create() => Assignments();
 }
 
-String _$assignmentsHash() => r'8192b564e9802b2acb47cfc66775d7684186e0a3';
+String _$assignmentsHash() => r'9e1be58714b06b794c78ff450d18f241aeb6290f';
 
 abstract class _$Assignments extends $AsyncNotifier<MemberAssignments> {
   FutureOr<MemberAssignments> build();

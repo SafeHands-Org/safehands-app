@@ -67,8 +67,10 @@ class FamilyMembers extends _$FamilyMembers {
     state = const AsyncLoading();
     try {
       await ref.read(familyMemberRepositoryProvider).joinFamily(joinCode);
+      if (!ref.mounted) return;
 
     } catch (error, stackTrace) {
+      if (!ref.mounted) return;
       state = AsyncError(error, stackTrace);
     }
   }

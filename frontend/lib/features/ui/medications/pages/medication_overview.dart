@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/features/components/shared/primary_action_button.dart';
 import 'package:frontend/features/components/shared/section_header.dart';
 import 'package:frontend/features/components/shared/state_widget.dart';
 import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/features/ui/medications/widgets/medication_card.dart';
+import 'package:frontend/models/models.dart';
 import 'package:go_router/go_router.dart';
 
 class MedicationsView extends ConsumerWidget {
@@ -18,18 +18,15 @@ class MedicationsView extends ConsumerWidget {
 
     switch (medicationsAsync) {
       case AsyncLoading(): return MedicationScaffold(child: LoadingBody());
-      case AsyncError(): return MedicationScaffold(child: ErrorBody());
+      case AsyncError(): return MedicationScaffold(child: ErrorBody(callback: () async => ref.refresh(medicationsProvider)));
       case AsyncData(:final value):
         if (value.isEmpty){
           return MedicationScaffold(
-            child: RefreshIndicator(
-              onRefresh: () => ref.refresh(medicationsProvider.future),
-              child: EmptyBody(action: PrimaryActionButton(
-                  onPressed: () => context.push('/medications/create'),
-                  buttonText: 'Create Medication',
-                  buttonIcon: Icon(Icons.add)
-                )
-              )
+            child: EmptyBody(
+              type: 'medications',
+              role: UserRole.caregiver,
+              refresh: () => ref.refresh(medicationsProvider),
+              redirect: () => context.push('/medications/create')
             )
           );
         }
@@ -56,14 +53,14 @@ class MedicationsView extends ConsumerWidget {
                     child: ListView(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                          padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SectionHeader(title: 'All Medications (${value.length})'),
                               Card(
                                 child: Padding(
-                                  padding: EdgeInsets.only(top: 16),
+                                  padding: EdgeInsets.only(top: 16, bottom: 16),
                                   child: MedicationList(medications: value)
                                 )
 

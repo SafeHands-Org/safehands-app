@@ -25,73 +25,48 @@ class CaregiverMedicationCardList extends ConsumerWidget {
     final fid = ref.watch(currentFamilyProvider).value ?? '';
     final membersAsync = ref.watch(aggregateMembershipsProvider(fid));
     final liveMembers = membersAsync.value ?? members;
-
+    final alreadyLogged = liveMembers.expand((v) => v.todaysLogs);
+    final assignments = liveMembers.expand((e) => e.todaysAssignments);
     final now = DateTime.now();
 
     final List<({Assignment assignment, String timeStr, DateTime scheduledDt})>
     allDoses = [];
 
-    for (final m in liveMembers) {
-      for (final a in m.assignments) {
-        if (a.schedule.isEmpty) continue;
+    for (final a in assignments) {
+      final logsForThisAssignment = alreadyLogged.where((log) => log.fmmid == a.schedule.fmmid);
+      for (final timeStr in a.schedule.timesOfDay) {
+        final parts = timeStr.split(':');
+        if (parts.length < 2) continue;
+        final hour = int.tryParse(parts[0]) ?? 0;
+        final minute = int.tryParse(parts[1]) ?? 0;
+        final scheduledDt = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          hour,
+          minute,
+        );
+        final shortTime = timeStr.length >= 5
+            ? timeStr.substring(0, 5)
+            : timeStr;
+        final loggedTimesForThis = logsForThisAssignment.map((v) =>
+            v.scheduledTime.length >= 5 ? v.scheduledTime.substring(0, 5) : v.scheduledTime);
 
-        final daysOfWeek = a.schedule.daysOfWeek;
-        if (daysOfWeek.isNotEmpty) {
-          final todayWeekday = now.weekday; // 1=Mon ... 7=Sun
-          const dayMap = {
-            'monday': 1,
-            'tuesday': 2,
-            'wednesday': 3,
-            'thursday': 4,
-            'friday': 5,
-            'saturday': 6,
-            'sunday': 7,
-          };
-          final scheduledToday = daysOfWeek.any(
-            (d) => dayMap[d.toLowerCase()] == todayWeekday,
-          );
-          if (!scheduledToday) continue;
-        }
+        if (loggedTimesForThis.any((v) => v == shortTime)) continue;
 
-        for (final timeStr in a.schedule.timesOfDay) {
-          final parts = timeStr.split(':');
-          if (parts.length < 2) continue;
-          final hour = int.tryParse(parts[0]) ?? 0;
-          final minute = int.tryParse(parts[1]) ?? 0;
-          final scheduledDt = DateTime(
-            now.year,
-            now.month,
-            now.day,
-            hour,
-            minute,
-          );
-
-          final shortTime = timeStr.length >= 5
-              ? timeStr.substring(0, 5)
-              : timeStr;
-          final alreadyLogged = a.todaysLogs.any((log) {
-            final logTime = log.scheduledTime.length >= 5
-                ? log.scheduledTime.substring(0, 5)
-                : log.scheduledTime;
-            return logTime == shortTime;
-          });
-          if (alreadyLogged) continue;
-
-          allDoses.add((
-            assignment: a,
-            timeStr: shortTime,
-            scheduledDt: scheduledDt,
-          ));
-        }
+        allDoses.add((
+          assignment: a,
+          timeStr: shortTime,
+          scheduledDt: scheduledDt,
+        ));
       }
     }
 
     final missed = allDoses.where((d) => d.scheduledDt.isBefore(now)).toList()
       ..sort((a, b) => a.scheduledDt.compareTo(b.scheduledDt));
 
-    final upcoming =
-        allDoses.where((d) => !d.scheduledDt.isBefore(now)).toList()
-          ..sort((a, b) => a.scheduledDt.compareTo(b.scheduledDt));
+    final upcoming = allDoses.where((d) => !d.scheduledDt.isBefore(now)).toList()
+      ..sort((a, b) => a.scheduledDt.compareTo(b.scheduledDt));
 
     if (missed.isEmpty && upcoming.isEmpty) {
       return Column(
@@ -118,7 +93,7 @@ class CaregiverMedicationCardList extends ConsumerWidget {
           ...missed.map(
             (d) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: _MedicationCard(
+              child: MedicationCardView(
                 key: ValueKey(
                   '${d.assignment.assignment.id}_${d.timeStr}_missed',
                 ),
@@ -138,7 +113,7 @@ class CaregiverMedicationCardList extends ConsumerWidget {
               .map(
                 (d) => Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: _MedicationCard(
+                  child: MedicationCardView(
                     key: ValueKey(
                       '${d.assignment.assignment.id}_${d.timeStr}_upcoming',
                     ),
@@ -164,11 +139,11 @@ class CaregiverMedicationCardList extends ConsumerWidget {
   }
 }
 
-class _MedicationCard extends ConsumerStatefulWidget {
+class MedicationCardView extends ConsumerStatefulWidget {
   final Assignment assignment;
   final String scheduledTimeStr;
   final bool isMissed;
-  const _MedicationCard({
+  const MedicationCardView({
     super.key,
     required this.assignment,
     required this.scheduledTimeStr,
@@ -176,10 +151,10 @@ class _MedicationCard extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<_MedicationCard> createState() => _MedicationCardState();
+  ConsumerState<MedicationCardView> createState() => _MedicationCardState();
 }
 
-class _MedicationCardState extends ConsumerState<_MedicationCard> {
+class _MedicationCardState extends ConsumerState<MedicationCardView> {
   bool _loggingTaken = false;
   bool _loggingSkipped = false;
   String? _loggedStatus;
@@ -445,37 +420,37 @@ class _MedicationCardState extends ConsumerState<_MedicationCard> {
                 ),
                 const SizedBox(width: 8),
                 _loggingSkipped
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : TextButton(
-                        onPressed:
-                            (_loggingTaken ||
-                                _loggingSkipped ||
-                                _loggedStatus != null)
-                            ? null
-                            : _markSkipped,
-                        style: TextButton.styleFrom(
-                          backgroundColor: cs.outlineVariant.withValues(red: 0.9, blue: 0.9, green: 0.9),
-                          foregroundColor: cs.onSurfaceVariant,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
-                          ),
-                        ),
-                        child: const Text(
-                          'Skip',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : TextButton(
+                  onPressed:
+                      (_loggingTaken ||
+                          _loggingSkipped ||
+                          _loggedStatus != null)
+                      ? null
+                      : _markSkipped,
+                  style: TextButton.styleFrom(
+                    backgroundColor: cs.outlineVariant.withValues(red: 0.9, blue: 0.9, green: 0.9),
+                    foregroundColor: cs.onSurfaceVariant,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                  ),
+                  child: const Text(
+                    'Skip',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
               ],
             ),
         ],

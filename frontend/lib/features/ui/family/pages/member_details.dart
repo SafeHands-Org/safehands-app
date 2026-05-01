@@ -14,8 +14,8 @@ class MemberView extends ConsumerWidget {
     final familyAsync = ref.watch(aggregateMemberProvider(fmid));
 
     return switch (familyAsync) {
-      AsyncLoading() => const Scaffold(body: LoadingCard()),
-      AsyncError(:final error) => Scaffold(body: ErrorCard(message: error.toString())),
+      AsyncLoading() => const TemplateStatePage(body: LoadingCard()),
+      AsyncError() => TemplateStatePage(body: ErrorBody(callback: () async => ref.refresh(aggregateMemberProvider(fmid)))),
       AsyncData(:final value) => MemberProfileSection(member: value),
     };
   }
