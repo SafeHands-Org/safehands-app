@@ -39,5 +39,5 @@ class Medication with MedicationMappable {
   bool get isNotEmpty => !isEmpty;
 
   String get displayName => names.isNotEmpty ? names.first : 'Unknown Medication';
-  String get alternateName => names.length > 1 ? names.last : '';
+  String get alternateName => names.length > 1 ? names.last != names.first ? names.last : '' : '';
 }

@@ -9,8 +9,8 @@ class SideDrawer extends ConsumerWidget {
   const SideDrawer({super.key});
 
   static const _menuItems = <({IconData icon, String label, String path})>[
-    (icon: Icons.home_outlined,            label: 'Dashboard',           path: '/'),
-    (icon: Icons.medical_services_outlined,           label: 'Medications',         path: '/medications'),
+    (icon: Icons.home_outlined,             label: 'Dashboard',   path: '/'),
+    (icon: Icons.medical_services_outlined, label: 'Medications', path: '/medications'),
   ];
 
   @override
@@ -166,7 +166,7 @@ class _MenuItem extends StatelessWidget {
       ),
       onTap: () {
         Navigator.pop(context);
-        if (item.path.isNotEmpty) context.go(item.path);
+        if (item.path.isNotEmpty) context.push(item.path);
       },
       hoverColor: cs.primaryContainer,
     );

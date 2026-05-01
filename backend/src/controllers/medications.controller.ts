@@ -5,7 +5,6 @@ import { Medication, FamilyMemberMedication, MedicationSchedule, MedicationAdher
 import { getParam } from "../middleware/auth.middleware";
 
 export const getMedications = async (req: Request, res: Response) => {
-  console.log("GET /medications hit");
   const userId = req.user!.id;
   const meds = await service.getAllMedications(userId);
   res.status(200).json(meds);
@@ -98,9 +97,7 @@ export const getMedicationSchedules = async (req: Request, res: Response) => {
 
 export const createMedicationSchedule = async (req: Request, res: Response) => {
   const data = req.body;
-  console.log(data)
   const result = await service.createMedicationSchedule(data);
-  console.log(result)
   res.status(201).json(result);
 };
 

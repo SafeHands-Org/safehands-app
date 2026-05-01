@@ -21,7 +21,7 @@ class AdherenceView extends ConsumerWidget {
 
     return switch (memberAsync) {
       AsyncLoading() => const Scaffold(body: LoadingCard()),
-      AsyncError(:final error) => Scaffold(body: ErrorCard(message: error.toString())),
+      AsyncError() => TemplateStatePage(body: ErrorBody(callback: () async => ref.refresh(aggregateMemberProvider(fmid)))),
       AsyncData(:final value) => AdherenceLogSection(
         membership: value,
         assigned: value.assignments.firstWhere((v) => v.assignment.id == fmmid)

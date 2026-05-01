@@ -239,7 +239,7 @@ class MemberAccountView extends ConsumerWidget {
                 ),
               ]
             ),
-            AsyncData(value: null) => EmptyBody(),
+            AsyncData(value: null) => EmptyCard(message: 'No Family to Show'),
           }
         )
       )

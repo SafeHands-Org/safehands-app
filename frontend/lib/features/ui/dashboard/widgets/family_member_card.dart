@@ -134,111 +134,45 @@ class _MedicationDetails extends StatelessWidget{
     final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 3),
-      child: Stack(
-        alignment: Alignment.centerLeft,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          LinearProgressIndicator(
-            value: dosesTaken/dosesTotal,
-            minHeight: 25,
-            borderRadius: AppRadius.borderRadiusPill,
-            valueColor: AlwaysStoppedAnimation<Color>(cs.secondary),
-            stopIndicatorColor: Colors.green.shade900,
-            backgroundColor: Colors.grey.shade200,
-          ),
-          Padding(
-            padding: EdgeInsetsGeometry.only(left: 10),
-            child: Text(
-              '$dosesTaken/$dosesTotal',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: dosesTaken / dosesTotal > 0.2 ? cs.onInverseSurface : cs.onSurface
-              ),
+          Text(
+            'Doses Today',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: cs.onSurface,
             ),
-          )
+          ),
+          SizedBox(height: 1.5),
+          Stack(
+            alignment: Alignment.centerLeft,
+            children: [
+              LinearProgressIndicator(
+                value: dosesTaken/dosesTotal,
+                minHeight: 25,
+                borderRadius: AppRadius.borderRadiusSm,
+                valueColor: dosesTaken/dosesTotal != 1
+                  ? AlwaysStoppedAnimation<Color>(cs.secondary)
+                  : AlwaysStoppedAnimation<Color>(Colors.green.shade700),
+                backgroundColor: Colors.grey.shade200,
+              ),
+              Padding(
+                padding: EdgeInsetsGeometry.only(left: 10),
+                child: Text(
+                  dosesTaken/dosesTotal != 1 ? '$dosesTaken/$dosesTotal' : 'All Completed',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: dosesTaken / dosesTotal > 0.1 ? cs.onInverseSurface : cs.onSurface
+                  ),
+                ),
+              )
+            ],
+          ),
         ],
-      ),
+      )
     );
-
-    //return Row(
-    //  children: [
-    //    Expanded(
-    //      child: _StatBox(
-    //        icon: Icons.medication_outlined,
-    //        iconColor: palette.categoryGreen,
-    //        bg: palette.categoryGreenContainer.withValues(alpha: 0.60),
-    //        label: 'Active',
-    //        value: '$activeMeds',
-    //      ),
-    //    ),
-    //    const SizedBox(width: 10),
-    //    Expanded(
-    //      child: _StatBox(
-    //        icon: Icons.calendar_today_outlined,
-    //        iconColor: palette.categoryBlue,
-    //        bg: palette.categoryBlueContainer.withValues(alpha: 0.60),
-    //        label: 'Today',
-    //        value: '$dosesTaken/$dosesTotal',
-    //      ),
-    //    ),
-    //    const SizedBox(width: 10),
-    //    Expanded(
-    //      child: _StatBox(
-    //        icon: Icons.error_outline,
-    //        iconColor: palette.categoryIndigo,
-    //        bg: palette.categoryIndigoContainer.withValues(alpha: 0.60),
-    //        label: 'Next',
-    //        value: nextDose,
-    //      ),
-    //    ),
-    //  ],
-    //);
   }
 }
-
-//class _StatBox extends StatelessWidget {
-//  const _StatBox({
-//    required this.icon,
-//    required this.iconColor,
-//    required this.bg,
-//    required this.label,
-//    required this.value,
-//  });
-
-//  final IconData icon;
-//  final Color iconColor;
-//  final Color bg;
-//  final String label;
-//  final String value;
-
-//  @override
-//  Widget build(BuildContext context) {
-//    final cs = Theme.of(context).colorScheme;
-//    return Container(
-//      width: 70,
-//      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-//      decoration: BoxDecoration(
-//        color: bg,
-//        borderRadius: BorderRadius.circular(8),
-//        border: BoxBorder.all(color: iconColor)
-//      ),
-//      child: Column(
-//        children: [
-//          Icon(icon, color: iconColor, size: 16),
-//          const SizedBox(height: 2),
-//          Text(
-//            label,
-//            style: TextStyle(fontSize: 10, color: cs.onSurfaceVariant),
-//          ),
-//          Text(
-//            value,
-//            style: TextStyle(
-//              fontSize: 12, fontWeight: FontWeight.w600, color: cs.onSurface,
-//            ),
-//          ),
-//        ],
-//      ),
-//    );
-//  }
-//}
 

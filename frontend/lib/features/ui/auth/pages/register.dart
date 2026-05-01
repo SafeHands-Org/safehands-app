@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/features/providers/auth/auth_provider.dart';
 import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/features/ui/auth/widgets/register_email.dart';
 import 'package:frontend/features/ui/auth/widgets/register_invite.dart';
@@ -94,7 +93,7 @@ class _RegistrationViewState extends ConsumerState<RegistrationView> {
       password: _password,
       role: _role,
     );
-
+    if (!mounted) return;
     if (_role == 'family_member') {
       final user = ref.read(authProvider).value;
       if (user == null || !user.isLoggedIn) return;

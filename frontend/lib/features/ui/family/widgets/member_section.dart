@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/components/shared/section_header.dart';
+import 'package:frontend/features/components/shared/state_widget.dart';
 import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/models/models.dart';
-import 'package:frontend/models/medications/family_member_medication.dart';
 import 'package:frontend/services/notification_service.dart';
 import 'package:frontend/utils/utils.dart';
 import 'package:go_router/go_router.dart';
@@ -17,8 +17,12 @@ class MemberProfileSection extends ConsumerWidget {
     final activeAssignments = member.assignments.where((a) => a.assignment.isActive);
     final inactiveAssignments = member.assignments.where((a) => !a.assignment.isActive);
     final currentUser = ref.watch(currentUserProvider);
+
+    bool emptySet = activeAssignments.isEmpty && inactiveAssignments.isEmpty;
+
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
@@ -42,7 +46,14 @@ class MemberProfileSection extends ConsumerWidget {
           ],
         ]
       ),
-      body: SingleChildScrollView(
+      body: emptySet
+      ? EmptyBody(
+        type: 'assignments',
+        role: currentUser!.role!,
+        redirect: () => context.push('/assignment/create'),
+        refresh: () => ref.refresh(aggregateMemberProvider(member.id).future)
+      )
+      : SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -51,32 +62,26 @@ class MemberProfileSection extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SectionHeader(title: 'Member Information'),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          _ContactRow(
-                            icon: Icons.calendar_today_outlined,
-                            iconBg: cs.primaryContainer,
-                            iconColor: cs.primary,
-                            label: 'Member since',
-                            value: member.joinDate,
-                          ),
-                          const SizedBox(height: 12),
-                          _ContactRow(
-                            icon: Icons.warning_amber_outlined,
-                            iconBg: cs.errorContainer,
-                            iconColor: cs.error,
-                            label: 'Risk level',
-                            value: member.riskLevel,
-                          ),
-                        ],
+                  Column(
+                    children: [
+                      _ContactRow(
+                        icon: Icons.calendar_today_outlined,
+                        iconBg: cs.primaryContainer,
+                        iconColor: cs.primary,
+                        label: 'Member Since',
+                        value: member.joinDate,
                       ),
-                    ),
+                      const SizedBox(height: 12),
+                      _ContactRow(
+                        icon: Icons.warning_amber_outlined,
+                        iconBg: cs.errorContainer,
+                        iconColor: cs.error,
+                        label: 'Risk Level',
+                        value: member.riskLevel,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                   if (activeAssignments.isNotEmpty)...[
                     SectionHeader(title: 'Active Medications (${activeAssignments.length})'),
                     ...activeAssignments.map(
@@ -130,28 +135,33 @@ class _ContactRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(8)),
-          child: Icon(icon, color: iconColor, size: 16),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label,
-                style: tt.bodySmall!.copyWith(fontSize: 11, color: cs.outline)
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(8)),
+              child: Icon(icon, color: iconColor, size: 16),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label,
+                    style: tt.bodySmall!.copyWith(fontSize: 11, color: cs.outline, fontWeight: FontWeight.w700)
+                  ),
+                  Text('${value[0].toUpperCase()}${value.substring(1)}',
+                    style: tt.bodyMedium!.copyWith(fontWeight: FontWeight.w500)
+                  ),
+                ],
               ),
-              Text('${value[0].toUpperCase()}${value.substring(1)}',
-                style: tt.bodyMedium!.copyWith(fontWeight: FontWeight.w500)
-              ),
-            ],
-          ),
-        ),
-      ],
+            ),
+          ]
+        )
+      )
     );
   }
 }

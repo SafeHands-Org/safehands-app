@@ -43,7 +43,6 @@ class NotificationTestPage extends StatelessWidget {
               },
               child: const Text("Schedule in 10 seconds"),
             ),
-
           ],
         ),
       ),

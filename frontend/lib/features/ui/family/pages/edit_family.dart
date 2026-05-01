@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/components/shared/form_section.dart';
 import 'package:frontend/features/components/shared/section_header.dart';
 import 'package:frontend/features/components/styles/styles.dart';
-import 'package:frontend/features/providers/family/family_providers.dart';
 import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/features/ui/auth/widgets/form_buttons.dart';
 import 'package:frontend/utils/exceptions.dart';

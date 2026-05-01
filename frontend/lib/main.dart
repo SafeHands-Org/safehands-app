@@ -6,7 +6,7 @@ import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/routes/app_router.dart';
 import 'package:frontend/services/notification_service.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.init();
 

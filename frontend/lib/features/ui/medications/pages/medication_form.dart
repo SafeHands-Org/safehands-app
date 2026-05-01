@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/features/components/shared/form_section.dart';
-import 'package:frontend/features/components/shared/section_header.dart';
 import 'package:frontend/features/components/styles/styles.dart';
 import 'package:frontend/features/providers/providers.dart';
 import 'package:frontend/features/ui/auth/widgets/form_buttons.dart';
@@ -173,99 +172,96 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
         ),
         flexibleSpace: Container(decoration: BoxDecoration(gradient: context.palette.header)),
         title: Text(
-          'Medication Form',
+          'Create a New Medication',
           style: tt.titleMedium?.copyWith(color: cs.onInverseSurface),
           textAlign: TextAlign.center,
         ),
       ),
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-          child: Container(
-            width: double.infinity,
-            height: 700,
-            color: cs.surface,
-            child: Column(
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(12, 24, 12, 24),
+            child:  Column(
               children: [
-                SectionHeader(title: 'Create a new medication'),
-                Card(
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(5, 16, 5, 16),
-                    child: Column(
-                      children: [
-                        FormSection(
-                          title: 'Medication Name',
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  controller: _medicationController,
-                                  decoration: formFieldDecoration(context: context),
-                                  validator: (v) => (v == null || v.trim().isEmpty)
-                                      ? 'Please enter a medication name'
-                                      : null,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              searchAnchor(),
-                            ],
-                          ),
+                FormSection(
+                  title: 'Medication Name',
+                  child: Stack(
+                    alignment: Alignment.centerRight,
+                    children: [
+                      TextFormField(
+                        controller: _medicationController,
+                        decoration: formFieldDecoration(
+                          context: context,
+                        ).copyWith(
+                          contentPadding: const EdgeInsets.fromLTRB(12, 16, 48, 16),
                         ),
-                        FormSection(
-                          title: 'Dose Form',
-                          child: OptionalFormField(
-                            controller: _doseFormController,
-                            hintText: 'Choose or enter a dose form',
-                            options: const [
-                              'Tablet', 'Capsule', 'Injection', 'Cream',
-                              'Ointment', 'Gel', 'Patch', 'Solution',
-                              'Suspension', 'Drops',
-                            ],
-                          ),
-                        ),
-                        FormSection(
-                          title: 'Dose Strength',
-                          child: TextFormField(
-                            controller: _doseStrengthController,
-                            decoration: formFieldDecoration(
-                              context: context,
-                              hintText: 'Enter the dose strength',
-                            ),
-                          ),
-                        ),
-                        FormSection(
-                          title: 'Instructions',
-                          child: TextFormField(
-                            controller: _instructionsController,
-                            maxLines: 4,
-                            decoration: formFieldDecoration(
-                              context: context,
-                              hintText: 'Medication instructions',
-                            ),
-                            validator: (v) => (v == null || v.trim().isEmpty)
-                                ? 'Please enter instructions'
-                                : null,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 16, right: 16),
-                          child: FormButton(
-                            label: 'Confirm',
-                            weight: FontWeight.w500,
-                            radius: AppRadius.borderRadiusXl,
-                            onPressed: () => _createMedication(),
-                          ),
-                        ),
-                      ],
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? 'Please enter a medication name'
+                            : null,
+                      ),
+                      Positioned(
+                        right: 8,
+                        child: searchAnchor(),
+                      ),
+                    ],
+                  ),
+                ),
+                FormSection(
+                  title: 'Dose Form',
+                  child: OptionalFormField(
+                    controller: _doseFormController,
+                    hintText: 'Choose or enter a dose form',
+                    options: const [
+                      'Tablet', 'Capsule', 'Injection', 'Cream',
+                      'Ointment', 'Gel', 'Patch', 'Solution',
+                      'Suspension', 'Drops',
+                    ],
+                  ),
+                ),
+                FormSection(
+                  title: 'Dose Strength',
+                  child: TextFormField(
+                    controller: _doseStrengthController,
+                    decoration: formFieldDecoration(
+                      context: context,
+                      hintText: 'Enter the dose strength',
                     ),
+                  ),
+                ),
+                FormSection(
+                  title: 'Instructions',
+                  child: TextFormField(
+                    controller: _instructionsController,
+                    maxLines: 4,
+                    textInputAction: TextInputAction.done,
+                    onTapOutside: (_) => FocusScope.of(context).unfocus(),
+                    onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
+                    decoration: formFieldDecoration(
+                      context: context,
+                      hintText: 'Medication instructions',
+                    ),
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Please enter instructions'
+                        : null,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: FormButton(
+                    label: 'Confirm',
+                    weight: FontWeight.w500,
+                    radius: AppRadius.borderRadiusXl,
+                    onPressed: () => _createMedication(),
                   ),
                 ),
               ],
             ),
           ),
         ),
-      ),
+      )
     );
   }
 
@@ -275,14 +271,13 @@ class _MedicationFormViewState extends ConsumerState<MedicationFormView> {
       builder: (BuildContext context, SearchController controller) {
         final cs = Theme.of(context).colorScheme;
         return SizedBox(
-          width: 49,
+          width: 30,
           child: IconButton(
             onPressed: controller.openView,
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minHeight: 49),
+            constraints: const BoxConstraints(minHeight: 30),
             icon: const Icon(Icons.search, size: 28),
             style: IconButton.styleFrom(
-              backgroundColor: cs.outlineVariant,
               foregroundColor: cs.outline,
               shape: RoundedRectangleBorder(
                 borderRadius: AppRadius.borderRadiusXl,

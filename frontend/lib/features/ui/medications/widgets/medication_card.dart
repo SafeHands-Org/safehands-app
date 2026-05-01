@@ -15,9 +15,9 @@ class MedicationList extends ConsumerWidget {
     final medicationList = medications.values.toList();
     return Column(
       children: [
-        for (final med in medicationList) ...[
+        for (final (index, med) in medicationList.indexed) ...[
           MedicationCard(med: med),
-          const Divider(),
+          if (index != medicationList.length - 1) const Divider(),
         ]
       ],
     );
@@ -35,6 +35,7 @@ class MedicationCard extends StatelessWidget {
     final tt = Theme.of(context).textTheme;
 
     return ListTile(
+      minTileHeight: 72,
       shape: RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusCard),
       leading: medicationAvatar(cs, med.doseForm),
       title: Text(

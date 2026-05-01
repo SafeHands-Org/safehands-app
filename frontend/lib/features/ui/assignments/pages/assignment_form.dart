@@ -114,16 +114,16 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
 
     try {
       final assignment = await ref
-          .read(assignmentRepositoryProvider)
-          .createFamilyMedicationAndReturn(
-            MemberMedicationRequest(
-              medicationId: _selectedMedicationId!,
-              familyMemberId: _selectedMemberId!,
-              priority: _selectedPriority!.toLowerCase(),
-              quantity: int.parse(_quantityCtrl.text.trim()),
-              active: _active == 'Yes',
-            ),
-          );
+        .read(assignmentRepositoryProvider)
+        .createFamilyMedicationAndReturn(
+          MemberMedicationRequest(
+            medicationId: _selectedMedicationId!,
+            familyMemberId: _selectedMemberId!,
+            priority: _selectedPriority!.toLowerCase(),
+            quantity: int.parse(_quantityCtrl.text.trim()),
+            active: _active == 'Yes',
+          ),
+        );
 
       final timeStrings = _times.map(_formatTime).toList();
       await ref.read(scheduleRepositoryProvider).createSchedule(
@@ -162,7 +162,6 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Assignment & schedule created'),
-          backgroundColor: Color(0xFF17821E),
         ),
       );
       context.canPop() ? context.pop() : context.go('/family');
@@ -223,14 +222,12 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                         SectionHeader(title: 'Assignment Details'),
                         Card(
                           child: Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(5, 16, 5, 16),
+                            padding: const EdgeInsets.fromLTRB(5, 16, 5, 16),
                             child: Column(
                               children: [
                                 medicationsAsync.when(
                                   data: (medications) {
-                                    final entries =
-                                        medications.entries.toList();
+                                    final entries = medications.entries.toList();
                                     return FormSection(
                                       title: 'Medication',
                                       child: Column(children: [
@@ -238,31 +235,21 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                                         DropdownButtonFormField<String>(
                                           isExpanded: true,
                                           initialValue: _selectedMedicationId,
-                                          hint: const Text(
-                                              'Select a medication'),
-                                          decoration:
-                                              _dropdownDecoration(context),
+                                          hint: const Text('Select a medication'),
+                                          decoration: _dropdownDecoration(context),
                                           validator: (v) => v == null
                                               ? 'Please select a medication'
                                               : null,
                                           onChanged: (v) => setState(() {
                                             _selectedMedicationId = v;
-                                            _selectedMedicationName =
-                                                medications[v]
-                                                    ?.names
-                                                    .firstOrNull;
+                                            _selectedMedicationName = medications[v]?.names.firstOrNull;
                                           }),
                                           items: entries.map((e) {
                                             final Medication med = e.value;
-                                            final label =
-                                                med.names.isNotEmpty
-                                                    ? med.names.first
-                                                    : e.key;
+                                            final label = med.names.isNotEmpty ? med.names.first : e.key;
                                             return DropdownMenuItem<String>(
                                               value: e.key,
-                                              child: Text(label,
-                                                  overflow: TextOverflow
-                                                      .ellipsis),
+                                              child: Text(label, overflow: TextOverflow.ellipsis),
                                             );
                                           }).toList(),
                                         ),
@@ -274,13 +261,11 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                                       child: LinearProgressIndicator()),
                                   error: (_, _) => const FormSection(
                                       title: 'Medication',
-                                      child:
-                                          Text('Failed to load medications')),
+                                      child: Text('Failed to load medications')),
                                 ),
                                 membersAsync.when(
                                   data: (members) {
-                                    final entries =
-                                        members.entries.toList();
+                                    final entries = members.entries.toList();
                                     return FormSection(
                                       title: 'Family Member',
                                       child: Column(children: [
@@ -297,17 +282,13 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                                               : null,
                                           onChanged: (v) => setState(() {
                                             _selectedMemberId = v;
-                                            _selectedMemberName =
-                                                members[v]?.name;
+                                            _selectedMemberName = members[v]?.name;
                                           }),
                                           items: entries.map((e) {
-                                            final FamilyMember member =
-                                                e.value;
+                                            final FamilyMember member = e.value;
                                             return DropdownMenuItem<String>(
                                               value: e.key,
-                                              child: Text(member.name,
-                                                  overflow: TextOverflow
-                                                      .ellipsis),
+                                              child: Text(member.name, overflow: TextOverflow.ellipsis),
                                             );
                                           }).toList(),
                                         ),
@@ -319,8 +300,7 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                                       child: LinearProgressIndicator()),
                                   error: (_, _) => const FormSection(
                                       title: 'Family Member',
-                                      child: Text(
-                                          'Failed to load family members')),
+                                      child: Text('Failed to load family members')),
                                 ),
                                 FormSection(
                                   title: 'Priority',
@@ -374,8 +354,7 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                         SectionHeader(title: 'Dose Schedule'),
                         Card(
                           child: Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -392,21 +371,18 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                                         .asMap()
                                         .entries
                                         .map((e) => Chip(
-                                              label: Text(_displayTime(
-                                                  e.value)),
+                                              label: Text(_displayTime(e.value)),
                                               deleteIcon: const Icon(
                                                   Icons.close,
                                                   size: 16),
                                               onDeleted: () => setState(
-                                                  () => _times
-                                                      .removeAt(e.key)),
+                                                  () => _times.removeAt(e.key)),
                                               backgroundColor: cs
                                                   .primaryContainer
                                                   .withValues(alpha: 0.5),
                                               labelStyle: TextStyle(
                                                   color: cs.primary,
-                                                  fontWeight:
-                                                      FontWeight.w500),
+                                                  fontWeight: FontWeight.w500),
                                             ))
                                         .toList(),
                                   ),
@@ -419,11 +395,8 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                                       ? 'Add dose time'
                                       : 'Add another time'),
                                   style: OutlinedButton.styleFrom(
-                                    minimumSize:
-                                        const Size(double.infinity, 48),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            AppRadius.borderRadiusXl),
+                                    minimumSize: const Size(double.infinity, 48),
+                                    shape: RoundedRectangleBorder(borderRadius: AppRadius.borderRadiusXl),
                                   ),
                                 ),
 
@@ -435,32 +408,23 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                                         fontWeight: FontWeight.w600)),
                                 const SizedBox(height: 8),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: List.generate(7, (i) {
                                     final day = _allDays[i];
                                     final selected =
                                         _selectedDays.contains(day);
                                     return GestureDetector(
                                       onTap: () => setState(() {
-                                        selected
-                                            ? _selectedDays.remove(day)
-                                            : _selectedDays.add(day);
+                                        selected ? _selectedDays.remove(day) : _selectedDays.add(day);
                                       }),
                                       child: AnimatedContainer(
-                                        duration:
-                                            const Duration(milliseconds: 150),
+                                        duration: const Duration(milliseconds: 150),
                                         width: 36,
                                         height: 36,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: selected
-                                              ? cs.primary
-                                              : cs.surfaceContainerHighest,
-                                          border: Border.all(
-                                              color: selected
-                                                  ? cs.primary
-                                                  : cs.outlineVariant),
+                                          color: selected ? cs.primary : cs.surfaceContainerHighest,
+                                          border: Border.all(color: selected ? cs.primary : cs.outlineVariant),
                                         ),
                                         child: Center(
                                           child: Text(
@@ -468,9 +432,7 @@ class _AssignmentFormViewState extends ConsumerState<AssignmentFormView> {
                                             style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w600,
-                                              color: selected
-                                                  ? cs.onPrimary
-                                                  : cs.onSurfaceVariant,
+                                              color: selected ? cs.onPrimary : cs.onSurfaceVariant,
                                             ),
                                           ),
                                         ),

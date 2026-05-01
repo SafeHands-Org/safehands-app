@@ -41,13 +41,11 @@ export const deleteMedication = async (id: string) =>
   await db.delete(medications).where(eq(medications.id, id));
 
 export const getFamilyMemberMedications = async (userId: string) => {
-  console.log('getFamilyMemberMedications called with userId:', userId);
   const result = await db
     .select({ assignment: familyMemberMedications })
     .from(familyMemberMedications)
     .innerJoin(familyMemberships, eq(familyMemberMedications.familyMemberId, familyMemberships.id))
     .where(eq(familyMemberships.userId, userId));
-  console.log('getFamilyMemberMedications result:', JSON.stringify(result, null, 2));
   return result;
 }
 
